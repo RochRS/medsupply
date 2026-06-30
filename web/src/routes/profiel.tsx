@@ -1,9 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/profiel')({
+import "../css/index.css";
+import { Footer } from "../components/footer";
+
+export const Route = createFileRoute("/profiel")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/profiel"!</div>
+  return (
+    <div>
+      <div></div>
+      <Footer />
+    </div>
+  );
 }

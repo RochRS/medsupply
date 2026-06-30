@@ -1,9 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import { Footer } from "../components/footer";
 
-export const Route = createFileRoute('/geschiedenis')({
+import "../css/index.css";
+
+export const Route = createFileRoute("/geschiedenis")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/geschiedenis"!</div>
+  return (
+    <div>
+      <div></div>
+      <Footer />
+    </div>
+  );
 }

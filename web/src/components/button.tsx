@@ -1,13 +1,17 @@
 type EnterButtonProps = {
   buttonName: string;
-  //   isDisabled: boolean;
-  //   onClick: () => void;
+  isDisabled: boolean;
+  onClick: () => void;
 };
 
 export function EnterButton({
   buttonName,
-  //   isDisabled,
-  //   onClick,
+  isDisabled,
+  onClick,
 }: EnterButtonProps) {
-  return <button>{buttonName}</button>;
+  return (
+    <button onClick={onClick} disabled={isDisabled}>
+      {buttonName}
+    </button>
+  );
 }
