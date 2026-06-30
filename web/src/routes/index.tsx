@@ -1,15 +1,49 @@
+//Libs
 import { createFileRoute } from "@tanstack/react-router";
+import { EnterButton } from "../components/button.tsx";
+import { FormInput } from "../components/form.tsx";
 
+// ------------------------------------------
+//Styling
+import "../css/index.css";
+
+// ------------------------------------------
+//Route
 export const Route = createFileRoute("/")({
-  component: HomeComponent, // 👈 Pass it by name here
+  component: Index,
 });
 
-// 👈 Define your component outside.
-// Fast Refresh can now see exactly what it needs to watch!
-function HomeComponent() {
+// ------------------------------------------
+//Types
+
+// ------------------------------------------
+//Local Components
+function HospitalIcon() {
+  return <div>Profile Picture</div>;
+}
+
+function Index() {
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <h1 className="text-2xl font-bold">Welcome Home!</h1>
+    <div className="fixed inset-0 grid place-items-center">
+      <div>
+        <div>
+          <HospitalIcon />
+        </div>
+
+        <div>
+          <FormInput
+            label="Form Input"
+            type="text"
+            placeholder="John Doe"
+            value="userInput"
+            // onChange={}
+          />
+        </div>
+
+        <div>
+          <EnterButton buttonName="Hello" />
+        </div>
+      </div>
     </div>
   );
 }

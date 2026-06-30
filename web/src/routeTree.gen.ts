@@ -9,12 +9,48 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as TotaleVoorraadRouteImport } from './routes/totale-voorraad'
+import { Route as StatistiekenRouteImport } from './routes/statistieken'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProfielRouteImport } from './routes/profiel'
+import { Route as GeschiedenisRouteImport } from './routes/geschiedenis'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AanvraagRouteImport } from './routes/aanvraag'
 import { Route as IndexRouteImport } from './routes/index'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const TotaleVoorraadRoute = TotaleVoorraadRouteImport.update({
+  id: '/totale-voorraad',
+  path: '/totale-voorraad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatistiekenRoute = StatistiekenRouteImport.update({
+  id: '/statistieken',
+  path: '/statistieken',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfielRoute = ProfielRouteImport.update({
+  id: '/profiel',
+  path: '/profiel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeschiedenisRoute = GeschiedenisRouteImport.update({
+  id: '/geschiedenis',
+  path: '/geschiedenis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AanvraagRoute = AanvraagRouteImport.update({
+  id: '/aanvraag',
+  path: '/aanvraag',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,37 +61,128 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/aanvraag': typeof AanvraagRoute
+  '/dashboard': typeof DashboardRoute
+  '/geschiedenis': typeof GeschiedenisRoute
+  '/profiel': typeof ProfielRoute
+  '/settings': typeof SettingsRoute
+  '/statistieken': typeof StatistiekenRoute
+  '/totale-voorraad': typeof TotaleVoorraadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/aanvraag': typeof AanvraagRoute
+  '/dashboard': typeof DashboardRoute
+  '/geschiedenis': typeof GeschiedenisRoute
+  '/profiel': typeof ProfielRoute
+  '/settings': typeof SettingsRoute
+  '/statistieken': typeof StatistiekenRoute
+  '/totale-voorraad': typeof TotaleVoorraadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/aanvraag': typeof AanvraagRoute
+  '/dashboard': typeof DashboardRoute
+  '/geschiedenis': typeof GeschiedenisRoute
+  '/profiel': typeof ProfielRoute
+  '/settings': typeof SettingsRoute
+  '/statistieken': typeof StatistiekenRoute
+  '/totale-voorraad': typeof TotaleVoorraadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/'
+    | '/aanvraag'
+    | '/dashboard'
+    | '/geschiedenis'
+    | '/profiel'
+    | '/settings'
+    | '/statistieken'
+    | '/totale-voorraad'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to:
+    | '/'
+    | '/aanvraag'
+    | '/dashboard'
+    | '/geschiedenis'
+    | '/profiel'
+    | '/settings'
+    | '/statistieken'
+    | '/totale-voorraad'
+  id:
+    | '__root__'
+    | '/'
+    | '/aanvraag'
+    | '/dashboard'
+    | '/geschiedenis'
+    | '/profiel'
+    | '/settings'
+    | '/statistieken'
+    | '/totale-voorraad'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  AanvraagRoute: typeof AanvraagRoute
+  DashboardRoute: typeof DashboardRoute
+  GeschiedenisRoute: typeof GeschiedenisRoute
+  ProfielRoute: typeof ProfielRoute
+  SettingsRoute: typeof SettingsRoute
+  StatistiekenRoute: typeof StatistiekenRoute
+  TotaleVoorraadRoute: typeof TotaleVoorraadRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/totale-voorraad': {
+      id: '/totale-voorraad'
+      path: '/totale-voorraad'
+      fullPath: '/totale-voorraad'
+      preLoaderRoute: typeof TotaleVoorraadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/statistieken': {
+      id: '/statistieken'
+      path: '/statistieken'
+      fullPath: '/statistieken'
+      preLoaderRoute: typeof StatistiekenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profiel': {
+      id: '/profiel'
+      path: '/profiel'
+      fullPath: '/profiel'
+      preLoaderRoute: typeof ProfielRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/geschiedenis': {
+      id: '/geschiedenis'
+      path: '/geschiedenis'
+      fullPath: '/geschiedenis'
+      preLoaderRoute: typeof GeschiedenisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aanvraag': {
+      id: '/aanvraag'
+      path: '/aanvraag'
+      fullPath: '/aanvraag'
+      preLoaderRoute: typeof AanvraagRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,7 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  AanvraagRoute: AanvraagRoute,
+  DashboardRoute: DashboardRoute,
+  GeschiedenisRoute: GeschiedenisRoute,
+  ProfielRoute: ProfielRoute,
+  SettingsRoute: SettingsRoute,
+  StatistiekenRoute: StatistiekenRoute,
+  TotaleVoorraadRoute: TotaleVoorraadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
