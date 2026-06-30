@@ -21,5 +21,11 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../examples/routes", "../examples/hooks", "index.tsx"]
+  "include": [
+    "src",
+    "../examples/routes",
+    "../examples/hooks",
+    "index.tsx",
+    "src/routes/settings.tsx"
+  ]
 }
