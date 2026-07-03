@@ -33,7 +33,7 @@ function UserInputFields() {
   );
 }
 
-function SendLoginRequest() {
+function SubmitLoginRequestButton() {
   const sendMessage = () => {
     console.log("Hellow");
   };
@@ -54,15 +54,20 @@ function Index() {
           <div className="text-red-900">
             <HospitalIcon />
           </div>
+
           <div>
             <UserInputFields />
           </div>
+
           <div className="text-blue-600 ">
-            <SendLoginRequest />
+            <SubmitLoginRequestButton />
           </div>
         </div>
       </div>
-      <Footer />
+
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }

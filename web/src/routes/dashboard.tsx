@@ -41,7 +41,10 @@ function RouteComponent() {
           <KritikeMeldingen />
         </div>
       </div>
-      <Footer />
+
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }
