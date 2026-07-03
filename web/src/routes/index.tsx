@@ -1,21 +1,18 @@
-//Libs
 import { createFileRoute } from "@tanstack/react-router";
+
 import { EnterButton } from "../components/button.tsx";
 import { FormInput } from "../components/form.tsx";
+import { Footer } from "../components/footer.tsx";
 
 // ------------------------------------------
 //Styling
 import "../css/index.css";
-import { Footer } from "../components/footer.tsx";
 
 // ------------------------------------------
 //Route
 export const Route = createFileRoute("/")({
   component: Index,
 });
-
-// ------------------------------------------
-//Types
 
 //#########################################################################
 //Local Components

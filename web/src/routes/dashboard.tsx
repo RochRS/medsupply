@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
-import "../css/index.css";
+import "../css/dashboard.css";
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,

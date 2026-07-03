@@ -7,8 +7,9 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 //styiling
-import "../css/index.css";
+import "../css/navigation-bar.css";
 
+//Navigation bar
 const RootLayout = () => {
   const location = useLocation();
   const hideNavbar = location.pathname === "/";

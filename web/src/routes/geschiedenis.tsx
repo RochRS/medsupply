@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
-import "../css/index.css";
+import "../css/geschiedenis.css";
 
 export const Route = createFileRoute("/geschiedenis")({
   component: RouteComponent,
