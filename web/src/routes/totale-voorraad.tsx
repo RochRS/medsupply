@@ -30,6 +30,11 @@ function RouteComponent() {
   return (
     <div>
       <div>
+        <div className="text-center">
+          <h1>Totale Voorraad</h1>
+          <p>Overzicht van de totale voorraad in het magazijn.</p>
+        </div>
+
         <div>
           <TotaleVoorraadOverzichtStats />
         </div>

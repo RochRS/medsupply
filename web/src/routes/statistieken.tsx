@@ -49,7 +49,7 @@ function GemiddeldOpslagTijdPerItem() {
 function RouteComponent() {
   return (
     <div>
-      <div>
+      <div className="text-center">
         <div>
           <h1>Analyse & Statistieken</h1>
           <p>

@@ -29,6 +29,10 @@ function RouteComponent() {
   return (
     <div>
       <div>
+        <div className="text-center">
+          <h1>Dashboard</h1>
+        </div>
+
         <div>
           <SpoedAanvraag />
         </div>

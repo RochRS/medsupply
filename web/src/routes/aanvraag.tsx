@@ -33,6 +33,11 @@ function RouteComponent() {
   return (
     <div>
       <div>
+        <div className="text-center">
+          <h1>Aanvraag</h1>
+          <p>Voor Reguliere Voorraadaanvragen (Zonder Spoed)</p>
+        </div>
+
         <div>
           <NormaleAanvraagSelectors />
         </div>

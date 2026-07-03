@@ -21,7 +21,23 @@ export const Route = createFileRoute("/")({
 //Local Components
 //#########################################################################
 function HospitalIcon() {
-  return <div>Profile Picture</div>;
+  return (
+    <div>
+      <div>
+        <image
+        // src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Hospital_icon.svg/1200px-Hospital_icon.svg.png"
+        // alt="Hospital Icon"
+        // width="100"
+        // height="100"
+        />
+      </div>
+
+      <div>
+        <h1>MedSupply</h1>
+        <p>Voorraadbeheer Systeem voor Medische Supplies</p>
+      </div>
+    </div>
+  );
 }
 
 function UserInputFields() {
