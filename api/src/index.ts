@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 
 // Import route modules
+import { auth } from "./routes/auth.js";
 import { dashboard } from "./routes/dashboard.js";
 import { aanvraag } from "./routes/aanvraag.js";
 import { profiel } from "./routes/profiel.js";
@@ -18,6 +19,8 @@ app.get("/", (c) =>
   c.json({
     message: "Welcome to the Med Supply API",
     routes: [
+      "/auth/login: Log in",
+      "/auth/logout: Log out",
       "/dashboard: Get dashboard data",
       "/aanvraag: Create a new request",
       "/totale-aanvraag: Get total requests",
@@ -31,6 +34,7 @@ app.get("/", (c) =>
 );
 
 //API ROUTES
+app.route("/auth", auth);
 app.route("/dashboard", dashboard);
 app.route("/aanvraag", aanvraag);
 app.route("/totale-aanvraag", totaleAanvraag);

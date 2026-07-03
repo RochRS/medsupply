@@ -7,9 +7,8 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 //styiling
-import "../css/navigation-bar.css";
+import "../css/__root.css";
 
-//Navigation bar
 const RootLayout = () => {
   const location = useLocation();
   const hideNavbar = location.pathname === "/";
@@ -29,6 +28,7 @@ const RootLayout = () => {
             <div className="flex gap-10">
               <Link to="/profiel">Profiel</Link>{" "}
               <Link to="/settings">Settings</Link>
+              <button>Log Out</button>
             </div>
           </div>
           <hr />
