@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import "dotenv/config";
 import { testDbConnection } from "./database/database.js";
 import { dizzleCheck } from "./database/database.js";
+import { db } from "./database/database.js";
 
 // Import route modules
 import { auth } from "./routes/auth.js";
