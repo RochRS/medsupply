@@ -2,5 +2,7 @@
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:3000", // Points to wherever your Hono API runs
+  baseURL: import.meta.env.BETTER_AUTH_URL || "http://localhost:3000",
 });
+
+export const { signIn, signUp, signOut, useSession } = authClient;

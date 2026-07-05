@@ -1,14 +1,9 @@
-// import { betterAuth } from "better-auth";
-// import { db } from "../database/database.js"; // your drizzle instance
+import { createAuthClient } from "better-auth/react";
 
-// export const auth = betterAuth({
-//   database: drizzleAdapter(db, {
-//     provider: "pg", // postgres
-//   }),
-//   // emailAndPassword: {
-//   //   enabled: true,
-//   // },
-//   trustedOrigins: [process.env.CLIENT_URL || "http://localhost:5173"],
-//   secret: process.env.BETTER_AUTH_SECRET,
-//   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
-// });
+export const authClient = createAuthClient({
+  // Point directly to your Hono backend domain
+  baseURL: "http://localhost:3000",
+});
+
+// Destructure the hooks you'll use everywhere
+export const { signIn, signUp, signOut, useSession } = authClient;
