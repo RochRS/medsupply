@@ -1,6 +1,9 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 
+import "dotenv/config";
+import { testDbConnection } from "./database/database.js";
+
 // Import route modules
 import { auth } from "./routes/auth.js";
 import { dashboard } from "./routes/dashboard.js";
@@ -44,12 +47,17 @@ app.route("/settings", settings);
 app.route("/profiel", profiel);
 
 //Start and listen to server
-serve(
-  {
-    fetch: app.fetch,
-    port: 3000,
-  },
-  (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
-  },
-);
+const startServer = async () => {
+  await testDbConnection();
+  serve(
+    {
+      fetch: app.fetch,
+      port: Number(process.env.PORT || 3000),
+    },
+    (info) => {
+      console.log(`\nServer is running on http://localhost:${info.port}`);
+    },
+  );
+};
+
+startServer();
