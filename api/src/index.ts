@@ -1,10 +1,11 @@
+import "dotenv/config";
+
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 
-import "dotenv/config";
+// Import database connection and test functions
 import { testDbConnection } from "./database/database.js";
 import { dizzleCheck } from "./database/database.js";
-import { db } from "./database/database.js";
 
 // Import route modules
 import { auth } from "./routes/auth.js";
@@ -37,6 +38,8 @@ app.get("/", (c) =>
     version: "1.0.0",
   }),
 );
+
+//Better Auth routec
 
 //API ROUTES
 app.route("/auth", auth);
