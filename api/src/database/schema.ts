@@ -1,8 +1,12 @@
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { pgTable, integer, varchar, primaryKey, unique } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
 
-export const userTest = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  age: integer().notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
-});
+
+
+export const users = pgTable("users", {
+	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+	name: varchar({ length: 255 }).notNull(),
+	age: integer().notNull(),
+	email: varchar({ length: 255 }).notNull(),
+}, (table) => [
+	unique("users_email_unique").on(table.email),]);

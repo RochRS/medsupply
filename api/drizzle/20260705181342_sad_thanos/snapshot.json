@@ -1,10 +1,10 @@
 {
-  "version": "8",
   "dialect": "postgres",
-  "id": "46d789fb-52ca-47ef-bc68-74bfd604086b",
+  "id": "742fad3a-9c47-40a7-b46a-e4dfb959d805",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
+  "version": "8",
   "ddl": [
     {
       "isRlsEnabled": false,
@@ -23,11 +23,11 @@
         "type": "always",
         "name": "users_id_seq",
         "increment": "1",
-        "startWith": "1",
         "minValue": "1",
         "maxValue": "2147483647",
-        "cache": 1,
-        "cycle": false
+        "startWith": "1",
+        "cycle": false,
+        "cache": 1
       },
       "name": "id",
       "entityType": "columns",
@@ -77,22 +77,22 @@
       "columns": [
         "id"
       ],
-      "nameExplicit": false,
+      "nameExplicit": true,
       "name": "users_pkey",
+      "entityType": "pks",
       "schema": "public",
-      "table": "users",
-      "entityType": "pks"
+      "table": "users"
     },
     {
-      "nameExplicit": false,
+      "nameExplicit": true,
       "columns": [
         "email"
       ],
       "nullsNotDistinct": false,
-      "name": "users_email_key",
+      "name": "users_email_unique",
+      "entityType": "uniques",
       "schema": "public",
-      "table": "users",
-      "entityType": "uniques"
+      "table": "users"
     }
   ],
   "renames": []
