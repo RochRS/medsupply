@@ -3,6 +3,7 @@ import { Hono } from "hono";
 
 import "dotenv/config";
 import { testDbConnection } from "./database/database.js";
+import { dizzleCheck } from "./database/database.js";
 
 // Import route modules
 import { auth } from "./routes/auth.js";
@@ -49,6 +50,8 @@ app.route("/profiel", profiel);
 //Start and listen to server
 const startServer = async () => {
   await testDbConnection();
+  await dizzleCheck();
+
   serve(
     {
       fetch: app.fetch,
