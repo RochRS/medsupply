@@ -1,25 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
+import {
+  ProfielInformation,
+  ProfielPageButtons,
+} from "../module/profiel-module.tsx";
+
 import "../css/profiel.css";
 
 export const Route = createFileRoute("/profiel")({
   component: RouteComponent,
 });
-//#########################################################################
-//Local Components
-//#########################################################################
-function ProfielInformation() {
-  return <div></div>;
-}
-
-function ProfielPageButtons() {
-  return <div></div>;
-}
-
-//#########################################################################
-//Page
-//#########################################################################
 
 function RouteComponent() {
   return (

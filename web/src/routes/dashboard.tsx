@@ -1,30 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
+import {
+  SpoedAanvraag,
+  KritiekeVoorraadOverzicht,
+  KritikeMeldingen,
+} from "../module/dashboard-module.tsx";
+
 import "../css/dashboard.css";
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
 });
 
-//#########################################################################
-//Local Components
-//#########################################################################
-function SpoedAanvraag() {
-  return <div></div>;
-}
-
-function KritiekeVoorraadOverzicht() {
-  return <div></div>;
-}
-
-function KritikeMeldingen() {
-  return <div></div>;
-}
-
-//#########################################################################
-//Page
-//#########################################################################
 function RouteComponent() {
   return (
     <div>

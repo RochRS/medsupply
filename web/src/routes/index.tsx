@@ -1,64 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-
-import { EnterButton } from "../components/button.tsx";
-import { FormInput } from "../components/form.tsx";
 import { Footer } from "../components/footer.tsx";
 
-// ------------------------------------------
-//Styling
+import {
+  HospitalIcon,
+  UserInputFields,
+  SubmitLoginRequestButton,
+} from "../module/index-module.tsx";
+
 import "../css/index.css";
 
-// ------------------------------------------
-//Route
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-//#########################################################################
-//Local Components
-//#########################################################################
-function HospitalIcon() {
-  return (
-    <div>
-      <div>
-        <image
-        // src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Hospital_icon.svg/1200px-Hospital_icon.svg.png"
-        // alt="Hospital Icon"
-        // width="100"
-        // height="100"
-        />
-      </div>
-
-      <div>
-        <h1>MedSupply</h1>
-        <p>Voorraadbeheer Systeem voor Medische Supplies</p>
-      </div>
-    </div>
-  );
-}
-
-function UserInputFields() {
-  return (
-    <div>
-      <FormInput label="Test" type="text" placeholder="test" value="a" />
-      <FormInput label="Test" type="text" placeholder="test" value="a" />
-    </div>
-  );
-}
-
-function SubmitLoginRequestButton() {
-  const sendMessage = () => {
-    console.log("Hellow");
-  };
-
-  return (
-    <EnterButton buttonName="Login" onClick={sendMessage} isDisabled={false} />
-  );
-}
-
-//#########################################################################
-//Page
-//#########################################################################
 function Index() {
   return (
     <div>

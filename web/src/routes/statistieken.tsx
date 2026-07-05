@@ -1,50 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
+import {
+  BelangrijkeStatistieken,
+  VoorraadStatusVerdeling,
+  CategorieVerdeling,
+  HuidigeVoorraadNiveauPerItem,
+  DagelijksVerbruikPerItem,
+  MaandelijkseVerbruikPerItem,
+  JaarlijkseVerbruikPerItem,
+  GemiddeldOpslagTijdPerItem,
+} from "../module/statistieken-module.tsx";
+
 import "../css/statistieken.css";
 
 export const Route = createFileRoute("/statistieken")({
   component: RouteComponent,
 });
-//#########################################################################
-//Local Components
-//#########################################################################
-
-function BelangrijkeStatistieken() {
-  return <div></div>;
-}
-
-function VoorraadStatusVerdeling() {
-  return <div></div>;
-}
-
-function CategorieVerdeling() {
-  return <div></div>;
-}
-
-function HuidigeVoorraadNiveauPerItem() {
-  return <div></div>;
-}
-
-function DagelijksVerbruikPerItem() {
-  return <div></div>;
-}
-
-function MaandelijkseVerbruikPerItem() {
-  return <div></div>;
-}
-
-function JaarlijkseVerbruikPerItem() {
-  return <div></div>;
-}
-
-function GemiddeldOpslagTijdPerItem() {
-  return <div></div>;
-}
-
-//#########################################################################
-//Page
-//#########################################################################
 
 function RouteComponent() {
   return (

@@ -1,30 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
+import {
+  TotaleVoorraadOverzichtStats,
+  TotaleVoorraadSearchbar,
+  TotaleVoorraadDisplayTable,
+} from "../module/totale-voorraad-module.tsx";
+
 import "../css/totale-voorraad.css";
 
 export const Route = createFileRoute("/totale-voorraad")({
   component: RouteComponent,
 });
-
-//#########################################################################
-//Local Components
-//#########################################################################
-function TotaleVoorraadOverzichtStats() {
-  return <div></div>;
-}
-
-function TotaleVoorraadSearchbar() {
-  return <div></div>;
-}
-
-function TotaleVoorraadDisplayTable() {
-  return <div></div>;
-}
-
-//#########################################################################
-//Page
-//#########################################################################
 
 function RouteComponent() {
   return (

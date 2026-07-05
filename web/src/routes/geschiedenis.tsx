@@ -1,24 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
+import { GeschiedenisDisplay } from "../module/geschiedenis-module.tsx";
+
 import "../css/geschiedenis.css";
 
 export const Route = createFileRoute("/geschiedenis")({
   component: RouteComponent,
 });
-//#########################################################################
-//Local Components
-//#########################################################################
-function GeschiedenisFilters() {
-  return <div></div>;
-}
-
-function GeschiedenisDisplayTable() {
-  return <div></div>;
-}
-//#########################################################################
-//Page
-//#########################################################################
 
 function RouteComponent() {
   return (
@@ -30,10 +19,7 @@ function RouteComponent() {
         </div>
 
         <div>
-          <GeschiedenisFilters />
-        </div>
-        <div>
-          <GeschiedenisDisplayTable />
+          <GeschiedenisDisplay />
         </div>
       </div>
 

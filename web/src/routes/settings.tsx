@@ -1,21 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
+import { Settings } from "../module/settings-module.tsx";
+
 import "../css/settings.css";
 
 export const Route = createFileRoute("/settings")({
   component: RouteComponent,
 });
-//#########################################################################
-//Local Components
-//#########################################################################
-function Settings() {
-  return <div></div>;
-}
-
-//#########################################################################
-//Page
-//#########################################################################
 
 function RouteComponent() {
   return (

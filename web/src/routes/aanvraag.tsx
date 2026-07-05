@@ -1,34 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/footer";
 
+import { NormaleAanvraagFormulier } from "../module/aanvraag-module.tsx";
+
 import "../css/aanvraag.css";
 
 export const Route = createFileRoute("/aanvraag")({
   component: RouteComponent,
 });
 
-//#########################################################################
-//Local Components
-//#########################################################################
-function NormaleAanvraagSelectors() {
-  return <div></div>;
-}
-
-function NormaleAanvraagUrgentieSelector() {
-  return <div></div>;
-}
-
-function OpmerkingenTextArea() {
-  return <div></div>;
-}
-
-function NormaleAanvraagButtons() {
-  return <div></div>;
-}
-
-//#########################################################################
-//Page
-//#########################################################################
 function RouteComponent() {
   return (
     <div>
@@ -39,19 +19,7 @@ function RouteComponent() {
         </div>
 
         <div>
-          <NormaleAanvraagSelectors />
-        </div>
-
-        <div>
-          <NormaleAanvraagUrgentieSelector />
-        </div>
-
-        <div>
-          <OpmerkingenTextArea />
-        </div>
-
-        <div>
-          <NormaleAanvraagButtons />
+          <NormaleAanvraagFormulier />
         </div>
       </div>
 
