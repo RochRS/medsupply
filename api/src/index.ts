@@ -19,23 +19,23 @@ import { totaleAanvraag } from "./routes/totale-aanvraag.js";
 import { statistieken } from "./routes/statistieken.js";
 
 //Auth
-import { auth } from "./routes/auth.js";
+import { auth } from "./auth/auth.js";
 import { cors } from "hono/cors";
 
 //----------------------------------
 const app = new Hono();
 
 //Better Auth route
-app.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "api/auth/*", (c) => auth.handler(c.req.raw));
 
 //API ROUTES
-app.route("/dashboard", dashboard);
-app.route("/aanvraag", aanvraag);
-app.route("/totale-aanvraag", totaleAanvraag);
-app.route("/statistieken", statistieken);
-app.route("/geschiedenis", geschiedenis);
-app.route("/settings", settings);
-app.route("/profiel", profiel);
+app.route("api/dashboard", dashboard);
+app.route("api/aanvraag", aanvraag);
+app.route("api/totale-aanvraag", totaleAanvraag);
+app.route("api/statistieken", statistieken);
+app.route("api/geschiedenis", geschiedenis);
+app.route("api/settings", settings);
+app.route("api/profiel", profiel);
 
 //Start and listen to server
 const startServer = async () => {
@@ -45,7 +45,7 @@ const startServer = async () => {
   serve(
     {
       fetch: app.fetch,
-      port: Number(process.env.PORT || 3000),
+      port: Number(process.env.SERVER_PORT || 3000),
     },
     (info) => {
       console.log(`\nServer is running on http://localhost:${info.port}`);
