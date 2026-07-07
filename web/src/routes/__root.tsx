@@ -41,5 +41,3 @@ const RootLayout = () => {
 };
 
 export const Route = createRootRoute({ component: RootLayout });
-
-console.log(import.meta.env.SERVER_URL);

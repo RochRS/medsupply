@@ -14,7 +14,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  console.log(import.meta.env.SERVER_URL);
   return (
     <div>
       <div className="min-h-screen flex items-center justify-center">

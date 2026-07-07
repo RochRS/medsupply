@@ -23,7 +23,22 @@ import { auth } from "./auth/auth.js";
 import { cors } from "hono/cors";
 
 //----------------------------------
+
+//Hono Object
 const app = new Hono();
+
+//CORS Setup
+app.use(
+  "/api/*",
+  cors({
+    origin: "http://example.com",
+    allowHeaders: ["X-Custom-Header", "Upgrade-Insecure-Requests"],
+    allowMethods: ["POST", "GET", "OPTIONS"],
+    exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
+    maxAge: 600,
+    credentials: true,
+  }),
+);
 
 //Better Auth route
 app.on(["POST", "GET"], "api/auth/*", (c) => auth.handler(c.req.raw));
@@ -54,4 +69,3 @@ const startServer = async () => {
 };
 
 startServer();
-export default app;
