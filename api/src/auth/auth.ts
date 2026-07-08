@@ -11,4 +11,5 @@ export const auth = betterAuth({
     provider: process.env.DATABASE_TYPE as DatabaseType, // or "mysql", "sqlite"
   }),
   baseURL: process.env.BASE_AUTH_URL,
+  secret: process.env.BETTER_AUTH_SECRET,
 });

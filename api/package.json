@@ -17,8 +17,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@jest/globals": "^30.4.1",
     "@types/node": "^20.19.43",
     "@types/pg": "^8.20.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11",
     "tsx": "^4.23.0",
     "typescript": "^5.9.3"
   }
