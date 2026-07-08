@@ -1,11 +1,15 @@
-import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
+import * as schema from "./schemas/schema.js";
+
 import "dotenv/config";
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
 });
-export const db = drizzle({ client: pool });
+
+//maybe we have to import relations or the schema ts in drizzle
+export const db = drizzle(pool, { schema });
 
 export const testDbConnection = async (): Promise<void> => {
   try {

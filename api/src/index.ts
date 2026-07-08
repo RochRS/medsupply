@@ -25,11 +25,10 @@ import { cors } from "hono/cors";
 //----------------------------------
 
 //Hono Object
-const app = new Hono();
+const app = new Hono().basePath("/api");
 
-//CORS Setup
+// CORS Setup
 app.use(
-  "/api/*",
   cors({
     origin: "http://example.com",
     allowHeaders: ["X-Custom-Header", "Upgrade-Insecure-Requests"],
@@ -41,16 +40,16 @@ app.use(
 );
 
 //Better Auth route
-app.on(["POST", "GET"], "api/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
 
 //API ROUTES
-app.route("api/dashboard", dashboard);
-app.route("api/aanvraag", aanvraag);
-app.route("api/totale-aanvraag", totaleAanvraag);
-app.route("api/statistieken", statistieken);
-app.route("api/geschiedenis", geschiedenis);
-app.route("api/settings", settings);
-app.route("api/profiel", profiel);
+app.route("/dashboard", dashboard);
+app.route("/aanvraag", aanvraag);
+app.route("/totale-aanvraag", totaleAanvraag);
+app.route("/statistieken", statistieken);
+app.route("/geschiedenis", geschiedenis);
+app.route("/settings", settings);
+app.route("/profiel", profiel);
 
 //Start and listen to server
 const startServer = async () => {

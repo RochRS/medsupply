@@ -4,9 +4,11 @@ import { db } from "../database/database.js"; // your drizzle instance
 import "dotenv/config";
 
 type DatabaseType = "mysql" | "pg" | "sqlite";
+// type DatabaseType = "mysql" | "pg" | "sqlite";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: process.env.DATABASE_TYPE as DatabaseType, // or "mysql", "sqlite"
   }),
+  baseURL: process.env.BASE_AUTH_URL,
 });
