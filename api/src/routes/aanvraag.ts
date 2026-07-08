@@ -5,6 +5,6 @@ export const aanvraag = new Hono();
 
 aanvraag.get("/", (c) => c.json({ message: "List all items" }));
 
-aanvraag.post("/send-aanvraag-request", (c) => {
+aanvraag.post("/send-aanvraag-request", async (c) => {
   //   userRole();
 });
