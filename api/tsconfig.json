@@ -2,6 +2,8 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
+    "moduleResolution": "NodeNext", // <-- Add this so TypeScript knows how to resolve your imports/exports
+    "isolatedModules": true, // <-- Add this to fix the ts-jest hybrid module warning/error
     "strict": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
