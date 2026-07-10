@@ -15,7 +15,7 @@ import { aanvraag } from "./routes/aanvraag.js";
 import { profiel } from "./routes/profiel.js";
 import { geschiedenis } from "./routes/geschiedenis.js";
 import { settings } from "./routes/settings.js";
-import { totaleAanvraag } from "./routes/totale-aanvraag.js";
+import { totaleAanvraag } from "./routes/totale-voorraad.js";
 import { statistieken } from "./routes/statistieken.js";
 
 //Auth

@@ -2,4 +2,5 @@ import { Hono } from "hono";
 
 export const geschiedenis = new Hono();
 
-geschiedenis.get("/", (c) => c.json({ message: "List all items" }));
+geschiedenis.get("/get-geschiedenis-info", async (c) => {
+});
