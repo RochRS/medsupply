@@ -45,7 +45,7 @@ app.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
 //API ROUTES
 app.route("/dashboard", dashboard);
 app.route("/aanvraag", aanvraag);
-app.route("/totale-aanvraag", totaleVoorraad);
+app.route("/totale-voorraad", totaleVoorraad);
 app.route("/statistieken", statistieken);
 app.route("/geschiedenis", geschiedenis);
 app.route("/settings", settings);
