@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Footer } from "../components/footer";
+import { Footer } from "../components/global/footer.tsx";
 
 import { NormaleAanvraagFormulier } from "../module/aanvraag-module.tsx";
 
@@ -8,6 +8,8 @@ import "../css/aanvraag.css";
 export const Route = createFileRoute("/aanvraag")({
   component: RouteComponent,
 });
+
+
 
 function RouteComponent() {
   return (

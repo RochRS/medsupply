@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Footer } from "../components/footer.tsx";
+import { Footer } from "../components/global/footer.tsx";
 
 import {
   HospitalIcon,
