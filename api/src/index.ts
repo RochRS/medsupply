@@ -37,40 +37,40 @@ const frontendOrigin =
 const app = new Hono<AppEnv>().basePath("/api");
 
 // Basic browser security headers
-app.use("*", secureHeaders());
+// app.use("*", secureHeaders());
 
 // Log each request
-app.use("*", logger);
+// app.use("*", logger);
 
 // Allow the Vite frontend to call this API (with cookies)
-app.use(
-  "*",
-  cors({
-    origin: frontendOrigin,
-    allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    exposeHeaders: ["Content-Length"],
-    maxAge: 600,
-    credentials: true,
-  }),
-);
+// app.use(
+//   "*",
+//   cors({
+//     origin: frontendOrigin,
+//     allowHeaders: ["Content-Type", "Authorization"],
+//     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//     exposeHeaders: ["Content-Length"],
+//     maxAge: 600,
+//     credentials: true,
+//   }),
+// );
 
 // better-auth handles login / signup / logout / session
 // /** matches nested paths like /auth/sign-in/email
-app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
+// app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
 
 // Load user/session on every request (may be null)
-app.use("*", loadSession);
+// app.use("*", loadSession);
 
 // Public session helpers (/session/me, /session/health)
-app.route("/session", sessionRoutes);
+// app.route("/session", sessionRoutes);
 
 // Public demo: validate + sanitize login payload (not a real login)
-app.route("/", login);
+// app.route("/", login);
 
 // Everything below needs a logged-in user
 const protectedRoutes = new Hono<AppEnv>();
-protectedRoutes.use("*", requireAuth);
+// protectedRoutes.use("*", requireAuth);
 protectedRoutes.route("/dashboard", dashboard);
 protectedRoutes.route("/requests", requests);
 protectedRoutes.route("/inventory", inventory);
@@ -79,7 +79,7 @@ protectedRoutes.route("/history", history);
 protectedRoutes.route("/settings", settings);
 protectedRoutes.route("/profile", profile);
 
-app.route("/", protectedRoutes);
+// app.route("/", protectedRoutes);
 
 // Start and listen to server
 const startServer = async () => {
