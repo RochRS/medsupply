@@ -11,12 +11,12 @@ import { dizzleCheck } from "./database/database.js";
 
 // Import route modules
 import { dashboard } from "./routes/dashboard.js";
-import { aanvraag } from "./routes/aanvraag.js";
-import { profiel } from "./routes/profiel.js";
-import { geschiedenis } from "./routes/geschiedenis.js";
 import { settings } from "./routes/settings.js";
-import { totaleVoorraad } from "./routes/totale-voorraad.js";
-import { statistieken } from "./routes/statistieken.js";
+import { requests } from "./routes/requests.js";
+import { inventory } from "./routes/inventory.js";
+import { statistics } from "./routes/statistics.js";
+import { history } from "./routes/history.js";
+import { profile } from "./routes/profile.js";
 
 //Auth
 import { auth } from "./auth/auth.js";
@@ -44,12 +44,12 @@ app.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
 
 //API ROUTES
 app.route("/dashboard", dashboard);
-app.route("/aanvraag", aanvraag);
-app.route("/totale-voorraad", totaleVoorraad);
-app.route("/statistieken", statistieken);
-app.route("/geschiedenis", geschiedenis);
+app.route("/requests", requests);
+app.route("/inventory", inventory);
+app.route("/statistics", statistics);
+app.route("/history", history);
 app.route("/settings", settings);
-app.route("/profiel", profiel);
+app.route("/profile", profile);
 
 //Start and listen to server
 const startServer = async () => {

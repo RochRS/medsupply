@@ -8,6 +8,9 @@
   //enables strict type-checking options in TypeScript, which can help catch potential errors and improve code quality.
   //Forced by ZOD
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }

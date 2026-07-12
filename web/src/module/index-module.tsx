@@ -1,11 +1,12 @@
-import { EnterButton } from "../components/button.tsx";
-import { FormInput } from "../components/form.tsx";
+import { Button } from "../components/ui/button";
+import { FormInput } from "../components/global/form-input";
+import { useState } from "react";
 
 export function HospitalIcon() {
   return (
     <div>
       <div>
-        <image />
+        <img />
       </div>
 
       <div>
@@ -17,10 +18,12 @@ export function HospitalIcon() {
 }
 
 export function UserInputFields() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <div>
-      <FormInput label="Test" type="text" placeholder="test" value="a" />
-      <FormInput label="Test" type="text" placeholder="test" value="a" />
+      <FormInput label="Email" name="email" type="email" placeholder="jouw@rkz.com" value={email} onChange={setEmail} />
+      <FormInput label="Wachtwoord" name="password" type="password" placeholder="" value={password} onChange={setPassword} />
     </div>
   );
 }
@@ -31,6 +34,8 @@ export function SubmitLoginRequestButton() {
   };
 
   return (
-    <EnterButton buttonName="Login" onClick={sendMessage} isDisabled={false} />
+    <Button onClick={sendMessage} disabled={false}>
+      Login
+    </Button>
   );
 }
