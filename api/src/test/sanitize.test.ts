@@ -34,12 +34,12 @@ describe("sanitizeDeep", () => {
 
   it("does not strip HTML-like characters from password fields", () => {
     const input = {
-      email: "  Nurse@RKZ.nl  ",
+      email: "  Nurse@RKZ.sr  ",
       password: "p@ss<script>1",
     };
 
     expect(sanitizeDeep(input)).toEqual({
-      email: "Nurse@RKZ.nl",
+      email: "Nurse@RKZ.sr",
       password: "p@ss<script>1",
     });
   });
@@ -48,19 +48,19 @@ describe("sanitizeDeep", () => {
 describe("loginSchema", () => {
   it("accepts a valid login payload", () => {
     const result = loginSchema.safeParse({
-      email: "Nurse@RKZ.nl",
+      email: "Nurse@RKZ.sr",
       password: "secret123",
     });
 
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.email).toBe("nurse@rkz.nl");
+      expect(result.data.email).toBe("nurse@rkz.sr");
     }
   });
 
   it("rejects extra fields (strict)", () => {
     const result = loginSchema.safeParse({
-      email: "nurse@rkz.nl",
+      email: "nurse@rkz.sr",
       password: "secret123",
       role: "admin",
     });
@@ -82,7 +82,7 @@ describe("registerSchema", () => {
   it("requires password length >= 8", () => {
     const result = registerSchema.safeParse({
       name: "Jan",
-      email: "jan@rkz.nl",
+      email: "jan@rkz.sr",
       password: "short",
     });
 
@@ -92,7 +92,7 @@ describe("registerSchema", () => {
   it("accepts a valid register payload", () => {
     const result = registerSchema.safeParse({
       name: "Jan de Vries",
-      email: "jan@rkz.nl",
+      email: "jan@rkz.sr",
       password: "veiligWachtwoord1",
     });
 
