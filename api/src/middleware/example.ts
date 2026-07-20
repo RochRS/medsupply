@@ -5,8 +5,5 @@ export const logger = createMiddleware(async (c, next) => {
   await next();
 });
 
-export const requireAuth = createMiddleware(async (c, next) => {
-  const token = c.req.header("Authorization");
-  if (!token) return c.json({ message: "Unauthorized" }, 401);
-  await next();
-});
+// Auth middleware lives in ./auth.ts (loadSession, requireAuth)
+// Validation middleware lives in ./validate.ts
