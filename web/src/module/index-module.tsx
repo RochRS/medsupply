@@ -41,7 +41,7 @@ export function UserInputFields({
         label="Email"
         name="email"
         type="email"
-        placeholder="jouw@rkz.nl"
+        placeholder="jouw@rkz.sr"
         value={email}
         onChange={onEmailChange}
         error={errors?.email}
