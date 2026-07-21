@@ -15,10 +15,10 @@ export function SpoedAanvraag() {
   };
 
   return (
-    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex flex-col gap-3">
+    <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex flex-col gap-3">
       <div>
-        <h2 className="font-bold text-orange-700">Spoedaanvraag</h2>
-        <p className="text-xs text-orange-600">Hoogste prioriteit</p>
+        <h2 className="font-bold text-rose-700">Spoedaanvraag</h2>
+        <p className="text-xs text-rose-600">Hoogste prioriteit</p>
       </div>
 
       <FormInput
@@ -47,8 +47,8 @@ export function SpoedAanvraag() {
         />
       </div>
 
-      <Button onClick={handleSubmit}>Spoedaanvraag versturen</Button>
-    </div>
+      <Button onClick={handleSubmit} className="bg-rose-600 hover:bg-rose-700">Spoedaanvraag versturen</Button>
+     </div>
   );
 }
 
@@ -69,7 +69,7 @@ const CATEGORIEN_NIVEAUS = [
 export function KritiekeVoorraadOverzicht() {
   return (
     <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
-      <h2 className="font-bold text-blue-700">Kritiek Voorraadoverzicht</h2>
+      <h2 className="font-bold text-teal-700">Kritiek Voorraadoverzicht</h2>
 
       <div className="flex gap-3">
         <Select defaultValue="alle-niveaus">
@@ -120,7 +120,7 @@ export function KritikeMeldingen() {
   return (
     <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">
-        <h2 className="font-bold text-blue-700">Meldingen</h2>
+        <h2 className="font-bold text-teal-700">Meldingen</h2>
         <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
       </div>
 

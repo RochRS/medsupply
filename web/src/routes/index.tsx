@@ -25,11 +25,11 @@ function Index() {
 
   return (
     <div>
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-sky-700 to-slate-600">
-        <div className="flex flex-col items-center gap-6 max-w-sm w-full px-6">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-teal-800 to-teal-600">
+        <div className="flex flex-col items-center gap-5 max-w-sm w-full px-6">
           <HospitalIcon />
 
-          <div className="bg-white w-full rounded-xl shadow-lg p-6 flex flex-col gap-4">
+          <div className="bg-white w-full rounded-2xl shadow-xl p-7 flex flex-col gap-5">
             <UserInputFields
               email={email}
               password={password}
@@ -39,7 +39,7 @@ function Index() {
             />
 
             {formError && (
-              <p className="text-sm text-red-500 text-left">{formError}</p>
+              <p className="text-sm text-rose-600 text-left">{formError}</p>
             )}
 
             <SubmitLoginRequestButton

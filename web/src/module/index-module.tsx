@@ -6,16 +6,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { signIn } from "../lib/auth-client";
 import { loginSchema } from "../schemas/login";
 
+
 export function HospitalIcon() {
   return (
-    <div className="flex flex-col items-center gap-2 text-center">
-      <div className="bg-indigo-800 rounded-2xl p-4">
-        <img src={logo} alt="RKZ Logo" className="w-12 h-12" />
+    <div className="flex flex-col items-center gap-3 text-center">
+      <div className="bg-white rounded-2xl p-3 shadow-lg">
+        <img src={logo} alt="RKZ Logo" className="w-14 h-14" />
       </div>
 
       <div>
-        <h1 className="text-white text-2xl font-bold">MedSupply</h1>
-        <p className="text-slate-200 text-sm">Voorraadbeheer Systeem voor Medische Supplies</p>
+        <h1 className="text-white text-2xl font-bold tracking-tight">MedSupply</h1>
+        <p className="text-teal-100 text-sm mt-1">Voorraadbeheer Systeem voor Medische Supplies</p>
       </div>
     </div>
   );
@@ -115,7 +116,7 @@ export function SubmitLoginRequestButton({
 
   return (
     <div className="flex flex-col gap-2 items-center">
-      <Button onClick={sendLoginRequest} disabled={loading}>
+      <Button onClick={sendLoginRequest} disabled={loading} className="bg-teal-700 hover:bg-teal-800 w-full">
         {loading ? "Bezig..." : "Login"}
       </Button>
       <p className="text-sm text-red-500 text-center">

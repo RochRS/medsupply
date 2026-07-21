@@ -14,13 +14,13 @@ export const Route = createFileRoute("/aanvraag")({
 function RouteComponent() {
   return (
     <div>
-      <div>
-        <div className="text-center">
-          <h1>Aanvraag</h1>
-          <p>Voor Reguliere Voorraadaanvragen (Zonder Spoed)</p>
+      <div className="min-h-screen bg-teal-800">
+        <div className="text-center py-6">
+          <h1 className="text-2xl font-bold text-white">Aanvraag</h1>
+          <p className="text-teal-100 text-sm">Voor Reguliere Voorraadaanvragen (Zonder Spoed)</p>
         </div>
 
-        <div>
+        <div className="px-4 pb-8 flex justify-center">
           <NormaleAanvraagFormulier />
         </div>
       </div>

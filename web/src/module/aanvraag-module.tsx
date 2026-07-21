@@ -90,7 +90,7 @@ export function OpmerkingenTextArea() {
 
 export function NormaleAanvraagFormulier() {
   return (
-    <div className="bg-white border rounded-lg p-6 flex flex-col gap-6 max-w-3xl mx-auto">
+    <div className="bg-white border rounded-lg px-8 py-4 flex flex-col gap-6 max-w-7xl w-full mx-auto">
       <div>
         <h2 className="font-bold text-lg">Normale aanvraag</h2>
         <p className="text-sm text-gray-500">Voor reguliere voorraadaanvragen zonder spoed</p>
@@ -127,8 +127,8 @@ export function NormaleAanvraagButtons() {
 
   return (
     <div className="flex gap-3">
-      <Button onClick={handleVersturen}>Aanvraag versturen</Button>
-      <Button onClick={handleWissen} variant="destructive">Wissen</Button>
+      <Button onClick={handleVersturen} className="bg-teal-700 hover:bg-teal-800">Aanvraag versturen</Button>
+      <Button onClick={handleWissen} variant="destructive">Wissen</Button> 
     </div>
   );
 }
