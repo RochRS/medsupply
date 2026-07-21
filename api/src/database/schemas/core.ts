@@ -7,15 +7,7 @@ import {
   unique,
   text,
 } from "drizzle-orm/pg-core";
-
-export const categories = pgTable("categories", {
-  categoryId: integer().primaryKey().generatedAlwaysAsIdentity(),
-  categoryName: varchar({ length: 255 }).notNull(),
-  categoryDescription: text(),
-
-  createdAt: timestamp().defaultNow().notNull(),
-  updateAt: timestamp(),
-});
+import { relations } from "drizzle-orm";
 
 export const items = pgTable("items", {
   itemId: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -24,9 +16,16 @@ export const items = pgTable("items", {
   remainingAmount: integer().notNull(),
   createdAt: timestamp(),
   updatedAt: timestamp(),
-
   //external link
-  categoryId: integer(),
+  categoryId: integer().references(() => categories.categoryId),
+});
+
+export const categories = pgTable("categories", {
+  categoryId: integer().primaryKey().generatedAlwaysAsIdentity(),
+  categoryName: varchar({ length: 255 }).notNull(),
+  categoryDescription: text(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updateAt: timestamp(),
 });
 
 export const request = pgTable("request", {
@@ -35,15 +34,15 @@ export const request = pgTable("request", {
   requestedAmount: integer().notNull(),
   isUrgent: boolean().notNull(),
   isCompleted: boolean().notNull(),
-
   createdAt: timestamp().defaultNow(),
   updatedAt: timestamp().defaultNow(),
-
   //external link
-  itemId: integer(),
-  userId: integer(),
-  departmentId: integer(),
-  requestDescriptionId: integer(),
+  itemId: integer().references(() => items.itemId),
+  userId: integer(), // TODO: .references(() => user.id) — link to Better Auth's user table?
+  departmentId: integer(), // TODO: .references(() => departments.departmentId) — departments table not yet defined
+  requestDescriptionId: integer().references(
+    () => requestDescription.requestDescriptionId,
+  ),
 });
 
 export const shipments = pgTable("shipments", {
@@ -52,13 +51,11 @@ export const shipments = pgTable("shipments", {
   GTIN: integer().default(0),
   experationDate: timestamp().notNull(),
   cost: integer().notNull(),
-
   deliveryDate: timestamp().defaultNow(),
   updatedAt: timestamp().defaultNow(),
-
   //external links
-  itemId: integer(),
-  suppliersId: integer(),
+  itemId: integer().references(() => items.itemId),
+  suppliersId: integer().references(() => suppliers.supplierId),
 });
 
 export const suppliers = pgTable("suppliers", {
@@ -67,7 +64,6 @@ export const suppliers = pgTable("suppliers", {
   address: varchar(),
   description: text(),
   contactInfo: varchar(),
-
   createdAt: timestamp().defaultNow(),
   updatedAt: timestamp().defaultNow(),
 });
@@ -76,3 +72,59 @@ export const requestDescription = pgTable("request_description", {
   requestDescriptionId: integer().primaryKey().generatedAlwaysAsIdentity(),
   requestDescriptionField: text(),
 });
+
+// ─── Relations ───────────────────────────────
+
+export const itemsRelations = relations(items, ({ one, many }) => ({
+  category: one(categories, {
+    fields: [items.categoryId],
+    references: [categories.categoryId],
+  }),
+  requests: many(request),
+  shipments: many(shipments),
+}));
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  items: many(items),
+}));
+
+export const requestRelations = relations(request, ({ one }) => ({
+  item: one(items, {
+    fields: [request.itemId],
+    references: [items.itemId],
+  }),
+  // user: one(user, {
+  //   fields: [request.userId],
+  //   references: [user.id],
+  // }),
+  // department: one(departments, {
+  //   fields: [request.departmentId],
+  //   references: [departments.departmentId],
+  // }),
+  description: one(requestDescription, {
+    fields: [request.requestDescriptionId],
+    references: [requestDescription.requestDescriptionId],
+  }),
+}));
+
+export const shipmentsRelations = relations(shipments, ({ one }) => ({
+  item: one(items, {
+    fields: [shipments.itemId],
+    references: [items.itemId],
+  }),
+  supplier: one(suppliers, {
+    fields: [shipments.suppliersId],
+    references: [suppliers.supplierId],
+  }),
+}));
+
+export const suppliersRelations = relations(suppliers, ({ many }) => ({
+  shipments: many(shipments),
+}));
+
+export const requestDescriptionRelations = relations(
+  requestDescription,
+  ({ many }) => ({
+    requests: many(request),
+  }),
+);
