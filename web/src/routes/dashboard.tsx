@@ -16,20 +16,14 @@ export const Route = createFileRoute("/dashboard")({
 function RouteComponent() {
   return (
     <div>
-      <div>
-        <div className="text-center">
-          <h1>Dashboard</h1>
+      <div className="min-h-screen bg-slate-50">
+        <div className="text-center py-6">
+          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
         </div>
 
-        <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 max-w-7xl mx-auto">
           <SpoedAanvraag />
-        </div>
-
-        <div>
           <KritiekeVoorraadOverzicht />
-        </div>
-
-        <div>
           <KritikeMeldingen />
         </div>
       </div>
