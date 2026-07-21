@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/global/footer.tsx";
+import { useState } from "react";
 
 import {
   HospitalIcon,
@@ -14,6 +15,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+
   return (
     <div>
       <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-sky-700 to-slate-600">
@@ -21,8 +30,24 @@ function Index() {
           <HospitalIcon />
 
           <div className="bg-white w-full rounded-xl shadow-lg p-6 flex flex-col gap-4">
-            <UserInputFields />
-            <SubmitLoginRequestButton />
+            <UserInputFields
+              email={email}
+              password={password}
+              onEmailChange={setEmail}
+              onPasswordChange={setPassword}
+              errors={fieldErrors}
+            />
+
+            {formError && (
+              <p className="text-sm text-red-500 text-left">{formError}</p>
+            )}
+
+            <SubmitLoginRequestButton
+              email={email}
+              password={password}
+              onError={setFormError}
+              onFieldErrors={setFieldErrors}
+            />
           </div>
         </div>
       </div>
