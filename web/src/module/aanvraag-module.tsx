@@ -90,16 +90,9 @@ export function OpmerkingenTextArea() {
 
 export function NormaleAanvraagFormulier() {
   return (
-    <div className="bg-white border rounded-lg px-8 py-4 flex flex-col gap-6 max-w-7xl w-full mx-auto">
-      <div>
-        <h2 className="font-bold text-lg">Normale aanvraag</h2>
-        <p className="text-sm text-gray-500">Voor reguliere voorraadaanvragen zonder spoed</p>
-      </div>
-
+    <div className="bg-white border rounded-lg p-10 flex flex-col gap-6 max-w-7xl w-full mx-auto">
       <NormaleAanvraagSelectors />
-
       <NormaleAanvraagUrgentieSelector />
-
       <OpmerkingenTextArea />
 
       <div className="flex flex-col gap-1">

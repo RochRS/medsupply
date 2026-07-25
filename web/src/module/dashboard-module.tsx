@@ -15,11 +15,12 @@ export function SpoedAanvraag() {
   };
 
   return (
-    <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex flex-col gap-3">
-      <div>
+    <div className="bg-white border-t-4 border-t-rose-600 border-x border-b rounded-lg p-4 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
         <h2 className="font-bold text-rose-700">Spoedaanvraag</h2>
-        <p className="text-xs text-rose-600">Hoogste prioriteit</p>
+        <span className="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">SPOED</span>
       </div>
+      <p className="text-xs text-gray-500 -mt-2">Hoogste prioriteit</p>
 
       <FormInput
         label="Zoek supplies"

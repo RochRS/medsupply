@@ -14,10 +14,9 @@ export const Route = createFileRoute("/aanvraag")({
 function RouteComponent() {
   return (
     <div>
-      <div className="min-h-screen bg-teal-800">
-        <div className="text-center py-6">
-          <h1 className="text-2xl font-bold text-white">Aanvraag</h1>
-          <p className="text-teal-100 text-sm">Voor Reguliere Voorraadaanvragen (Zonder Spoed)</p>
+      <div className="min-h-screen bg-gradient-to-b from-slate-100 to-teal-50">
+        <div className="text-center py-3">
+          <h1 className="text-2xl font-bold text-teal-800">Aanvraag</h1>
         </div>
 
         <div className="px-4 pb-8 flex justify-center">
