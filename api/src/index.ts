@@ -36,6 +36,24 @@ const frontendOrigin =
 // All API routes live under /api
 const app = new Hono<AppEnv>().basePath("/api");
 
+app.get("/", async (c) => {
+  return c.json({
+    name: "MedSupply API",
+    version: "1.0.0",
+    status: "running",
+    endpoints: {
+      auth: "/api/auth/*",
+      dashboard: "/api/dashboard",
+      requests: "/api/requests",
+      inventory: "/api/inventory",
+      statistics: "/api/statistics",
+      history: "/api/history",
+      settings: "/api/settings",
+      profile: "/api/profile",
+      session: "/api/session",
+    },
+  });
+});
 // Basic browser security headers
 // app.use("*", secureHeaders());
 
