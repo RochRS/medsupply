@@ -7,6 +7,7 @@ import {
   unique,
   text,
 } from "drizzle-orm/pg-core";
+import { user } from "./auth-schema.js";
 
 export const items = pgTable("items", {
   itemId: integer("item_id").primaryKey().generatedAlwaysAsIdentity(),
@@ -37,7 +38,7 @@ export const request = pgTable("request", {
   updatedAt: timestamp("updated_at").defaultNow(),
   //external link
   itemId: integer("item_id").references(() => items.itemId),
-  userId: integer("user_id"),
+  userId: text("user_id").references(() => user.id),
   departmentId: integer("department_id"),
   requestDescriptionId: integer("request_description_id").references(
     () => requestDescription.requestDescriptionId,
