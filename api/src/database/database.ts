@@ -8,7 +8,6 @@ const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-//maybe we have to import relations or the schema ts in drizzle
 export const db = drizzle(pool, { schema });
 
 export const testDbConnection = async (): Promise<void> => {

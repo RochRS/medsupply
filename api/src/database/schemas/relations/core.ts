@@ -7,6 +7,7 @@ import {
   shipments,
   suppliers,
 } from "../core.js";
+import { user } from "../auth-schema.js";
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
   category: one(categories, {
@@ -29,6 +30,10 @@ export const requestRelations = relations(request, ({ one }) => ({
   description: one(requestDescription, {
     fields: [request.requestDescriptionId],
     references: [requestDescription.requestDescriptionId],
+  }),
+  user: one(user, {
+    fields: [request.userId],
+    references: [user.id],
   }),
 }));
 
