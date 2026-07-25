@@ -5,7 +5,7 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "../components/ui/button";
 
-export function NormaleAanvraagSelectors() {
+export function RequestFields() {
   const [supplyType, setSupplyType] = useState("");
   const [naam, setNaam] = useState("");
   const [aantal, setAantal] = useState("");
@@ -54,7 +54,7 @@ const URGENTIE_OPTIES = [
   { value: "hoog", label: "Hoog (binnen 24 uur)" },
 ];
 
-export function NormaleAanvraagUrgentieSelector() {
+export function UrgencySelector() {
   const [urgentie, setUrgentie] = useState("normaal");
 
   return (
@@ -72,7 +72,7 @@ export function NormaleAanvraagUrgentieSelector() {
   );
 }
 
-export function OpmerkingenTextArea() {
+export function CommentsTextArea() {
   const [opmerking, setOpmerking] = useState("");
 
   return (
@@ -88,12 +88,12 @@ export function OpmerkingenTextArea() {
   );
 }
 
-export function NormaleAanvraagFormulier() {
+export function RequestForm() {
   return (
     <div className="bg-white border rounded-lg p-10 flex flex-col gap-6 max-w-7xl w-full mx-auto">
-      <NormaleAanvraagSelectors />
-      <NormaleAanvraagUrgentieSelector />
-      <OpmerkingenTextArea />
+      <RequestFields />
+      <UrgencySelector />
+      <CommentsTextArea />
 
       <div className="flex flex-col gap-1">
         <Label>Gebruikers Info</Label>
@@ -102,14 +102,14 @@ export function NormaleAanvraagFormulier() {
         </div>
       </div>
 
-      <NormaleAanvraagButtons />
+      <RequestFormButtons />
     </div>
   );
 }
 
 
 
-export function NormaleAanvraagButtons() {
+export function RequestFormButtons() {
   const handleVersturen = () => {
     console.log("Aanvraag versturen clicked");
   };

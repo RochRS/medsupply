@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
 
-export function SpoedAanvraag() {
+export function EmergencyRequest() {
   const [search, setSearch] = useState("");
   const [afdeling, setAfdeling] = useState("");
   const [noodsituatie, setNoodsituatie] = useState("");
@@ -67,7 +67,7 @@ const CATEGORIEN_NIVEAUS = [
 ];
 
 //kritiek
-export function KritiekeVoorraadOverzicht() {
+export function CriticalInventoryOverview() {
   return (
     <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
       <h2 className="font-bold text-teal-700">Kritiek Voorraadoverzicht</h2>
@@ -117,7 +117,7 @@ const SORTEER_OPTIES = [
   {value: "oudste", label: "Oudste eerst"},
 ]
 
-export function KritikeMeldingen() {
+export function Notifications() {
   return (
     <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">

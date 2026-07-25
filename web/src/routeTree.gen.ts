@@ -9,23 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TotaleVoorraadRouteImport } from './routes/totale-voorraad'
-import { Route as StatistiekenRouteImport } from './routes/statistieken'
+import { Route as TotalInventoryRouteImport } from './routes/total-inventory'
+import { Route as StatisticsRouteImport } from './routes/statistics'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RequestRouteImport } from './routes/request'
 import { Route as ProfielRouteImport } from './routes/profiel'
-import { Route as GeschiedenisRouteImport } from './routes/geschiedenis'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as AanvraagRouteImport } from './routes/aanvraag'
 import { Route as IndexRouteImport } from './routes/index'
 
-const TotaleVoorraadRoute = TotaleVoorraadRouteImport.update({
-  id: '/totale-voorraad',
-  path: '/totale-voorraad',
+const TotalInventoryRoute = TotalInventoryRouteImport.update({
+  id: '/total-inventory',
+  path: '/total-inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StatistiekenRoute = StatistiekenRouteImport.update({
-  id: '/statistieken',
-  path: '/statistieken',
+const StatisticsRoute = StatisticsRouteImport.update({
+  id: '/statistics',
+  path: '/statistics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -33,24 +33,24 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RequestRoute = RequestRouteImport.update({
+  id: '/request',
+  path: '/request',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfielRoute = ProfielRouteImport.update({
   id: '/profiel',
   path: '/profiel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GeschiedenisRoute = GeschiedenisRouteImport.update({
-  id: '/geschiedenis',
-  path: '/geschiedenis',
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AanvraagRoute = AanvraagRouteImport.update({
-  id: '/aanvraag',
-  path: '/aanvraag',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -61,93 +61,93 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/aanvraag': typeof AanvraagRoute
   '/dashboard': typeof DashboardRoute
-  '/geschiedenis': typeof GeschiedenisRoute
+  '/history': typeof HistoryRoute
   '/profiel': typeof ProfielRoute
+  '/request': typeof RequestRoute
   '/settings': typeof SettingsRoute
-  '/statistieken': typeof StatistiekenRoute
-  '/totale-voorraad': typeof TotaleVoorraadRoute
+  '/statistics': typeof StatisticsRoute
+  '/total-inventory': typeof TotalInventoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/aanvraag': typeof AanvraagRoute
   '/dashboard': typeof DashboardRoute
-  '/geschiedenis': typeof GeschiedenisRoute
+  '/history': typeof HistoryRoute
   '/profiel': typeof ProfielRoute
+  '/request': typeof RequestRoute
   '/settings': typeof SettingsRoute
-  '/statistieken': typeof StatistiekenRoute
-  '/totale-voorraad': typeof TotaleVoorraadRoute
+  '/statistics': typeof StatisticsRoute
+  '/total-inventory': typeof TotalInventoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/aanvraag': typeof AanvraagRoute
   '/dashboard': typeof DashboardRoute
-  '/geschiedenis': typeof GeschiedenisRoute
+  '/history': typeof HistoryRoute
   '/profiel': typeof ProfielRoute
+  '/request': typeof RequestRoute
   '/settings': typeof SettingsRoute
-  '/statistieken': typeof StatistiekenRoute
-  '/totale-voorraad': typeof TotaleVoorraadRoute
+  '/statistics': typeof StatisticsRoute
+  '/total-inventory': typeof TotalInventoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/aanvraag'
     | '/dashboard'
-    | '/geschiedenis'
+    | '/history'
     | '/profiel'
+    | '/request'
     | '/settings'
-    | '/statistieken'
-    | '/totale-voorraad'
+    | '/statistics'
+    | '/total-inventory'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/aanvraag'
     | '/dashboard'
-    | '/geschiedenis'
+    | '/history'
     | '/profiel'
+    | '/request'
     | '/settings'
-    | '/statistieken'
-    | '/totale-voorraad'
+    | '/statistics'
+    | '/total-inventory'
   id:
     | '__root__'
     | '/'
-    | '/aanvraag'
     | '/dashboard'
-    | '/geschiedenis'
+    | '/history'
     | '/profiel'
+    | '/request'
     | '/settings'
-    | '/statistieken'
-    | '/totale-voorraad'
+    | '/statistics'
+    | '/total-inventory'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AanvraagRoute: typeof AanvraagRoute
   DashboardRoute: typeof DashboardRoute
-  GeschiedenisRoute: typeof GeschiedenisRoute
+  HistoryRoute: typeof HistoryRoute
   ProfielRoute: typeof ProfielRoute
+  RequestRoute: typeof RequestRoute
   SettingsRoute: typeof SettingsRoute
-  StatistiekenRoute: typeof StatistiekenRoute
-  TotaleVoorraadRoute: typeof TotaleVoorraadRoute
+  StatisticsRoute: typeof StatisticsRoute
+  TotalInventoryRoute: typeof TotalInventoryRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/totale-voorraad': {
-      id: '/totale-voorraad'
-      path: '/totale-voorraad'
-      fullPath: '/totale-voorraad'
-      preLoaderRoute: typeof TotaleVoorraadRouteImport
+    '/total-inventory': {
+      id: '/total-inventory'
+      path: '/total-inventory'
+      fullPath: '/total-inventory'
+      preLoaderRoute: typeof TotalInventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/statistieken': {
-      id: '/statistieken'
-      path: '/statistieken'
-      fullPath: '/statistieken'
-      preLoaderRoute: typeof StatistiekenRouteImport
+    '/statistics': {
+      id: '/statistics'
+      path: '/statistics'
+      fullPath: '/statistics'
+      preLoaderRoute: typeof StatisticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -157,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/request': {
+      id: '/request'
+      path: '/request'
+      fullPath: '/request'
+      preLoaderRoute: typeof RequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profiel': {
       id: '/profiel'
       path: '/profiel'
@@ -164,11 +171,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfielRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/geschiedenis': {
-      id: '/geschiedenis'
-      path: '/geschiedenis'
-      fullPath: '/geschiedenis'
-      preLoaderRoute: typeof GeschiedenisRouteImport
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -176,13 +183,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/aanvraag': {
-      id: '/aanvraag'
-      path: '/aanvraag'
-      fullPath: '/aanvraag'
-      preLoaderRoute: typeof AanvraagRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -197,13 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AanvraagRoute: AanvraagRoute,
   DashboardRoute: DashboardRoute,
-  GeschiedenisRoute: GeschiedenisRoute,
+  HistoryRoute: HistoryRoute,
   ProfielRoute: ProfielRoute,
+  RequestRoute: RequestRoute,
   SettingsRoute: SettingsRoute,
-  StatistiekenRoute: StatistiekenRoute,
-  TotaleVoorraadRoute: TotaleVoorraadRoute,
+  StatisticsRoute: StatisticsRoute,
+  TotalInventoryRoute: TotalInventoryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

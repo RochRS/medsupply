@@ -13,28 +13,28 @@ export function Navbar() {
             Dashboard
           </Link>
           <Link
-            to="/aanvraag"
+            to="/request"
             className="text-slate-500 hover:text-teal-400 font-medium"
             activeProps={{ className: "text-teal-800 font-semibold" }}
           >
             Request
           </Link>
           <Link
-            to="/totale-voorraad"
+            to="/total-inventory"
             className="text-slate-500 hover:text-teal-400 font-medium"
             activeProps={{ className: "text-teal-800 font-semibold" }}
           >
             Total Inventory
           </Link>
           <Link
-            to="/statistieken"
+            to="/statistics"
             className="text-slate-500 hover:text-teal-400 font-medium"
             activeProps={{ className: "text-teal-800 font-semibold" }}
           >
             Statistics
           </Link>
           <Link
-            to="/geschiedenis"
+            to="/history"
             className="text-slate-500 hover:text-teal-400 font-medium"
             activeProps={{ className: "text-teal-800 font-semibold" }}
           >

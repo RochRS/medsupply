@@ -69,7 +69,7 @@ function useInventory(search: string) {
   return { data, loading, error };
 }
 
-export function TotaleVoorraadOverzichtStats({
+export function InventoryOverviewStats({
   summary,
   loading,
 }: {
@@ -100,7 +100,7 @@ export function TotaleVoorraadOverzichtStats({
   );
 }
 
-export function TotaleVoorraadSearchbar({
+export function InventorySearchbar({
   value,
   onChange,
 }: {
@@ -118,7 +118,7 @@ export function TotaleVoorraadSearchbar({
   );
 }
 
-export function TotaleVoorraadDisplayTable({
+export function InventoryTable({
   items,
   loading,
   error,
@@ -177,7 +177,7 @@ export function TotaleVoorraadDisplayTable({
 }
 
 // Page container that owns search + fetch state
-export function TotaleVoorraadPage() {
+export function InventoryPage() {
   const [search, setSearch] = useState("");
   const { data, loading, error } = useInventory(search);
 
@@ -186,20 +186,20 @@ export function TotaleVoorraadPage() {
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto p-4">
       <div className="text-center">
-        <h1 className="text-2xl font-semibold">Totale Voorraad</h1>
+        <h1 className="text-2xl font-bold text-teal-800">Totale Voorraad</h1>
         <p className="text-sm text-gray-500">
           Overzicht van de totale voorraad in het magazijn.
         </p>
       </div>
 
-      <TotaleVoorraadOverzichtStats
+      <InventoryOverviewStats 
         summary={data?.summary}
         loading={loading && !data}
       />
 
-      <TotaleVoorraadSearchbar value={search} onChange={setSearch} />
+      <InventorySearchbar value={search} onChange={setSearch} />
 
-      <TotaleVoorraadDisplayTable
+      <InventoryTable
         items={items}
         loading={loading && !data}
         error={error}

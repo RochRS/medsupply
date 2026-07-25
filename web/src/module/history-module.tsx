@@ -48,7 +48,7 @@ function statusForBadge(
   return "goed";
 }
 
-export function GeschiedenisDisplay() {
+export function HistoryDisplay() {
   const [data, setData] = useState<HistoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -112,7 +112,7 @@ export function GeschiedenisDisplay() {
             onClick={() => setFilter(value)}
             className={`px-3 py-1.5 text-sm border rounded-md ${
               filter === value
-                ? "bg-blue-600 text-white border-blue-600"
+                ? "bg-teal-700 text-white border-teal-700"
                 : "bg-white text-gray-700"
             }`}
           >
