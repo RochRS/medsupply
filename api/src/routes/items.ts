@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, asc, ilike, or, lte } from "drizzle-orm";
+import { eq, asc, ilike, or, lte, and, not, exists } from "drizzle-orm";
 import { db } from "../database/database.js";
 import { items as itemsTable, categories, request } from "../database/schemas/core.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
@@ -16,13 +16,73 @@ function stockLevel(amount: number): "critical" | "low" | "ok" {
 
 export const items = new Hono<AppEnv>();
 
+// ---- GET / POST (collection) ----
+
 items.get("/", async (c) => {
   const search = c.req.query("search")?.trim();
   const status = c.req.query("status");
   const stockMax = c.req.query("stock_max");
+  const isUrgent = c.req.query("isUrgent");
 
   try {
-    // ── status=urgent: items with urgent requests ──
+    if (isUrgent === "true") {
+      const rows = await db
+        .select({
+          itemId: itemsTable.itemId,
+          itemName: itemsTable.itemName,
+          remainingAmount: itemsTable.remainingAmount,
+        })
+        .from(itemsTable)
+        .where(
+          and(
+            search ? ilike(itemsTable.itemName, `%${search}%`) : undefined,
+            exists(
+              db
+                .select({ id: request.requestId })
+                .from(request)
+                .where(
+                  and(
+                    eq(request.itemId, itemsTable.itemId),
+                    eq(request.isUrgent, true),
+                  ),
+                ),
+            ),
+          ),
+        );
+
+      return c.json({ items: rows });
+    }
+
+    if (isUrgent === "false") {
+      const rows = await db
+        .select({
+          itemId: itemsTable.itemId,
+          itemName: itemsTable.itemName,
+          remainingAmount: itemsTable.remainingAmount,
+        })
+        .from(itemsTable)
+        .where(
+          and(
+            search ? ilike(itemsTable.itemName, `%${search}%`) : undefined,
+            not(
+              exists(
+                db
+                  .select({ id: request.requestId })
+                  .from(request)
+                  .where(
+                    and(
+                      eq(request.itemId, itemsTable.itemId),
+                      eq(request.isUrgent, true),
+                    ),
+                  ),
+              ),
+            ),
+          ),
+        );
+
+      return c.json({ items: rows });
+    }
+
     if (status === "urgent") {
       const rows = await db
         .select({
@@ -37,7 +97,6 @@ items.get("/", async (c) => {
       return c.json({ items: rows });
     }
 
-    // ── status=critical|low or stock_max=N: items below a stock threshold ──
     const threshold = stockMax
       ? Number(stockMax)
       : status === "critical"
@@ -61,7 +120,6 @@ items.get("/", async (c) => {
       return c.json({ items: list });
     }
 
-    // ── default: full list with optional search ──
     const rows = await db
       .select({
         itemId: itemsTable.itemId,
@@ -108,6 +166,44 @@ items.get("/", async (c) => {
   }
 });
 
+items.post("/", async (c) => {
+  const body = await c.req.json<{
+    itemName: string;
+    description?: string;
+    remainingAmount: number;
+    categoryId?: number;
+  }>();
+
+  if (!body.itemName || body.remainingAmount == null) {
+    return c.json(
+      { message: "itemName and remainingAmount are required", error: "VALIDATION_ERROR" },
+      ERROR_CODE_MAP.BAD_REQUEST,
+    );
+  }
+
+  try {
+    const [created] = await db
+      .insert(itemsTable)
+      .values({
+        itemName: body.itemName,
+        description: body.description,
+        remainingAmount: body.remainingAmount,
+        categoryId: body.categoryId,
+      })
+      .returning();
+
+    return c.json({ item: created }, 201);
+  } catch (error) {
+    console.error("items POST / error:", error);
+    return c.json(
+      { message: "Could not create item", error: "ITEM_CREATE_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
+});
+
+// ---- GET /:id , PATCH /:id , DELETE /:id (single item) ----
+
 items.get("/:id", async (c) => {
   const id = Number(c.req.param("id"));
 
@@ -149,42 +245,6 @@ items.get("/:id", async (c) => {
     console.error("items GET /:id error:", error);
     return c.json(
       { message: "Could not load item", error: "ITEMS_FETCH_FAILED" },
-      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
-    );
-  }
-});
-
-items.post("/", async (c) => {
-  const body = await c.req.json<{
-    itemName: string;
-    description?: string;
-    remainingAmount: number;
-    categoryId?: number;
-  }>();
-
-  if (!body.itemName || body.remainingAmount == null) {
-    return c.json(
-      { message: "itemName and remainingAmount are required", error: "VALIDATION_ERROR" },
-      ERROR_CODE_MAP.BAD_REQUEST,
-    );
-  }
-
-  try {
-    const [created] = await db
-      .insert(itemsTable)
-      .values({
-        itemName: body.itemName,
-        description: body.description,
-        remainingAmount: body.remainingAmount,
-        categoryId: body.categoryId,
-      })
-      .returning();
-
-    return c.json({ item: created }, 201);
-  } catch (error) {
-    console.error("items POST / error:", error);
-    return c.json(
-      { message: "Could not create item", error: "ITEM_CREATE_FAILED" },
       ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
     );
   }
