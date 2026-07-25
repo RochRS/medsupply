@@ -4,10 +4,10 @@ import type { AppEnv } from "../types/hono.js";
 
 // Extra session helpers for the frontend
 // Real login/logout still goes through /api/auth/*
-export const sessionRoutes = new Hono<AppEnv>();
+export const session = new Hono<AppEnv>();
 
 // Return the current logged-in user (needs a valid session)
-sessionRoutes.get("/me", requireAuth, (c) => {
+session.get("/me", requireAuth, (c) => {
   const user = c.get("user");
   const session = c.get("session");
 
@@ -21,6 +21,6 @@ sessionRoutes.get("/me", requireAuth, (c) => {
 });
 
 // Simple health check — no login needed
-sessionRoutes.get("/health", (c) => {
+session.get("/health", (c) => {
   return c.json({ status: "ok", auth: "ready" });
 });

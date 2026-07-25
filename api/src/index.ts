@@ -11,15 +11,14 @@ import { secureHeaders } from "hono/secure-headers";
 import { testDbConnection, dizzleCheck } from "./database/database.js";
 
 // Import route modules
-import { dashboard } from "./routes/dashboard.js";
 import { settings } from "./routes/settings.js";
 import { requests } from "./routes/requests.js";
-import { inventory } from "./routes/inventory.js";
+import { items } from "./routes/items.js";
 import { statistics } from "./routes/statistics.js";
 import { history } from "./routes/history.js";
-import { profile } from "./routes/profile.js";
-import { sessionRoutes } from "./routes/session.js";
-import { login } from "./routes/index.js";
+import { users } from "./routes/users.js";
+import { session } from "./routes/session.js";
+import { login } from "./routes/login.js";
 
 // Auth
 import { auth } from "./auth/auth.js";
@@ -30,12 +29,29 @@ import type { AppEnv } from "./types/hono.js";
 //----------------------------------
 
 // Frontend URL for CORS (strip trailing slash)
-const frontendOrigin =
-  process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
+// const frontendOrigin =
+//   process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
 
 // All API routes live under /api
 const app = new Hono<AppEnv>().basePath("/api");
 
+app.get("/", async (c) => {
+  return c.json({
+    name: "MedSupply API",
+    version: "1.0.0",
+    status: "running",
+    endpoints: {
+      auth: "/api/auth/*",
+      requests: "/api/requests",
+      items: "/api/items",
+      statistics: "/api/statistics",
+      history: "/api/history",
+      settings: "/api/settings",
+      users: "/api/users",
+      sessions: "/api/sessions",
+    },
+  });
+});
 // Basic browser security headers
 // app.use("*", secureHeaders());
 
@@ -62,8 +78,8 @@ const app = new Hono<AppEnv>().basePath("/api");
 // Load user/session on every request (may be null)
 // app.use("*", loadSession);
 
-// Public session helpers (/session/me, /session/health)
-// app.route("/session", sessionRoutes);
+// Public session helpers (/sessions/me, /sessions/health)
+// app.route("/sessions", session);
 
 // Public demo: validate + sanitize login payload (not a real login)
 // app.route("/", login);
@@ -71,13 +87,12 @@ const app = new Hono<AppEnv>().basePath("/api");
 // Everything below needs a logged-in user
 const protectedRoutes = new Hono<AppEnv>();
 // protectedRoutes.use("*", requireAuth);
-protectedRoutes.route("/dashboard", dashboard);
 protectedRoutes.route("/requests", requests);
-protectedRoutes.route("/inventory", inventory);
+protectedRoutes.route("/items", items);
 protectedRoutes.route("/statistics", statistics);
 protectedRoutes.route("/history", history);
 protectedRoutes.route("/settings", settings);
-protectedRoutes.route("/profile", profile);
+protectedRoutes.route("/users", users);
 
 // app.route("/", protectedRoutes);
 
@@ -88,13 +103,13 @@ const startServer = async () => {
 
   serve(
     {
-      fetch: app.fetch,
+      fetch: protectedRoutes.fetch,
       port: Number(process.env.SERVER_PORT || 3000),
     },
     (info) => {
       console.log(`\nServer is running on http://localhost:${info.port}`);
-      console.log(`Auth endpoints: http://localhost:${info.port}/api/auth/*`);
-      console.log(`Frontend origin (CORS): ${frontendOrigin}`);
+      // console.log(`Auth endpoints: http://localhost:${info.port}/api/auth/*`);
+      // console.log(`Frontend origin (CORS): ${frontendOrigin}`);
     },
   );
 };
