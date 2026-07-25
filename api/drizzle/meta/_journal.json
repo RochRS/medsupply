@@ -15,6 +15,13 @@
       "when": 1783900463251,
       "tag": "0001_sparkling_surge",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784989307788,
+      "tag": "0002_jazzy_satana",
+      "breakpoints": true
     }
   ]
 }

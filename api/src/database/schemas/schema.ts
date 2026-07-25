@@ -17,7 +17,7 @@ export * from "./core.js";
 export const users = pgTable(
   "users",
   {
-    id: integer().primaryKey().generatedAlwaysAsIdentity({
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity({
       name: "users_id_seq",
       startWith: 1,
       increment: 1,
@@ -25,9 +25,9 @@ export const users = pgTable(
       maxValue: 2147483647,
       cache: 1,
     }),
-    name: varchar({ length: 255 }).notNull(),
-    age: integer().notNull(),
-    email: varchar({ length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    age: integer("age").notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
   },
   (table) => [unique("users_email_unique").on(table.email)],
 );
