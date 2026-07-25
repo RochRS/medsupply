@@ -8,10 +8,10 @@ import type { AppEnv } from "../types/hono.js";
 const CRITICAL_MAX = 5;
 const LOW_MAX = 20;
 
-function stockLevel(amount: number): "kritiek" | "laag" | "goed" {
-  if (amount <= CRITICAL_MAX) return "kritiek";
-  if (amount <= LOW_MAX) return "laag";
-  return "goed";
+function stockLevel(amount: number): "critical" | "low" | "ok" {
+  if (amount <= CRITICAL_MAX) return "critical";
+  if (amount <= LOW_MAX) return "low";
+  return "ok";
 }
 
 export const items = new Hono<AppEnv>();
@@ -92,8 +92,8 @@ items.get("/", async (c) => {
 
     const totalItems = list.length;
     const totalStock = list.reduce((sum, row) => sum + row.remainingAmount, 0);
-    const criticalStock = list.filter((row) => row.stockLevel === "kritiek").length;
-    const lowStock = list.filter((row) => row.stockLevel === "laag").length;
+    const criticalStock = list.filter((row) => row.stockLevel === "critical").length;
+    const lowStock = list.filter((row) => row.stockLevel === "low").length;
 
     return c.json({
       items: list,
@@ -102,7 +102,7 @@ items.get("/", async (c) => {
   } catch (error) {
     console.error("items GET / error:", error);
     return c.json(
-      { message: "Could not load items", error: "INVENTORY_FETCH_FAILED" },
+      { message: "Could not load items", error: "ITEMS_FETCH_FAILED" },
       ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
     );
   }
@@ -148,7 +148,7 @@ items.get("/:id", async (c) => {
   } catch (error) {
     console.error("items GET /:id error:", error);
     return c.json(
-      { message: "Could not load item", error: "INVENTORY_FETCH_FAILED" },
+      { message: "Could not load item", error: "ITEMS_FETCH_FAILED" },
       ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
     );
   }

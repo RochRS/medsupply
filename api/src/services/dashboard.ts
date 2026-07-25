@@ -2,7 +2,7 @@ import { db } from "../database/database.js";
 import { items, categories, request, requestDescription } from "../database/schemas/schema.js";
 import { eq, lte } from "drizzle-orm";
 
-export async function getSpoedItemsNames() {
+export async function getUrgentItems() {
   return db
     .select({
       itemId: items.itemId,
@@ -14,7 +14,7 @@ export async function getSpoedItemsNames() {
     .where(eq(request.isUrgent, true));
 }
 
-export async function getKritiekLaag(threshold = 10) {
+export async function getCriticalLowStock(threshold = 10) {
   return db
     .select()
     .from(items)
@@ -22,14 +22,14 @@ export async function getKritiekLaag(threshold = 10) {
     .orderBy(items.remainingAmount);
 }
 
-export async function getTotalItemsList() {
+export async function getAllItems() {
   return db
     .select()
     .from(items)
     .leftJoin(categories, eq(items.categoryId, categories.categoryId));
 }
 
-export async function sendSpoedaanvraagRequest(data: {
+export async function sendUrgentRequest(data: {
   itemId: number;
   requestedAmount: number;
   requestBatchId?: number;
