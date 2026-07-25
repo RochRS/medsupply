@@ -9,7 +9,16 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/database/seed/seed.ts",
+    "db:seed:categories": "tsx src/database/seed/seed-categories.ts",
+    "db:seed:items": "tsx src/database/seed/seed-items.ts",
+    "db:seed:suppliers": "tsx src/database/seed/seed-suppliers.ts",
+    "db:seed:departments": "tsx src/database/seed/seed-departments.ts",
+    "db:seed:users": "tsx src/database/seed/seed-users.ts",
+    "db:seed:request-descriptions": "tsx src/database/seed/seed-request-descriptions.ts",
+    "db:seed:shipments": "tsx src/database/seed/seed-shipments.ts",
+    "db:seed:requests": "tsx src/database/seed/seed-requests.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.8",

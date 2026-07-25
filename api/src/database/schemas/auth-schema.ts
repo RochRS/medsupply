@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -82,33 +81,18 @@ export const verification = pgTable(
 );
 
 export const role = pgTable("role", {
-  roleId: integer().primaryKey().generatedAlwaysAsIdentity(),
-  roleName: varchar({ length: 255 }).notNull(),
+  roleId: integer("role_id").primaryKey().generatedAlwaysAsIdentity(),
+  roleName: varchar("role_name", { length: 255 }).notNull(),
 });
 
 export const department = pgTable("department", {
-  departmentId: integer().primaryKey().generatedAlwaysAsIdentity(),
-  departmentName: varchar({ length: 255 }).notNull(),
+  departmentId: integer("department_id").primaryKey().generatedAlwaysAsIdentity(),
+  departmentName: varchar("department_name", { length: 255 }).notNull(),
 
-  createdAt: timestamp().defaultNow(),
-  updatedAt: timestamp().defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
-}));
 
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
 
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
-}));
+
