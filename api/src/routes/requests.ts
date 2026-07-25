@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import { sendSpoedaanvraagRequest } from "../services/dashboard.js";
+import { sendUrgentRequest } from "../services/dashboard.js";
+import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 
 export const requests = new Hono();
 
@@ -20,13 +21,13 @@ requests.post("/", async (c) => {
     }>();
 
     if (body.isUrgent) {
-      const result = await sendSpoedaanvraagRequest(body);
+      const result = await sendUrgentRequest(body);
       return c.json(result, 201);
     }
 
     return c.json({ message: "Create a new request" }, 201);
   } catch (error) {
-    return c.json({ error: "Failed to create request" }, 500);
+    return c.json({ error: "Failed to create request" }, ERROR_CODE_MAP.INTERNAL_SERVER_ERROR);
   }
 });
 
