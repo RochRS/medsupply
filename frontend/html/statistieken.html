@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Statistieken</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="../css/bootstrap-5.3.8-dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/statistieken.css" />
+  </head>
+
+  <body>
+    <header
+      class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm"
+    >
+      <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
+          <img
+            src="../img/rkz-logo.jif"
+            alt="Logo"
+            width="30"
+            height="30"
+            class="me-2"
+          />
+          <span class="fw-bold">RKZ Voorraad</span>
+        </a>
+
+        <!-- Hamburger button (VERY IMPORTANT) -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <!-- Left side links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="aanvraag">Aanvraag</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="totale-voorraad">Totale Voorraad</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="statistieken">Statistieken</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="geschiedenis ">Geschiedenis</a>
+            </li>
+          </ul>
+
+          <!-- NOT FUNCTIONAL -->
+          <!-- Right side utilities -->
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="profile">Profiel</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="settings">Instellingen</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="login" id="logout"
+                >Log Out</a
+              >
+            </li>
+          </ul>
+          <!-- NOT FUNCTIONAL -->
+        </div>
+      </div>
+    </header>
+
+    <main class="container-fluid px-4 py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Statistieken Overzicht</h2>
+      </div>
+      <!-- ===== TOP GRID ===== -->
+      <div class="row g-4">
+        <!-- Voorraad status verdeling -->
+        <div class="col-lg-6">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Voorraad status verdeling</h6>
+              <div class="chart-box">Grafiek placeholder</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categorie verdeling -->
+        <div class="col-lg-6">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Categorie verdeling</h6>
+              <div class="chart-box">Grafiek placeholder</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Huidige voorraadniveaus -->
+        <div class="col-lg-8">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Huidige voorraadniveaus (per item)</h6>
+              <div class="chart-box">Staafdiagram placeholder</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Belangrijke statistieken -->
+        <div class="col-lg-4">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Belangrijke statistieken</h6>
+
+              <ul class="stat-list">
+                <li><strong>Totale items:</strong> 120</li>
+                <li><strong>Kritieke items:</strong> 8</li>
+                <li><strong>Gem. verbruik/dag:</strong> 35</li>
+                <li><strong>Gem. tijd in opslag:</strong> 42 dagen</li>
+                <li><strong>Hoogste verbruik item:</strong> Paracetamol</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dagelijks gebruik -->
+        <div class="col-lg-6">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Dagelijks gebruik (laatste week)</h6>
+              <div class="chart-box">Lijngrafiek placeholder</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Maandelijks gebruik -->
+        <div class="col-lg-6">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Maandelijks gebruik (2025)</h6>
+              <div class="chart-box">Staafdiagram placeholder</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jaarlijks gebruik vergelijking -->
+        <div class="col-lg-6">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Jaarlijks gebruik (vergelijking)</h6>
+              <div class="chart-box">Vergelijkingsgrafiek placeholder</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tijd in opslag -->
+        <div class="col-lg-6">
+          <div class="card stat-card h-100">
+            <div class="card-body">
+              <h6 class="card-title">Tijd in opslag (gemiddeld per item)</h6>
+              <div class="chart-box">Grafiek placeholder</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="text-center">
+      <p>&copy; 2024 RKZ Voorraadbeheer. Alle rechten voorbehouden.</p>
+    </footer>
+    <script src="../css/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../javascript/statistieken.js"></script>
+    <script src="../javascript/logOut.js"></script>
+  </body>
+</html>

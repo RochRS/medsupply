@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model categories {
+  categoryId   Int      @id @default(autoincrement())
+  categoryName String
+  description  String   @db.Text
+  createdAt    DateTime @default(now())
+  // Use @default(now()) and @db.Timestamp
+  updatedAt    DateTime @default(now()) @updatedAt @db.Timestamp
+
+  items        items[]
+}
+
+model department {
+  departmentId   Int      @id @default(autoincrement())
+  departmentName String   @db.VarChar(100)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt @db.Timestamp
+
+  users          users[]
+  request request[]
+}
+
+model items {
+  itemId          Int      @id @default(autoincrement())
+  itemName        String
+  description     String   @db.MediumText
+  remainingAmount Int
+  categoryId      Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt @db.Timestamp
+
+  categories      categories @relation(fields: [categoryId], references: [categoryId], map: "Items_categoryId_fkey")
+  request         request[]
+  shipments       shipments[]
+
+  @@index([categoryId], map: "Items_categoryId_idx")
+}
+
+model request {
+  requestId       Int      @id @default(autoincrement())
+  requestBatchId  Int
+  itemId          Int
+  requestedAmount Int
+  isUrgent Boolean
+  isCompleted Boolean
+  requestedDate   DateTime @default(now())
+  userId          Int
+  departmentId Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt @db.Timestamp
+
+  items           items    @relation(fields: [itemId], references: [itemId], map: "Request_itemId_fkey")
+  users           users    @relation(fields: [userId], references: [userId], map: "Request_userId_fkey")
+  department           department    @relation(fields: [departmentId], references: [departmentId], map: "Request_departmentId_fkey")
+
+  @@index([itemId], map: "Request_itemId_idx")
+  @@index([departmentId], map: "Request_departmentId_idx")
+  @@index([userId], map: "Request_userId_idx")
+}
+
+model shipments {
+  shipmentId      Int       @id @default(autoincrement())
+  shipmentBatchId Int
+  itemId          Int
+  GTIN            Int       @default(0)
+  supplierId      Int
+  deliveryDate    DateTime  @default(now())
+  experationDate  DateTime
+  cost            Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt @db.Timestamp
+
+  items           items     @relation(fields: [itemId], references: [itemId], map: "Shipments_itemId_fkey")
+  suppliers       suppliers @relation(fields: [supplierId], references: [supplierId], map: "Shipments_supplierId_fkey")
+
+  @@index([itemId], map: "Shipments_itemId_idx")
+  @@index([supplierId], map: "Shipments_supplierId_idx")
+}
+
+model suppliers {
+  supplierId   Int       @id @default(autoincrement())
+  supplierName String    @unique(map: "Suppliers_supplierName_key")
+  Address      String
+  Description  String    @db.MediumText
+  contact      String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamp
+
+  shipments    shipments[]
+}
+
+model users {
+  userId       Int        @id @default(autoincrement())
+  firstName    String     @db.VarChar(50)
+  lastName     String     @db.VarChar(50)
+  email        String     @unique(map: "Users_email_key") @db.VarChar(255)
+  saltedPassword     String     @db.Text
+  roleId       Int
+  departmentId Int
+  isActive Boolean @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt @db.Timestamp
+
+  request      request[]
+  department   department @relation(fields: [departmentId], references: [departmentId], map: "Users_departmentId_fkey")
+  role         role       @relation(fields: [roleId], references: [roleId], map: "Users_roleId_fkey")
+
+  @@index([departmentId], map: "Users_departmentId_idx")
+  @@index([roleId], map: "Users_roleId_idx")
+}
+
+// Added role back since it was missing fields in your snippet
+model role {
+  roleId   Int     @id @default(autoincrement())
+  roleName String
+  users    users[]
+}
+
+
+//A field that should store text from the request,
+// so that we don't have to write multiple time to req table
+
+model reqDescirptions{
+  reqDescriptionId Int @id @default(autoincrement())
+  descriptionField String @db.LongText
+}

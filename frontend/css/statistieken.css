@@ -1,0 +1,27 @@
+/* card styling */
+.card-title {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.chart-box {
+  height: 220px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 14px;
+}
+
+.stat-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.stat-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ececec;
+  font-size: 14px;
+}

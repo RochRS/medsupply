@@ -1,0 +1,14 @@
+#env file exclude
+.env
+
+#node_modules
+node_modules
+
+
+#removing bootstrap from gitview
+bootstrap-5.3.8-dist
+
+#removing planning folder
+planning
+
+generated

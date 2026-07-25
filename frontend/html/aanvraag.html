@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Aanvraag</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/bootstrap-5.3.8-dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/aanvraag.css" />
+  </head>
+
+  <body>
+    <body>
+    <header class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+      <div class="container-fluid">
+
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
+          <img 
+            src="../img/rkz-logo.jif" 
+            alt="Logo" 
+            width="30" 
+            height="30"
+            class="me-2"
+          >
+          <span class="fw-bold">RKZ Voorraad</span>
+        </a>
+
+        <!-- Hamburger button (VERY IMPORTANT) -->
+        <button 
+          class="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+          <!-- Left side links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="aanvraag">Aanvraag</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="totale-voorraad">Totale Voorraad</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="statistieken">Statistieken</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="geschiedenis">Geschiedenis</a>
+            </li>
+          </ul>
+
+          <!-- NOT FUNCTIONAL -->
+          <!-- Right side utilities -->
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="profile">Profiel</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="settings">Instellingen</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="login" id="logout"
+                >Log Out</a
+              >
+            </li>
+          </ul>
+          <!-- NOT FUNCTIONAL -->
+
+        </div>
+      </div>
+    </header>
+
+    <main class="container-fluid px-4 py-4">
+      <!-- Title of the page -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Aanvraag formulier</h2>
+      </div>
+
+      <!-- Aanvraag formulier of the page -->
+      <section class="card mx-auto">
+        <div class="card-header bg-white pt-3">
+          <h4 class="mb-1 fw-bold">Normale aanvraag</h4>
+          <p class="small">Voor reguliere voorraadaanvragen zonder spoed</p>
+        </div>
+
+        <!-- body of he normale aanvraag fomulier -->
+        <div class="card-body">
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <!-- Impliment a way to be able to type and or search up for supplies type-->
+              <!-- Make not required if possibel(be able to get the supply type just by the supply name) -->
+              <label
+                class="form-label fw-bold"
+                for="search-select-supplies-filter"
+                >Zoek en/of select supply type:</label
+              >
+              <input
+                class="form-control mb-3"
+                type="text"
+                id="search-select-supplies-filter"
+                placeholder="Voer supply type in"
+              />
+
+              <!-- Impliment a way to insert the amount you want to request, also be
+              able to see total storage -->
+              <label class="form-label fw-bold" for="aantal-supplies-selecter"
+                >Aantal:</label
+              >
+              <input
+                class="form-control"
+                type="number"
+                id="aantal-supplies-selecter"
+                placeholder="Voer aantal in"
+              />
+            </div>
+
+            <!-- Impliment a way to be able to type and or search up for supplies-->
+            <div class="col-md-6">
+              <label class="form-label fw-bold" for="naam-supply-selecter"
+                >Naam van supplies:</label
+              >
+              <input
+                class="form-control mb-3"
+                type="text"
+                id="naam-supply-selecter"
+                placeholder="Voer/zoek op supply naam"
+              />
+
+              <!-- Impliment a way to be able to type and or search up for afdeling name-->
+              <label class="form-label fw-bold" for="naam-afdeling-selector"
+                >Afdeling:</label
+              >
+              <input
+                class="form-control"
+                type="text"
+                id="naam-afdeling-selector"
+                placeholder="Voer afdelingsnaam in"
+              />
+            </div>
+          </div>
+
+          <!-- Select the urgency(how quickly) you need to be able to get the supply-->
+          <!-- Impliment a way to pull this data -->
+          <div class="mb-4 p-3 card border-0 shadow-sm">
+            <h6 class="fw-bold">Urgentie</h6>
+            <div class="d-flex flex-column gap-2">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="urgentie"
+                  id="normal"
+                  checked
+                />
+                <label for="normal">Normaal (binnen 3-5 dagen)</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="urgentie"
+                  id="verhoogd"
+                />
+                <label for="verhoogd">Verhoogd (binnen 1-2 dagen)</label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="urgentie"
+                  id="hoog"
+                />
+                <label class="form-check-label" for="hoog"
+                  >Hoog (binnen 24 uur)</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- A way to add extra info -->
+          <!-- Impliment a way to pull this data out of the box -->
+          <div class="mb-4">
+            <h6 class="fw-bold">Opmerkingen (optioneel)</h6>
+            <textarea
+              class="form-control"
+              name="opmerkingen"
+              rows="4"
+              placeholder="Waarom is deze voorraad nodig?"
+            ></textarea>
+          </div>
+
+          <!-- Give you the data of who is asking(The User) -->
+          <!-- Impliment a way get User info from DB -->
+          <div class="mb-4">
+            <h6 class="fw-bold">Gebruikers Info</h6>
+            <textarea
+              class="form-control bg-light"
+              rows="2"
+              id="gebruiker-info"
+              readonly
+            >
+              Rol: &
+              Afdeling: aangeven
+            </textarea
+            >
+          </div>
+
+          <!-- Buttons to send data to the DB -->
+          <!-- Make funtional -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" id="versturen">Aanvraag versturen</button>
+            <button class="btn btn-danger" id="wissen">Wissen</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center">
+      <p>&copy; 2024 RKZ Voorraadbeheer. Alle rechten voorbehouden.</p>
+    </footer>
+    <script src="../css/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../javascript/aanvraag.js"></script> 
+    <script src="../javascript/logOut.js"></script> 
+  </body>
+</html>

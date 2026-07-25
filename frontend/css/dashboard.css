@@ -1,0 +1,19 @@
+/* ============================================================
+   dashboard.css — only styles unique to the dashboard page.
+   Everything else is handled by main.css + Bootstrap.
+   ============================================================ */
+
+/* Spoedaanvraag card — orange gradient, unique to dashboard */
+.spoed-card {
+  background: linear-gradient(180deg, #e44907, #ff6a2f);
+}
+
+.spoed-header {
+  background: transparent;
+  border-bottom: none;
+}
+
+/* Keep the spoed title white (overrides the blue from main.css) */
+.spoed-header h5 {
+  color: #ffffff !important;
+}

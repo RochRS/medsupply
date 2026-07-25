@@ -1,0 +1,29 @@
+/* ============================================================
+   geschiedenis.css — only styles unique to the history page.
+   Tables, badges, selects and layout are all handled by main.css.
+   ============================================================ */
+
+/* Note/annotation input field — unique to geschiedenis */
+.note-input {
+  width: 100%;
+  min-width: 280px;
+  border: 1px dashed #b7c5d8;
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  color: #1f2d3d;
+  background-color: #fbfdff;
+}
+
+.note-input::placeholder { color: #8a99ad; }
+
+.note-input:focus {
+  outline: none;
+  border-color: #2f80ed;
+  box-shadow: 0 0 0 0.16rem rgba(47, 128, 237, 0.18);
+  background-color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .note-input { min-width: 220px; }
+}
