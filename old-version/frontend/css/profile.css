@@ -1,0 +1,78 @@
+/* ============================================================
+   profile.css — only styles unique to the profile page.
+   Shared styles (header bar, avatar, stat cards, back button,
+   CSS variables) are all in main.css.
+   ============================================================ */
+
+
+
+/* Full-height profile card layout */
+.profile-card {
+  background-color: #ffffff;
+  border-radius: 0;
+  border: none;
+  box-shadow: none !important;
+}
+
+/* Each info row (icon + label + value) */
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.info-row svg {
+  color: var(--icon);
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.info-row .fs-4.text-dark {
+  font-weight: 600;
+}
+
+/* Form labels appear white inside the white card */
+.form-label {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 0.15rem;
+  font-weight: 400;
+}
+
+/* Divider between info rows and activity section */
+.activity-divider {
+  border-top: 1px solid var(--line);
+  margin: 10px 0 18px 0;
+}
+
+.activity-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+
+/* Stat numbers and labels inside activity cards */
+.stat-card h4 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card p {
+  margin-bottom: 0;
+  font-size: 1.25rem;
+  color: #36465c;
+  font-weight: 600;
+}
+
+/* Action area at the bottom */
+.profile-actions {
+  margin-top: 1.5rem;
+  padding: 0 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}

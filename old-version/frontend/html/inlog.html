@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Medsupply Manager RKZ</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="../css/bootstrap-5.3.8-dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/inlog.css" />
+  </head>
+
+  <body class="bg-rkz-blue">
+    <main
+      class="d-flex flex-column justify-content-center align-items-center min-vh-100 container"
+    >
+      <img class="logo mb-3 shadow-sm" src="../img/rkz-logo.jif" alt="Logo" />
+
+      <h1 class="h1-title mb-1">Medsupply Manager RKZ</h1>
+      <p class="p-subtitle mb-4">Voorraadbeheer voor medische supplies</p>
+
+      <!-- rollen kiezen -->
+      <div class="login-box shadow-lg p-4">
+        <form onsubmit="return false;">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Rol</label>
+            <select class="form-select rounded-pill" name="role" required>
+              <option value="employee">employee</option>
+              <option value="manager">manager</option>
+              <option value="admin">admin</option>
+            </select>
+          </div>
+
+          <!-- email -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Email</label>
+            <input
+              class="form-control rounded-pill"
+              type="email"
+              name="email"
+              required
+            />
+          </div>
+
+          <!-- wachtwoord -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Wachtwoord</label>
+            <input
+              class="form-control rounded-pill"
+              type="password"
+              name="password"
+              required
+            />
+          </div>
+
+          <!-- inloggen button -->
+          <div>
+            <button
+              id="btn-login"
+              onclick="logIn()"
+              class="btn rounded-pill fw-bold"
+              type="button"
+            >
+              Inloggen
+            </button>
+          </div>
+          <!-- warning text -->
+          <p class="warning-text mt-4">
+            Let op: Alleen medewerkers met een geldig ziekenhuis e-mailadres
+            kunnen inloggen.
+          </p>
+        </form>
+      </div>
+    </main>
+
+    <footer class="text-center">
+      <p>&copy; 2024 RKZ Voorraadbeheer. Alle rechten voorbehouden.</p>
+    </footer>
+  </body>
+  <script src="../css/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../javascript/inlog.js"></script>
+</html>
