@@ -8,7 +8,7 @@ import type { LoginInput } from "../schemas/user-login.js";
 // Real login: POST /api/auth/sign-in/email
 export const login = new Hono<AppEnv>();
 
-login.post("/validate-login-payload", validate(loginSchema), async (c) => {
+login.post("/login", validate(loginSchema), async (c) => {
   const body = c.get("validated") as LoginInput;
 
   return c.json({
