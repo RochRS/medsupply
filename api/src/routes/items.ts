@@ -1,43 +1,47 @@
 import { Hono } from "hono";
-import { eq, asc, ilike, or, lte } from "drizzle-orm";
-import { db } from "../database/database.js";
-import { items as itemsTable, categories, request } from "../database/schemas/core.js";
+import {
+  getUrgentItems,
+  getNonUrgentItems,
+  getItemsByStock,
+  getAllItems,
+  getItemById,
+  createItem,
+  updateItem,
+  deleteItem,
+} from "../services/items.service.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 import type { AppEnv } from "../types/hono.js";
+import type { CreateItemInput, UpdateItemInput } from "../schemas/item.js";
 
 const CRITICAL_MAX = 5;
 const LOW_MAX = 20;
 
-function stockLevel(amount: number): "critical" | "low" | "ok" {
-  if (amount <= CRITICAL_MAX) return "critical";
-  if (amount <= LOW_MAX) return "low";
-  return "ok";
-}
-
 export const items = new Hono<AppEnv>();
+
+// ---- GET / POST (collection) ----
 
 items.get("/", async (c) => {
   const search = c.req.query("search")?.trim();
   const status = c.req.query("status");
   const stockMax = c.req.query("stock_max");
+  const isUrgent = c.req.query("isUrgent");
 
   try {
-    // ── status=urgent: items with urgent requests ──
-    if (status === "urgent") {
-      const rows = await db
-        .select({
-          itemId: itemsTable.itemId,
-          itemName: itemsTable.itemName,
-          remainingAmount: itemsTable.remainingAmount,
-        })
-        .from(itemsTable)
-        .innerJoin(request, eq(request.itemId, itemsTable.itemId))
-        .where(eq(request.isUrgent, true));
-
+    if (isUrgent === "true") {
+      const rows = await getUrgentItems(search);
       return c.json({ items: rows });
     }
 
-    // ── status=critical|low or stock_max=N: items below a stock threshold ──
+    if (isUrgent === "false") {
+      const rows = await getNonUrgentItems(search);
+      return c.json({ items: rows });
+    }
+
+    if (status === "urgent") {
+      const rows = await getUrgentItems(search);
+      return c.json({ items: rows });
+    }
+
     const threshold = stockMax
       ? Number(stockMax)
       : status === "critical"
@@ -47,58 +51,12 @@ items.get("/", async (c) => {
           : null;
 
     if (threshold !== null) {
-      const rows = await db
-        .select()
-        .from(itemsTable)
-        .where(lte(itemsTable.remainingAmount, threshold))
-        .orderBy(asc(itemsTable.remainingAmount));
-
-      const list = rows.map((row) => ({
-        ...row,
-        stockLevel: stockLevel(row.remainingAmount),
-      }));
-
+      const list = await getItemsByStock(threshold);
       return c.json({ items: list });
     }
 
-    // ── default: full list with optional search ──
-    const rows = await db
-      .select({
-        itemId: itemsTable.itemId,
-        itemName: itemsTable.itemName,
-        description: itemsTable.description,
-        remainingAmount: itemsTable.remainingAmount,
-        categoryId: itemsTable.categoryId,
-        categoryName: categories.categoryName,
-        createdAt: itemsTable.createdAt,
-        updatedAt: itemsTable.updatedAt,
-      })
-      .from(itemsTable)
-      .leftJoin(categories, eq(itemsTable.categoryId, categories.categoryId))
-      .where(
-        search
-          ? or(
-              ilike(itemsTable.itemName, `%${search}%`),
-              ilike(categories.categoryName, `%${search}%`),
-            )
-          : undefined,
-      )
-      .orderBy(asc(itemsTable.itemName));
-
-    const list = rows.map((row) => ({
-      ...row,
-      stockLevel: stockLevel(row.remainingAmount),
-    }));
-
-    const totalItems = list.length;
-    const totalStock = list.reduce((sum, row) => sum + row.remainingAmount, 0);
-    const criticalStock = list.filter((row) => row.stockLevel === "critical").length;
-    const lowStock = list.filter((row) => row.stockLevel === "low").length;
-
-    return c.json({
-      items: list,
-      summary: { totalItems, totalStock, criticalStock, lowStock },
-    });
+    const result = await getAllItems(search);
+    return c.json(result);
   } catch (error) {
     console.error("items GET / error:", error);
     return c.json(
@@ -107,6 +65,30 @@ items.get("/", async (c) => {
     );
   }
 });
+
+items.post("/", async (c) => {
+  const body = await c.req.json<CreateItemInput>();
+
+  if (!body.itemName || body.remainingAmount == null) {
+    return c.json(
+      { message: "itemName and remainingAmount are required", error: "VALIDATION_ERROR" },
+      ERROR_CODE_MAP.BAD_REQUEST,
+    );
+  }
+
+  try {
+    const created = await createItem(body);
+    return c.json({ item: created }, 201);
+  } catch (error) {
+    console.error("items POST / error:", error);
+    return c.json(
+      { message: "Could not create item", error: "ITEM_CREATE_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
+});
+
+// ---- GET /:id , PATCH /:id , DELETE /:id (single item) ----
 
 items.get("/:id", async (c) => {
   const id = Number(c.req.param("id"));
@@ -119,21 +101,7 @@ items.get("/:id", async (c) => {
   }
 
   try {
-    const [row] = await db
-      .select({
-        itemId: itemsTable.itemId,
-        itemName: itemsTable.itemName,
-        description: itemsTable.description,
-        remainingAmount: itemsTable.remainingAmount,
-        categoryId: itemsTable.categoryId,
-        categoryName: categories.categoryName,
-        createdAt: itemsTable.createdAt,
-        updatedAt: itemsTable.updatedAt,
-      })
-      .from(itemsTable)
-      .leftJoin(categories, eq(itemsTable.categoryId, categories.categoryId))
-      .where(eq(itemsTable.itemId, id))
-      .limit(1);
+    const row = await getItemById(id);
 
     if (!row) {
       return c.json(
@@ -142,49 +110,11 @@ items.get("/:id", async (c) => {
       );
     }
 
-    return c.json({
-      item: { ...row, stockLevel: stockLevel(row.remainingAmount) },
-    });
+    return c.json({ item: row });
   } catch (error) {
     console.error("items GET /:id error:", error);
     return c.json(
       { message: "Could not load item", error: "ITEMS_FETCH_FAILED" },
-      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
-    );
-  }
-});
-
-items.post("/", async (c) => {
-  const body = await c.req.json<{
-    itemName: string;
-    description?: string;
-    remainingAmount: number;
-    categoryId?: number;
-  }>();
-
-  if (!body.itemName || body.remainingAmount == null) {
-    return c.json(
-      { message: "itemName and remainingAmount are required", error: "VALIDATION_ERROR" },
-      ERROR_CODE_MAP.BAD_REQUEST,
-    );
-  }
-
-  try {
-    const [created] = await db
-      .insert(itemsTable)
-      .values({
-        itemName: body.itemName,
-        description: body.description,
-        remainingAmount: body.remainingAmount,
-        categoryId: body.categoryId,
-      })
-      .returning();
-
-    return c.json({ item: created }, 201);
-  } catch (error) {
-    console.error("items POST / error:", error);
-    return c.json(
-      { message: "Could not create item", error: "ITEM_CREATE_FAILED" },
       ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
     );
   }
@@ -200,12 +130,7 @@ items.patch("/:id", async (c) => {
     );
   }
 
-  const body = await c.req.json<{
-    itemName?: string;
-    description?: string;
-    remainingAmount?: number;
-    categoryId?: number;
-  }>();
+  const body = await c.req.json<UpdateItemInput>();
 
   if (Object.keys(body).length === 0) {
     return c.json(
@@ -215,11 +140,7 @@ items.patch("/:id", async (c) => {
   }
 
   try {
-    const [updated] = await db
-      .update(itemsTable)
-      .set(body)
-      .where(eq(itemsTable.itemId, id))
-      .returning();
+    const updated = await updateItem(id, body);
 
     if (!updated) {
       return c.json(
@@ -249,10 +170,7 @@ items.delete("/:id", async (c) => {
   }
 
   try {
-    const [deleted] = await db
-      .delete(itemsTable)
-      .where(eq(itemsTable.itemId, id))
-      .returning();
+    const deleted = await deleteItem(id);
 
     if (!deleted) {
       return c.json(

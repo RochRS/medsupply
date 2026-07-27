@@ -1,11 +1,22 @@
 import { Hono } from "hono";
-import { sendUrgentRequest } from "../services/dashboard.js";
+import { getAllRequests, getRequestById, sendUrgentRequest } from "../services/requests.service.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 
 export const requests = new Hono();
 
+// ---- GET / POST (collection) ----
+
 requests.get("/", async (c) => {
-  return c.json({ message: "List all requests" });
+  try {
+    const rows = await getAllRequests();
+    return c.json({ requests: rows });
+  } catch (error) {
+    console.error("requests GET / error:", error);
+    return c.json(
+      { message: "Could not load requests", error: "REQUESTS_FETCH_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
 });
 
 requests.post("/", async (c) => {
@@ -15,7 +26,7 @@ requests.post("/", async (c) => {
       requestedAmount: number;
       isUrgent?: boolean;
       requestBatchId?: number;
-      userId?: number | null;
+      userId?: string | null;
       departmentId?: number | null;
       requestDescriptionField?: string | null;
     }>();
@@ -31,9 +42,29 @@ requests.post("/", async (c) => {
   }
 });
 
+// ---- GET /:id , PATCH /:id , DELETE /:id (single request) ----
+
 requests.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  return c.json({ message: `Get request ${id}` });
+  const id = Number(c.req.param("id"));
+
+  try {
+    const row = await getRequestById(id);
+
+    if (!row) {
+      return c.json(
+        { message: "Request not found", error: "REQUEST_NOT_FOUND" },
+        ERROR_CODE_MAP.NOT_FOUND,
+      );
+    }
+
+    return c.json({ request: row });
+  } catch (error) {
+    console.error("requests GET /:id error:", error);
+    return c.json(
+      { message: "Could not load request", error: "REQUEST_FETCH_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
 });
 
 requests.patch("/:id", async (c) => {
