@@ -1,0 +1,5 @@
+ALTER TABLE "items" ADD CONSTRAINT "items_categoryId_categories_categoryId_fk" FOREIGN KEY ("categoryId") REFERENCES "public"."categories"("categoryId") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "request" ADD CONSTRAINT "request_itemId_items_itemId_fk" FOREIGN KEY ("itemId") REFERENCES "public"."items"("itemId") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "request" ADD CONSTRAINT "request_requestDescriptionId_request_description_requestDescriptionId_fk" FOREIGN KEY ("requestDescriptionId") REFERENCES "public"."request_description"("requestDescriptionId") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "shipments" ADD CONSTRAINT "shipments_itemId_items_itemId_fk" FOREIGN KEY ("itemId") REFERENCES "public"."items"("itemId") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "shipments" ADD CONSTRAINT "shipments_suppliersId_suppliers_supplierId_fk" FOREIGN KEY ("suppliersId") REFERENCES "public"."suppliers"("supplierId") ON DELETE no action ON UPDATE no action;
