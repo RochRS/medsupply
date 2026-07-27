@@ -7,9 +7,9 @@ import type { AppEnv } from "../types/hono.js";
 
 export const history = new Hono<AppEnv>();
 
-// GET /api/history — activity feed (aanvragen + leveringen)
+// GET /api/history — activity feed (requests + deliveries)
 history.get("/", async (c) => {
-  const type = c.req.query("type"); // "aanvraag" | "levering" | undefined = all
+  const type = c.req.query("type"); // "request" | "delivery" | undefined = all
   const limitRaw = Number(c.req.query("limit") ?? 100);
   const limit = Number.isFinite(limitRaw)
     ? Math.min(Math.max(limitRaw, 1), 500)
@@ -18,7 +18,7 @@ history.get("/", async (c) => {
   try {
     const activities: Array<{
       id: string;
-      type: "aanvraag" | "levering";
+      type: "request" | "delivery";
       itemName: string | null;
       amount: number;
       isUrgent: boolean | null;
@@ -28,8 +28,8 @@ history.get("/", async (c) => {
       status: string;
     }> = [];
 
-    // Requests (= aanvragen) as history rows
-    if (!type || type === "aanvraag") {
+    // Requests as history rows
+    if (!type || type === "request") {
       const requests = await db
         .select({
           requestId: request.requestId,
@@ -46,8 +46,8 @@ history.get("/", async (c) => {
 
       for (const row of requests) {
         activities.push({
-          id: `aanvraag-${row.requestId}`,
-          type: "aanvraag",
+          id: `request-${row.requestId}`,
+          type: "request",
           itemName: row.itemName,
           amount: row.requestedAmount,
           isUrgent: row.isUrgent,
@@ -55,16 +55,16 @@ history.get("/", async (c) => {
           supplierName: null,
           createdAt: row.createdAt,
           status: row.isCompleted
-            ? "voltooid"
+            ? "completed"
             : row.isUrgent
-              ? "spoed"
+              ? "urgent"
               : "open",
         });
       }
     }
 
-    // Shipments (= leveringen) as history rows
-    if (!type || type === "levering") {
+    // Shipments (= deliveries) as history rows
+    if (!type || type === "delivery") {
       const deliveries = await db
         .select({
           shipmentId: shipments.shipmentId,
@@ -82,15 +82,15 @@ history.get("/", async (c) => {
 
       for (const row of deliveries) {
         activities.push({
-          id: `levering-${row.shipmentId}`,
-          type: "levering",
+          id: `delivery-${row.shipmentId}`,
+          type: "delivery",
           itemName: row.itemName,
           amount: row.cost,
           isUrgent: null,
           isCompleted: true,
           supplierName: row.supplierName,
           createdAt: row.deliveryDate,
-          status: "voltooid",
+          status: "completed",
         });
       }
     }
@@ -108,8 +108,8 @@ history.get("/", async (c) => {
       activities: sliced,
       summary: {
         total: sliced.length,
-        aanvragen: sliced.filter((a) => a.type === "aanvraag").length,
-        leveringen: sliced.filter((a) => a.type === "levering").length,
+        requests: sliced.filter((a) => a.type === "request").length,
+        deliveries: sliced.filter((a) => a.type === "delivery").length,
       },
     });
   } catch (error) {
