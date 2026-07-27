@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+// ---- create schema ----
+
 export const createRequestSchema = z.object({
   itemId: z.number().int().positive(),
   requestedAmount: z.number().int().positive(),

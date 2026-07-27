@@ -120,6 +120,7 @@ items.get("/:id", async (c) => {
   }
 });
 
+/** PATCH /items/:id — update item */
 items.patch("/:id", async (c) => {
   const id = Number(c.req.param("id"));
 
@@ -159,6 +160,7 @@ items.patch("/:id", async (c) => {
   }
 });
 
+/** DELETE /items/:id — delete item */
 items.delete("/:id", async (c) => {
   const id = Number(c.req.param("id"));
 

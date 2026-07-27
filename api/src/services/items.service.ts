@@ -6,11 +6,15 @@ import type { CreateItemInput, UpdateItemInput } from "../schemas/item.js";
 const CRITICAL_MAX = 5;
 const LOW_MAX = 20;
 
+// ---- helpers ----
+
 export function stockLevel(amount: number): "critical" | "low" | "ok" {
   if (amount <= CRITICAL_MAX) return "critical";
   if (amount <= LOW_MAX) return "low";
   return "ok";
 }
+
+// ---- queries ----
 
 export async function getUrgentItems(search?: string) {
   return db
@@ -137,6 +141,8 @@ export async function getItemById(id: number) {
 
   return { ...row, stockLevel: stockLevel(row.remainingAmount) };
 }
+
+// ---- mutations ----
 
 export async function createItem(data: CreateItemInput) {
   const [created] = await db

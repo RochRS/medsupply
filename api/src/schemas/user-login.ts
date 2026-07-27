@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-// Shared email rules (always store lowercase)
+// ---- shared field rules ----
+
 const emailField = z
   .string()
   .min(1, "Email is required")
@@ -8,13 +9,13 @@ const emailField = z
   .max(255, "Email is too long")
   .transform((value) => value.toLowerCase());
 
-// Password rules for registration
 const passwordField = z
   .string()
   .min(8, "Password must be at least 8 characters")
   .max(128, "Password is too long");
 
-// Login body: email + password only (.strict = no extra fields)
+// ---- schemas ----
+
 export const loginSchema = z
   .object({
     email: emailField,
@@ -22,7 +23,6 @@ export const loginSchema = z
   })
   .strict();
 
-// Register body: name + email + password
 export const registerSchema = z
   .object({
     name: z
