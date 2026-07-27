@@ -33,7 +33,7 @@ export async function sendUrgentRequest(data: {
   itemId: number;
   requestedAmount: number;
   requestBatchId?: number;
-  userId?: number | null;
+  userId?: string | null;
   departmentId?: number | null;
   requestDescriptionField?: string | null;
 }) {

@@ -1,7 +1,5 @@
 import { Hono } from "hono";
-import { eq, desc } from "drizzle-orm";
-import { db } from "../database/database.js";
-import { request, items } from "../database/schemas/core.js";
+import { getAllRequests, getRequestById } from "../services/requests.js";
 import { sendUrgentRequest } from "../services/dashboard.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 
@@ -11,21 +9,7 @@ export const requests = new Hono();
 
 requests.get("/", async (c) => {
   try {
-    const rows = await db
-      .select({
-        requestId: request.requestId,
-        requestBatchId: request.requestBatchId,
-        requestedAmount: request.requestedAmount,
-        isUrgent: request.isUrgent,
-        isCompleted: request.isCompleted,
-        itemName: items.itemName,
-        createdAt: request.createdAt,
-        updatedAt: request.updatedAt,
-      })
-      .from(request)
-      .leftJoin(items, eq(request.itemId, items.itemId))
-      .orderBy(desc(request.createdAt));
-
+    const rows = await getAllRequests();
     return c.json({ requests: rows });
   } catch (error) {
     console.error("requests GET / error:", error);
@@ -43,7 +27,7 @@ requests.post("/", async (c) => {
       requestedAmount: number;
       isUrgent?: boolean;
       requestBatchId?: number;
-      userId?: number | null;
+      userId?: string | null;
       departmentId?: number | null;
       requestDescriptionField?: string | null;
     }>();
@@ -62,8 +46,26 @@ requests.post("/", async (c) => {
 // ---- GET /:id , PATCH /:id , DELETE /:id (single request) ----
 
 requests.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  return c.json({ message: `Get request ${id}` });
+  const id = Number(c.req.param("id"));
+
+  try {
+    const row = await getRequestById(id);
+
+    if (!row) {
+      return c.json(
+        { message: "Request not found", error: "REQUEST_NOT_FOUND" },
+        ERROR_CODE_MAP.NOT_FOUND,
+      );
+    }
+
+    return c.json({ request: row });
+  } catch (error) {
+    console.error("requests GET /:id error:", error);
+    return c.json(
+      { message: "Could not load request", error: "REQUEST_FETCH_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
 });
 
 requests.patch("/:id", async (c) => {
