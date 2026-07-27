@@ -1,18 +1,20 @@
 import { Hono } from "hono";
-import { eq, asc, ilike, or, lte, and, not, exists } from "drizzle-orm";
-import { db } from "../database/database.js";
-import { items as itemsTable, categories, request } from "../database/schemas/core.js";
+import {
+  getUrgentItems,
+  getNonUrgentItems,
+  getItemsByStock,
+  getAllItems,
+  getItemById,
+  createItem,
+  updateItem,
+  deleteItem,
+} from "../services/items.service.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 import type { AppEnv } from "../types/hono.js";
+import type { CreateItemInput, UpdateItemInput } from "../schemas/item.js";
 
 const CRITICAL_MAX = 5;
 const LOW_MAX = 20;
-
-function stockLevel(amount: number): "critical" | "low" | "ok" {
-  if (amount <= CRITICAL_MAX) return "critical";
-  if (amount <= LOW_MAX) return "low";
-  return "ok";
-}
 
 export const items = new Hono<AppEnv>();
 
@@ -26,74 +28,17 @@ items.get("/", async (c) => {
 
   try {
     if (isUrgent === "true") {
-      const rows = await db
-        .select({
-          itemId: itemsTable.itemId,
-          itemName: itemsTable.itemName,
-          remainingAmount: itemsTable.remainingAmount,
-        })
-        .from(itemsTable)
-        .where(
-          and(
-            search ? ilike(itemsTable.itemName, `%${search}%`) : undefined,
-            exists(
-              db
-                .select({ id: request.requestId })
-                .from(request)
-                .where(
-                  and(
-                    eq(request.itemId, itemsTable.itemId),
-                    eq(request.isUrgent, true),
-                  ),
-                ),
-            ),
-          ),
-        );
-
+      const rows = await getUrgentItems(search);
       return c.json({ items: rows });
     }
 
     if (isUrgent === "false") {
-      const rows = await db
-        .select({
-          itemId: itemsTable.itemId,
-          itemName: itemsTable.itemName,
-          remainingAmount: itemsTable.remainingAmount,
-        })
-        .from(itemsTable)
-        .where(
-          and(
-            search ? ilike(itemsTable.itemName, `%${search}%`) : undefined,
-            not(
-              exists(
-                db
-                  .select({ id: request.requestId })
-                  .from(request)
-                  .where(
-                    and(
-                      eq(request.itemId, itemsTable.itemId),
-                      eq(request.isUrgent, true),
-                    ),
-                  ),
-              ),
-            ),
-          ),
-        );
-
+      const rows = await getNonUrgentItems(search);
       return c.json({ items: rows });
     }
 
     if (status === "urgent") {
-      const rows = await db
-        .select({
-          itemId: itemsTable.itemId,
-          itemName: itemsTable.itemName,
-          remainingAmount: itemsTable.remainingAmount,
-        })
-        .from(itemsTable)
-        .innerJoin(request, eq(request.itemId, itemsTable.itemId))
-        .where(eq(request.isUrgent, true));
-
+      const rows = await getUrgentItems(search);
       return c.json({ items: rows });
     }
 
@@ -106,57 +51,12 @@ items.get("/", async (c) => {
           : null;
 
     if (threshold !== null) {
-      const rows = await db
-        .select()
-        .from(itemsTable)
-        .where(lte(itemsTable.remainingAmount, threshold))
-        .orderBy(asc(itemsTable.remainingAmount));
-
-      const list = rows.map((row) => ({
-        ...row,
-        stockLevel: stockLevel(row.remainingAmount),
-      }));
-
+      const list = await getItemsByStock(threshold);
       return c.json({ items: list });
     }
 
-    const rows = await db
-      .select({
-        itemId: itemsTable.itemId,
-        itemName: itemsTable.itemName,
-        description: itemsTable.description,
-        remainingAmount: itemsTable.remainingAmount,
-        categoryId: itemsTable.categoryId,
-        categoryName: categories.categoryName,
-        createdAt: itemsTable.createdAt,
-        updatedAt: itemsTable.updatedAt,
-      })
-      .from(itemsTable)
-      .leftJoin(categories, eq(itemsTable.categoryId, categories.categoryId))
-      .where(
-        search
-          ? or(
-              ilike(itemsTable.itemName, `%${search}%`),
-              ilike(categories.categoryName, `%${search}%`),
-            )
-          : undefined,
-      )
-      .orderBy(asc(itemsTable.itemName));
-
-    const list = rows.map((row) => ({
-      ...row,
-      stockLevel: stockLevel(row.remainingAmount),
-    }));
-
-    const totalItems = list.length;
-    const totalStock = list.reduce((sum, row) => sum + row.remainingAmount, 0);
-    const criticalStock = list.filter((row) => row.stockLevel === "critical").length;
-    const lowStock = list.filter((row) => row.stockLevel === "low").length;
-
-    return c.json({
-      items: list,
-      summary: { totalItems, totalStock, criticalStock, lowStock },
-    });
+    const result = await getAllItems(search);
+    return c.json(result);
   } catch (error) {
     console.error("items GET / error:", error);
     return c.json(
@@ -167,12 +67,7 @@ items.get("/", async (c) => {
 });
 
 items.post("/", async (c) => {
-  const body = await c.req.json<{
-    itemName: string;
-    description?: string;
-    remainingAmount: number;
-    categoryId?: number;
-  }>();
+  const body = await c.req.json<CreateItemInput>();
 
   if (!body.itemName || body.remainingAmount == null) {
     return c.json(
@@ -182,16 +77,7 @@ items.post("/", async (c) => {
   }
 
   try {
-    const [created] = await db
-      .insert(itemsTable)
-      .values({
-        itemName: body.itemName,
-        description: body.description,
-        remainingAmount: body.remainingAmount,
-        categoryId: body.categoryId,
-      })
-      .returning();
-
+    const created = await createItem(body);
     return c.json({ item: created }, 201);
   } catch (error) {
     console.error("items POST / error:", error);
@@ -215,21 +101,7 @@ items.get("/:id", async (c) => {
   }
 
   try {
-    const [row] = await db
-      .select({
-        itemId: itemsTable.itemId,
-        itemName: itemsTable.itemName,
-        description: itemsTable.description,
-        remainingAmount: itemsTable.remainingAmount,
-        categoryId: itemsTable.categoryId,
-        categoryName: categories.categoryName,
-        createdAt: itemsTable.createdAt,
-        updatedAt: itemsTable.updatedAt,
-      })
-      .from(itemsTable)
-      .leftJoin(categories, eq(itemsTable.categoryId, categories.categoryId))
-      .where(eq(itemsTable.itemId, id))
-      .limit(1);
+    const row = await getItemById(id);
 
     if (!row) {
       return c.json(
@@ -238,9 +110,7 @@ items.get("/:id", async (c) => {
       );
     }
 
-    return c.json({
-      item: { ...row, stockLevel: stockLevel(row.remainingAmount) },
-    });
+    return c.json({ item: row });
   } catch (error) {
     console.error("items GET /:id error:", error);
     return c.json(
@@ -260,12 +130,7 @@ items.patch("/:id", async (c) => {
     );
   }
 
-  const body = await c.req.json<{
-    itemName?: string;
-    description?: string;
-    remainingAmount?: number;
-    categoryId?: number;
-  }>();
+  const body = await c.req.json<UpdateItemInput>();
 
   if (Object.keys(body).length === 0) {
     return c.json(
@@ -275,11 +140,7 @@ items.patch("/:id", async (c) => {
   }
 
   try {
-    const [updated] = await db
-      .update(itemsTable)
-      .set(body)
-      .where(eq(itemsTable.itemId, id))
-      .returning();
+    const updated = await updateItem(id, body);
 
     if (!updated) {
       return c.json(
@@ -309,10 +170,7 @@ items.delete("/:id", async (c) => {
   }
 
   try {
-    const [deleted] = await db
-      .delete(itemsTable)
-      .where(eq(itemsTable.itemId, id))
-      .returning();
+    const deleted = await deleteItem(id);
 
     if (!deleted) {
       return c.json(

@@ -1,6 +1,5 @@
 import { Hono } from "hono";
-import { getAllRequests, getRequestById } from "../services/requests.js";
-import { sendUrgentRequest } from "../services/dashboard.js";
+import { getAllRequests, getRequestById, sendUrgentRequest } from "../services/requests.service.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 
 export const requests = new Hono();
