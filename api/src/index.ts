@@ -29,8 +29,8 @@ import type { AppEnv } from "./types/hono.js";
 //----------------------------------
 
 // Frontend URL for CORS (strip trailing slash)
-// const frontendOrigin =
-//   process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
+const frontendOrigin =
+  process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
 
 // All API routes live under /api
 const app = new Hono<AppEnv>().basePath("/api");
@@ -53,36 +53,36 @@ app.get("/", async (c) => {
   });
 });
 // Basic browser security headers
-// app.use("*", secureHeaders());
+app.use("*", secureHeaders());
 
 // Log each request
-// app.use("*", logger);
+app.use("*", logger);
 
 // Allow the Vite frontend to call this API (with cookies)
-// app.use(
-//   "*",
-//   cors({
-//     origin: frontendOrigin,
-//     allowHeaders: ["Content-Type", "Authorization"],
-//     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//     exposeHeaders: ["Content-Length"],
-//     maxAge: 600,
-//     credentials: true,
-//   }),
-// );
+app.use(
+  "*",
+  cors({
+    origin: frontendOrigin,
+    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
+    credentials: true,
+  }),
+);
 
 // better-auth handles login / signup / logout / session
 // /** matches nested paths like /auth/sign-in/email
-// app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
 
 // Load user/session on every request (may be null)
-// app.use("*", loadSession);
+app.use("*", loadSession);
 
 // Public session helpers (/sessions/me, /sessions/health)
-// app.route("/sessions", session);
+app.route("/sessions", session);
 
 // Public demo: validate + sanitize login payload (not a real login)
-// app.route("/", login);
+app.route("/", login);
 
 // Everything below needs a logged-in user
 const protectedRoutes = new Hono<AppEnv>();
@@ -108,8 +108,8 @@ const startServer = async () => {
     },
     (info) => {
       console.log(`\nServer is running on http://localhost:${info.port}`);
-      // console.log(`Auth endpoints: http://localhost:${info.port}/api/auth/*`);
-      // console.log(`Frontend origin (CORS): ${frontendOrigin}`);
+      console.log(`Auth endpoints: http://localhost:${info.port}/api/auth/*`);
+      console.log(`Frontend origin (CORS): ${frontendOrigin}`);
     },
   );
 };
