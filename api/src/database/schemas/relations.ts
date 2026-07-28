@@ -1,2 +1,2 @@
-import { relations } from "drizzle-orm/relations";
-import {} from "./schema.js";
+export * from "./relations/auth.js";
+export * from "./relations/core.js";

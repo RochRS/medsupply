@@ -1,3 +1,5 @@
+// ---- HTTP error codes ----
+
 export const ERROR_CODE_MAP = {
   // 4xx Client Errors
   BAD_REQUEST: 400,

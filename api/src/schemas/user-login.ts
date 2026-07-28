@@ -1,34 +1,34 @@
 import { z } from "zod";
 
-// Shared email rules (always store lowercase)
+// ---- shared field rules ----
+
 const emailField = z
   .string()
-  .min(1, "E-mailadres is verplicht")
-  .email("Ongeldig e-mailadres")
-  .max(255, "E-mailadres is te lang")
+  .min(1, "Email is required")
+  .email("Invalid email address")
+  .max(255, "Email is too long")
   .transform((value) => value.toLowerCase());
 
-// Password rules for registration
 const passwordField = z
   .string()
-  .min(8, "Wachtwoord moet minimaal 8 tekens zijn")
-  .max(128, "Wachtwoord is te lang");
+  .min(8, "Password must be at least 8 characters")
+  .max(128, "Password is too long");
 
-// Login body: email + password only (.strict = no extra fields)
+// ---- schemas ----
+
 export const loginSchema = z
   .object({
     email: emailField,
-    password: z.string().min(1, "Wachtwoord is verplicht").max(128),
+    password: z.string().min(1, "Password is required").max(128),
   })
   .strict();
 
-// Register body: name + email + password
 export const registerSchema = z
   .object({
     name: z
       .string()
-      .min(2, "Naam moet minimaal 2 tekens zijn")
-      .max(100, "Naam is te lang"),
+      .min(2, "Name must be at least 2 characters")
+      .max(100, "Name is too long"),
     email: emailField,
     password: passwordField,
   })
