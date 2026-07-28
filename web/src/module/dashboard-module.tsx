@@ -4,14 +4,26 @@ import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
+import { StatusBadge } from "../components/global/status-badge";
+import { useUrgentItems, useCriticalItems, useLowStockItems } from "../hooks/use-items";
+import { useSendUrgentRequest } from "../hooks/use-requests";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "../lib/api";
 
 export function SpoedAanvraag() {
-  const [search, setSearch] = useState("");
+  const [itemId, setItemId] = useState("");
   const [afdeling, setAfdeling] = useState("");
   const [noodsituatie, setNoodsituatie] = useState("");
+  const { data: urgentItems, isLoading } = useUrgentItems();
+  const sendUrgent = useSendUrgentRequest();
 
   const handleSubmit = () => {
-    console.log({ search, afdeling, noodsituatie });
+    if (!itemId) return;
+    sendUrgent.mutate({
+      itemId: Number(itemId),
+      requestedAmount: 1,
+      requestDescriptionField: noodsituatie || null,
+    });
   };
 
   return (
@@ -21,13 +33,25 @@ export function SpoedAanvraag() {
         <p className="text-xs text-orange-600">Hoogste prioriteit</p>
       </div>
 
-      <FormInput
-        label="Zoek supplies"
-        name="search"
-        value={search}
-        onChange={setSearch}
-        placeholder="Zoek op naam of categorie"
-      />
+      {isLoading ? (
+        <p className="text-sm text-gray-400">Laden...</p>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          <Label>Selecteer item met spoed</Label>
+          <Select value={itemId} onValueChange={setItemId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Kies een item" />
+            </SelectTrigger>
+            <SelectContent>
+              {urgentItems?.map((item) => (
+                <SelectItem key={item.itemId} value={String(item.itemId)}>
+                  {item.itemName} ({item.remainingAmount})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <FormInput
         label="Afdeling"
@@ -47,7 +71,16 @@ export function SpoedAanvraag() {
         />
       </div>
 
-      <Button onClick={handleSubmit}>Spoedaanvraag versturen</Button>
+      <Button onClick={handleSubmit} disabled={sendUrgent.isPending}>
+        {sendUrgent.isPending ? "Bezig..." : "Spoedaanvraag versturen"}
+      </Button>
+
+      {sendUrgent.isSuccess && (
+        <p className="text-sm text-green-600">Spoedaanvraag verstuurd!</p>
+      )}
+      {sendUrgent.isError && (
+        <p className="text-sm text-red-600">Versturen mislukt.</p>
+      )}
     </div>
   );
 }
@@ -59,20 +92,24 @@ const VOORRAAD_NIVEAUS = [
   { value: "goed", label: "Goed" },
 ];
 
-const CATEGORIEN_NIVEAUS = [
-  { value: "alle-categorieen", label: "Alle categorieën" },
-  { value: "medicatie", label: "Medicatie" },
-  { value: "gassen", label: "Gassen" },
-];
-
-//kritiek
 export function KritiekeVoorraadOverzicht() {
+  const [niveauFilter, setNiveauFilter] = useState("alle-niveaus");
+  const { data: criticalItems, isLoading: criticalLoading } = useCriticalItems();
+  const { data: lowStockItems, isLoading: lowLoading } = useLowStockItems();
+
+  const items =
+    niveauFilter === "kritiek" ? criticalItems
+    : niveauFilter === "laag" ? lowStockItems
+    : [...(criticalItems ?? []), ...(lowStockItems ?? [])];
+
+  const loading = criticalLoading || lowLoading;
+
   return (
     <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
       <h2 className="font-bold text-blue-700">Kritiek Voorraadoverzicht</h2>
 
       <div className="flex gap-3">
-        <Select defaultValue="alle-niveaus">
+        <Select value={niveauFilter} onValueChange={setNiveauFilter}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -84,26 +121,28 @@ export function KritiekeVoorraadOverzicht() {
             ))}
           </SelectContent>
         </Select>
-
-        <Select defaultValue="alle-categorieen">
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIEN_NIVEAUS.map((categorie) => (
-              <SelectItem key={categorie.value} value={categorie.value}>
-                {categorie.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
-      <p className="text-sm text-gray-400">Laden...</p>
+      {loading ? (
+        <p className="text-sm text-gray-400">Laden...</p>
+      ) : items && items.length > 0 ? (
+        <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+          {items.map((item) => (
+            <div key={item.itemId} className="flex justify-between items-center border-b pb-1">
+              <span className="text-sm">{item.itemName}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">{item.remainingAmount}</span>
+                <StatusBadge status={item.stockLevel === "critical" ? "kritiek" : "laag"} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-400">Geen items met kritieke voorraad.</p>
+      )}
     </div>
   );
 }
-
 
 const MELDING_TYPES = [
   { value: "alle-meldingen", label: "Alle meldingen" },
@@ -112,21 +151,36 @@ const MELDING_TYPES = [
 ];
 
 const SORTEER_OPTIES = [
-  {value: "nieuwste", label: "Nieuwste eerst"},
-  {value: "oudste", label: "Oudste eerst"},
-]
+  { value: "nieuwste", label: "Nieuwste eerst" },
+  { value: "oudste", label: "Oudste eerst" },
+];
 
 export function KritikeMeldingen() {
+  const [typeFilter, setTypeFilter] = useState("alle-meldingen");
+  const { data: activities, isLoading } = useQuery({
+    queryKey: ["activities"],
+    queryFn: async () => {
+      const data = await apiFetch("/history?limit=10");
+      return data.activities ?? [];
+    },
+  });
+
+  const badgeCount = activities?.filter((a: { isUrgent?: boolean | null }) => a.isUrgent).length ?? 0;
+
   return (
     <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">
         <h2 className="font-bold text-blue-700">Meldingen</h2>
-        <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+        {badgeCount > 0 && (
+          <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            {badgeCount}
+          </span>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">
         <Label>Type melding</Label>
-        <Select defaultValue="alle-meldingen">
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -156,7 +210,27 @@ export function KritikeMeldingen() {
         </Select>
       </div>
 
-      <p className="text-sm text-gray-400">Laden...</p>
+      {isLoading ? (
+        <p className="text-sm text-gray-400">Laden...</p>
+      ) : activities && activities.length > 0 ? (
+        <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+          {activities.slice(0, 5).map((a: { id: string; itemName?: string | null; type: string; isUrgent?: boolean | null; status: string }) => (
+            <div key={a.id} className="flex justify-between items-center border-b pb-1 text-sm">
+              <span>{a.itemName ?? "Onbekend"}</span>
+              <StatusBadge
+                status={
+                  a.isUrgent ? "spoed"
+                  : a.status === "completed" ? "voltooid"
+                  : a.status === "urgent" ? "spoed"
+                  : "laag"
+                }
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-400">Geen meldingen.</p>
+      )}
     </div>
   );
 }
