@@ -25,11 +25,13 @@ function Index() {
 
   return (
     <div>
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-sky-700 to-slate-600">
-        <div className="flex flex-col items-center gap-6 max-w-sm w-full px-6">
-          <HospitalIcon />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col gap-4 max-w-sm dark:bg-slate-800 p-6 rounded-lg text-center size-80">
+          <div className="text-red-900">
+            <HospitalIcon />
+          </div>
 
-          <div className="bg-white w-full rounded-xl shadow-lg p-6 flex flex-col gap-4">
+          <div>
             <UserInputFields
               email={email}
               password={password}
@@ -37,11 +39,13 @@ function Index() {
               onPasswordChange={setPassword}
               errors={fieldErrors}
             />
+          </div>
 
-            {formError && (
-              <p className="text-sm text-red-500 text-left">{formError}</p>
-            )}
+          {formError && (
+            <p className="text-sm text-red-500 text-left">{formError}</p>
+          )}
 
+          <div className="text-blue-600 ">
             <SubmitLoginRequestButton
               email={email}
               password={password}

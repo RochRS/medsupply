@@ -71,7 +71,10 @@ items.post("/", async (c) => {
 
   if (!body.itemName || body.remainingAmount == null) {
     return c.json(
-      { message: "itemName and remainingAmount are required", error: "VALIDATION_ERROR" },
+      {
+        message: "itemName and remainingAmount are required",
+        error: "VALIDATION_ERROR",
+      },
       ERROR_CODE_MAP.BAD_REQUEST,
     );
   }
@@ -120,7 +123,6 @@ items.get("/:id", async (c) => {
   }
 });
 
-/** PATCH /items/:id — update item */
 items.patch("/:id", async (c) => {
   const id = Number(c.req.param("id"));
 
@@ -160,7 +162,6 @@ items.patch("/:id", async (c) => {
   }
 });
 
-/** DELETE /items/:id — delete item */
 items.delete("/:id", async (c) => {
   const id = Number(c.req.param("id"));
 

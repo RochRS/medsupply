@@ -1,20 +1,20 @@
 import { db } from "../database/database.js";
-import { items as itemsTable, categories, request } from "../database/schemas/schema.js";
+import {
+  items as itemsTable,
+  categories,
+  request,
+} from "../database/schemas/schema.js";
 import { eq, asc, ilike, or, lte, and, not, exists } from "drizzle-orm";
 import type { CreateItemInput, UpdateItemInput } from "../schemas/item.js";
 
 const CRITICAL_MAX = 5;
 const LOW_MAX = 20;
 
-// ---- helpers ----
-
 export function stockLevel(amount: number): "critical" | "low" | "ok" {
   if (amount <= CRITICAL_MAX) return "critical";
   if (amount <= LOW_MAX) return "low";
   return "ok";
 }
-
-// ---- queries ----
 
 export async function getUrgentItems(search?: string) {
   return db
@@ -114,10 +114,15 @@ export async function getAllItems(search?: string) {
 
   const totalItems = list.length;
   const totalStock = list.reduce((sum, row) => sum + row.remainingAmount, 0);
-  const criticalStock = list.filter((row) => row.stockLevel === "critical").length;
+  const criticalStock = list.filter(
+    (row) => row.stockLevel === "critical",
+  ).length;
   const lowStock = list.filter((row) => row.stockLevel === "low").length;
 
-  return { items: list, summary: { totalItems, totalStock, criticalStock, lowStock } };
+  return {
+    items: list,
+    summary: { totalItems, totalStock, criticalStock, lowStock },
+  };
 }
 
 export async function getItemById(id: number) {
@@ -142,13 +147,8 @@ export async function getItemById(id: number) {
   return { ...row, stockLevel: stockLevel(row.remainingAmount) };
 }
 
-// ---- mutations ----
-
 export async function createItem(data: CreateItemInput) {
-  const [created] = await db
-    .insert(itemsTable)
-    .values(data)
-    .returning();
+  const [created] = await db.insert(itemsTable).values(data).returning();
 
   return created;
 }

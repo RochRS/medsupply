@@ -1,10 +1,11 @@
 import { db } from "../database/database.js";
-import { request, items, requestDescription } from "../database/schemas/schema.js";
+import {
+  request,
+  items,
+  requestDescription,
+} from "../database/schemas/schema.js";
 import { eq, desc } from "drizzle-orm";
 import type { CreateRequestInput } from "../schemas/request.js";
-import { IS_URGENT, NOT_URGENT } from "../constants/magic-numbers.js";
-
-// ---- queries ----
 
 export async function getAllRequests() {
   return db
@@ -43,16 +44,16 @@ export async function getRequestById(id: number) {
   return row ?? null;
 }
 
-// ---- mutations ----
-
-async function insertRequest(data: CreateRequestInput, isUrgentValue: boolean) {
+export async function sendUrgentRequest(data: CreateRequestInput) {
   let descriptionId: number | null = null;
 
   if (data.requestDescriptionField) {
     const [desc] = await db
       .insert(requestDescription)
       .values({ requestDescriptionField: data.requestDescriptionField })
-      .returning({ requestDescriptionId: requestDescription.requestDescriptionId });
+      .returning({
+        requestDescriptionId: requestDescription.requestDescriptionId,
+      });
     descriptionId = desc.requestDescriptionId;
   }
 
@@ -61,7 +62,7 @@ async function insertRequest(data: CreateRequestInput, isUrgentValue: boolean) {
     .values({
       requestBatchId: data.requestBatchId ?? Date.now(),
       requestedAmount: data.requestedAmount,
-      isUrgent: isUrgentValue,
+      isUrgent: true,
       isCompleted: false,
       itemId: data.itemId,
       userId: data.userId ?? null,
@@ -71,12 +72,4 @@ async function insertRequest(data: CreateRequestInput, isUrgentValue: boolean) {
     .returning();
 
   return newRequest;
-}
-
-export async function sendUrgentRequest(data: CreateRequestInput) {
-  return insertRequest(data, IS_URGENT);
-}
-
-export async function createRequest(data: CreateRequestInput) {
-  return insertRequest(data, NOT_URGENT);
 }

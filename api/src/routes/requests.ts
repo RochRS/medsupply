@@ -1,7 +1,10 @@
 import { Hono } from "hono";
-import { getAllRequests, getRequestById, sendUrgentRequest, createRequest } from "../services/requests.service.js";
+import {
+  getAllRequests,
+  getRequestById,
+  sendUrgentRequest,
+} from "../services/requests.service.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
-import type { CreateRequestInput } from "../schemas/request.js";
 
 export const requests = new Hono();
 
@@ -22,18 +25,27 @@ requests.get("/", async (c) => {
 
 requests.post("/", async (c) => {
   try {
-    const urgent = c.req.query("urgent");
-    const body = await c.req.json<CreateRequestInput>();
+    const body = await c.req.json<{
+      itemId: number;
+      requestedAmount: number;
+      isUrgent?: boolean;
+      requestBatchId?: number;
+      userId?: string | null;
+      departmentId?: number | null;
+      requestDescriptionField?: string | null;
+    }>();
 
-    if (urgent === "1") {
+    if (body.isUrgent) {
       const result = await sendUrgentRequest(body);
       return c.json(result, 201);
     }
 
-    const result = await createRequest(body);
-    return c.json(result, 201);
+    return c.json({ message: "Create a new request" }, 201);
   } catch (error) {
-    return c.json({ error: "Failed to create request" }, ERROR_CODE_MAP.INTERNAL_SERVER_ERROR);
+    return c.json(
+      { error: "Failed to create request" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
   }
 });
 

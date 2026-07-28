@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/global/footer.tsx";
+
 import { GeschiedenisDisplay } from "../module/geschiedenis-module.tsx";
 
 import "../css/geschiedenis.css";
@@ -11,16 +12,20 @@ export const Route = createFileRoute("/geschiedenis")({
 function RouteComponent() {
   return (
     <div>
-      <div className="text-center pt-4">
-        <h1 className="text-2xl font-semibold">Geschiedenis</h1>
-        <p className="text-sm text-gray-500">
-          Overzicht van alle activiteiten die hebben plaatsgevonden.
-        </p>
+      <div>
+        <div className="text-center">
+          <h1>Geschiedenis</h1>
+          <p>Overzicht van alle activiteiten hebben plaatsgevonden.</p>
+        </div>
+
+        <div>
+          <GeschiedenisDisplay />
+        </div>
       </div>
 
-      <GeschiedenisDisplay />
-
-      <Footer />
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }
