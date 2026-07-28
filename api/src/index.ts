@@ -86,7 +86,7 @@ app.route("/", login);
 
 // Everything below needs a logged-in user
 const protectedRoutes = new Hono<AppEnv>();
-// protectedRoutes.use("*", requireAuth);
+protectedRoutes.use("*", requireAuth);
 protectedRoutes.route("/requests", requests);
 protectedRoutes.route("/items", items);
 protectedRoutes.route("/statistics", statistics);
@@ -94,7 +94,7 @@ protectedRoutes.route("/history", history);
 protectedRoutes.route("/settings", settings);
 protectedRoutes.route("/users", users);
 
-// app.route("/", protectedRoutes);
+app.route("/", protectedRoutes);
 
 // Start and listen to server
 const startServer = async () => {
