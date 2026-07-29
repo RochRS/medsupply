@@ -10,6 +10,18 @@ export const data = [
   { departmentName: "Cardiology" },
   { departmentName: "Orthopedics" },
   { departmentName: "Radiology" },
+  { departmentName: "Neurology" },
+  { departmentName: "Oncology" },
+  { departmentName: "Gastroenterology" },
+  { departmentName: "Pulmonology" },
+  { departmentName: "Nephrology" },
+  { departmentName: "Ophthalmology" },
+  { departmentName: "Dermatology" },
+  { departmentName: "Psychiatry" },
+  { departmentName: "Laboratory Services" },
+  { departmentName: "Maternity" },
+  { departmentName: "Neonatal ICU" },
+  { departmentName: "Outpatient Clinic" },
 ];
 
 export async function seed() {

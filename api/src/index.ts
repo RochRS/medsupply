@@ -11,7 +11,6 @@ import { secureHeaders } from "hono/secure-headers";
 import { testDbConnection, dizzleCheck } from "./database/database.js";
 
 // Import route modules
-import { settings } from "./routes/settings.js";
 import { requests } from "./routes/requests.js";
 import { items } from "./routes/items.js";
 import { statistics } from "./routes/statistics.js";
@@ -46,7 +45,6 @@ app.get("/", async (c) => {
       items: "/api/items",
       statistics: "/api/statistics",
       history: "/api/history",
-      settings: "/api/settings",
       users: "/api/users",
       sessions: "/api/sessions",
     },
@@ -91,7 +89,6 @@ protectedRoutes.route("/requests", requests);
 protectedRoutes.route("/items", items);
 protectedRoutes.route("/statistics", statistics);
 protectedRoutes.route("/history", history);
-protectedRoutes.route("/settings", settings);
 protectedRoutes.route("/users", users);
 
 // app.route("/", protectedRoutes);

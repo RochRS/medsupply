@@ -10,6 +10,18 @@ export const data = [
   { categoryName: "Diagnostic Equipment", categoryDescription: "Thermometers, blood pressure cuffs, stethoscopes" },
   { categoryName: "Respiratory", categoryDescription: "Oxygen masks, nebulizers, and respiratory therapy equipment" },
   { categoryName: "Emergency", categoryDescription: "Defibrillator pads, tourniquets, and emergency response supplies" },
+  { categoryName: "Laboratory", categoryDescription: "Lab supplies, test tubes, reagents, and diagnostic kits" },
+  { categoryName: "Radiology", categoryDescription: "X-ray film, contrast media, and imaging supplies" },
+  { categoryName: "Orthopedics", categoryDescription: "Casts, splints, braces, and orthopedic implants" },
+  { categoryName: "Ophthalmology", categoryDescription: "Eye examination tools, drops, and surgical instruments" },
+  { categoryName: "Gastroenterology", categoryDescription: "Endoscopy supplies, biopsy tools, and GI consumables" },
+  { categoryName: "Urology", categoryDescription: "Catheters, urine collection bags, and urological instruments" },
+  { categoryName: "Anesthesiology", categoryDescription: "Anesthesia masks, airways, and monitoring equipment" },
+  { categoryName: "Cardiology", categoryDescription: "ECG electrodes, pacemaker supplies, and cardiac catheters" },
+  { categoryName: "Neonatal", categoryDescription: "Incubator supplies, neonatal monitors, and pediatric equipment" },
+  { categoryName: "Dialysis", categoryDescription: "Dialyzers, dialysis tubing, and fistula needles" },
+  { categoryName: "Infection Control", categoryDescription: "Disinfectants, antiseptics, and sterilization supplies" },
+  { categoryName: "Nutrition", categoryDescription: "Feeding tubes, nutritional supplements, and enteral feeding sets" },
 ];
 
 export async function seed() {

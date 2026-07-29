@@ -17,6 +17,7 @@
     "db:seed:departments": "tsx src/database/seed/seed-departments.ts",
     "db:seed:users": "tsx src/database/seed/seed-users.ts",
     "db:seed:request-descriptions": "tsx src/database/seed/seed-request-descriptions.ts",
+    "db:seed:roles": "tsx src/database/seed/seed-roles.ts",
     "db:seed:shipments": "tsx src/database/seed/seed-shipments.ts",
     "db:seed:requests": "tsx src/database/seed/seed-requests.ts"
   },

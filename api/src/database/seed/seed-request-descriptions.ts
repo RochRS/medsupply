@@ -7,6 +7,16 @@ export const data = [
   { requestDescriptionField: "Emergency order — unexpected surge in patient intake, critical shortage" },
   { requestDescriptionField: "Replacement for expired inventory — batch EOL items being swapped out" },
   { requestDescriptionField: "New department request — establishing new ward, initial stock required" },
+  { requestDescriptionField: "Seasonal demand increase — preparing for flu season patient surge" },
+  { requestDescriptionField: "Backorder fulfillment — previously delayed items now being ordered" },
+  { requestDescriptionField: "Clinical trial supplies — specialized items for ongoing research study" },
+  { requestDescriptionField: "Regulatory compliance update — replacing items with updated specifications" },
+  { requestDescriptionField: "Equipment maintenance — replacement parts for scheduled repairs" },
+  { requestDescriptionField: "Budget surplus allocation — utilizing remaining yearly budget on essential stock" },
+  { requestDescriptionField: "Disaster preparedness — FEMA-mandated stockpile replenishment" },
+  { requestDescriptionField: "Physician preference order — specific brand/model requested by attending physician" },
+  { requestDescriptionField: "Training and simulation — supplies for medical staff training exercises" },
+  { requestDescriptionField: "Patient-specific order — customized items for a specific patient's treatment plan" },
 ];
 
 export async function seed() {
