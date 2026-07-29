@@ -88,7 +88,7 @@ export function InventoryOverviewStats({
       {cards.map((card) => (
         <div
           key={card.label}
-          className="border rounded-lg p-4 bg-white text-left"
+          className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 text-left"
         >
           <p className="text-xs text-gray-500">{card.label}</p>
           <p className="text-2xl font-semibold">
@@ -140,7 +140,7 @@ export function InventoryTable({
   }
 
   return (
-    <div className="border rounded-lg bg-white overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
@@ -186,7 +186,7 @@ export function InventoryPage() {
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto p-4">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-teal-800">Totale Voorraad</h1>
+        <h1 className="text-2xl font-bold text-rkz-navy">Totale Voorraad</h1>
         <p className="text-sm text-gray-500">
           Overzicht van de totale voorraad in het magazijn.
         </p>

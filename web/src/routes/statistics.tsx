@@ -21,9 +21,9 @@ export const Route = createFileRoute("/statistics")({
 function RouteComponent() {
   return (
     <div>
-      <div className="min-h-screen bg-gradient-to-b from-slate-100 to-teal-50">
+      <div className="min-h-screen bg-rkz-bg">
         <div className="text-center py-3">
-          <h1 className="text-2xl font-bold text-teal-800">Analyse &amp; Statistieken</h1>
+          <h1 className="text-2xl font-bold text-rkz-navy">Analyse &amp; Statistieken</h1>
           <p className="text-slate-500 text-sm">
             Gedetailleerd overzicht van voorraadgebruik en trends
           </p>

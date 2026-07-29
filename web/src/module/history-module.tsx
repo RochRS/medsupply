@@ -80,17 +80,17 @@ export function HistoryDisplay() {
   return (
     <div className="flex flex-col gap-4 max-w-5xl mx-auto p-4">
       <div className="grid grid-cols-3 gap-3">
-        <div className="border rounded-lg p-3 bg-white">
+        <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4">
           <p className="text-xs text-gray-500">Totaal</p>
           <p className="text-xl font-semibold">{data?.summary.total ?? "—"}</p>
         </div>
-        <div className="border rounded-lg p-3 bg-white">
+        <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4">
           <p className="text-xs text-gray-500">Aanvragen</p>
           <p className="text-xl font-semibold">
             {data?.summary.aanvragen ?? "—"}
           </p>
         </div>
-        <div className="border rounded-lg p-3 bg-white">
+        <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4">
           <p className="text-xs text-gray-500">Leveringen</p>
           <p className="text-xl font-semibold">
             {data?.summary.leveringen ?? "—"}
@@ -112,7 +112,7 @@ export function HistoryDisplay() {
             onClick={() => setFilter(value)}
             className={`px-3 py-1.5 text-sm border rounded-md ${
               filter === value
-                ? "bg-teal-700 text-white border-teal-700"
+                ? "bg-rkz-teal text-white border-rkz-teal"
                 : "bg-white text-gray-700"
             }`}
           >
@@ -129,7 +129,7 @@ export function HistoryDisplay() {
       )}
 
       {!loading && !error && data && data.activities.length > 0 && (
-        <div className="border rounded-lg bg-white overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

@@ -3,7 +3,9 @@ import { FormInput } from "../components/global/form-input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from "../components/ui/select";
 
 export function EmergencyRequest() {
   const [search, setSearch] = useState("");
@@ -15,10 +17,10 @@ export function EmergencyRequest() {
   };
 
   return (
-    <div className="bg-white border-t-4 border-t-rose-600 border-x border-b rounded-lg p-4 flex flex-col gap-3">
+    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border-t-4 border-t-rkz-red p-4 flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <h2 className="font-bold text-rose-700">Spoedaanvraag</h2>
-        <span className="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">SPOED</span>
+        <h2 className="font-bold text-rkz-red">Spoedaanvraag</h2>
+        <span className="bg-rkz-red text-white text-[10px] font-bold px-2 py-0.5 rounded">SPOED</span>
       </div>
       <p className="text-xs text-gray-500 -mt-2">Hoogste prioriteit</p>
 
@@ -48,8 +50,10 @@ export function EmergencyRequest() {
         />
       </div>
 
-      <Button onClick={handleSubmit} className="bg-rose-600 hover:bg-rose-700">Spoedaanvraag versturen</Button>
-     </div>
+      <Button onClick={handleSubmit} className="bg-rkz-red hover:bg-rkz-red/90">
+        Spoedaanvraag versturen
+      </Button>
+    </div>
   );
 }
 
@@ -60,41 +64,36 @@ const VOORRAAD_NIVEAUS = [
   { value: "goed", label: "Goed" },
 ];
 
-const CATEGORIEN_NIVEAUS = [
+const CATEGORIEEN = [
   { value: "alle-categorieen", label: "Alle categorieën" },
   { value: "medicatie", label: "Medicatie" },
   { value: "gassen", label: "Gassen" },
 ];
 
-//kritiek
 export function CriticalInventoryOverview() {
   return (
-    <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
-      <h2 className="font-bold text-teal-700">Kritiek Voorraadoverzicht</h2>
+    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
+      <h2 className="font-bold text-rkz-navy">Kritiek Voorraadoverzicht</h2>
 
       <div className="flex gap-3">
-        <Select defaultValue="alle-niveaus">
+        <Select items={VOORRAAD_NIVEAUS} defaultValue="alle-niveaus">
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {VOORRAAD_NIVEAUS.map((niveau) => (
-              <SelectItem key={niveau.value} value={niveau.value}>
-                {niveau.label}
-              </SelectItem>
+            {VOORRAAD_NIVEAUS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <Select defaultValue="alle-categorieen">
+        <Select items={CATEGORIEEN} defaultValue="alle-categorieen">
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {CATEGORIEN_NIVEAUS.map((categorie) => (
-              <SelectItem key={categorie.value} value={categorie.value}>
-                {categorie.label}
-              </SelectItem>
+            {CATEGORIEEN.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -105,7 +104,6 @@ export function CriticalInventoryOverview() {
   );
 }
 
-
 const MELDING_TYPES = [
   { value: "alle-meldingen", label: "Alle meldingen" },
   { value: "waarschuwing", label: "Waarschuwing" },
@@ -113,29 +111,27 @@ const MELDING_TYPES = [
 ];
 
 const SORTEER_OPTIES = [
-  {value: "nieuwste", label: "Nieuwste eerst"},
-  {value: "oudste", label: "Oudste eerst"},
-]
+  { value: "nieuwste", label: "Nieuwste eerst" },
+  { value: "oudste", label: "Oudste eerst" },
+];
 
 export function Notifications() {
   return (
-    <div className="bg-white border rounded-lg p-4 flex flex-col gap-3">
+    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">
-        <h2 className="font-bold text-teal-700">Meldingen</h2>
-        <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+        <h2 className="font-bold text-rkz-navy">Meldingen</h2>
+        <span className="bg-rkz-red text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
       </div>
 
       <div className="flex flex-col gap-1.5">
         <Label>Type melding</Label>
-        <Select defaultValue="alle-meldingen">
+        <Select items={MELDING_TYPES} defaultValue="alle-meldingen">
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {MELDING_TYPES.map((type) => (
-              <SelectItem key={type.value} value={type.value}>
-                {type.label}
-              </SelectItem>
+            {MELDING_TYPES.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -143,21 +139,22 @@ export function Notifications() {
 
       <div className="flex flex-col gap-1.5">
         <Label>Sorteren</Label>
-        <Select defaultValue="nieuwste">
+        <Select items={SORTEER_OPTIES} defaultValue="nieuwste">
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {SORTEER_OPTIES.map((optie) => (
-              <SelectItem key={optie.value} value={optie.value}>
-                {optie.label}
-              </SelectItem>
+            {SORTEER_OPTIES.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      <p className="text-sm text-gray-400">Laden...</p>
+      <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
+        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">✓</div>
+        <p className="text-sm text-gray-400">Geen nieuwe meldingen</p>
+      </div>
     </div>
   );
 }

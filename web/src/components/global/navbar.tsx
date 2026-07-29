@@ -2,56 +2,51 @@ import { Link } from "@tanstack/react-router";
 
 export function Navbar() {
   return (
-    <>
-      <div className="flex justify-between items-center px-8 py-3 bg-white">
-        <div className="flex gap-6">
-          <Link
-            to="/dashboard"
-            className="text-slate-500 hover:text-teal-400 font-medium"
-            activeProps={{ className: "text-teal-800 font-semibold" }}
-          >
-            Dashboard
-          </Link>
-          <Link
-            to="/request"
-            className="text-slate-500 hover:text-teal-400 font-medium"
-            activeProps={{ className: "text-teal-800 font-semibold" }}
-          >
-            Request
-          </Link>
-          <Link
-            to="/total-inventory"
-            className="text-slate-500 hover:text-teal-400 font-medium"
-            activeProps={{ className: "text-teal-800 font-semibold" }}
-          >
-            Total Inventory
-          </Link>
-          <Link
-            to="/statistics"
-            className="text-slate-500 hover:text-teal-400 font-medium"
-            activeProps={{ className: "text-teal-800 font-semibold" }}
-          >
-            Statistics
-          </Link>
-          <Link
-            to="/history"
-            className="text-slate-500 hover:text-teal-400 font-medium"
-            activeProps={{ className: "text-teal-800 font-semibold" }}
-          >
-            History
-          </Link>
-        </div>
-        <div className="flex gap-6 items-center">
-          <Link to="/profiel" className="text-slate-500 hover:text-teal-400 font-medium">
-            Profile
-          </Link>
-          <Link to="/settings" className="text-slate-500 hover:text-teal-400 font-medium">
-            Settings
-          </Link>
-          <button className="text-rose-600 font-medium hover:text-rose-700">Log Out</button>
-        </div>
+    <div className="bg-rkz-navy px-8 py-3 flex justify-between items-center">
+      <div className="flex gap-6">
+        <Link
+          to="/dashboard"
+          className="text-white/80 hover:text-white font-medium px-3 py-1.5 rounded-full transition-colors"
+          activeProps={{ className: "!text-white bg-rkz-teal font-semibold px-3 py-1.5 rounded-full" }}
+        >
+          Dashboard
+        </Link>
+        <Link
+          to="/request"
+          className="text-white/80 hover:text-white font-medium px-3 py-1.5 rounded-full transition-colors"
+          activeProps={{ className: "!text-white bg-rkz-teal font-semibold px-3 py-1.5 rounded-full" }}
+        >
+          Request
+        </Link>
+        <Link
+          to="/total-inventory"
+          className="text-white/80 hover:text-white font-medium px-3 py-1.5 rounded-full transition-colors"
+          activeProps={{ className: "!text-white bg-rkz-teal font-semibold px-3 py-1.5 rounded-full" }}
+        >
+          Total Inventory
+        </Link>
+        <Link
+          to="/statistics"
+          className="text-white/80 hover:text-white font-medium px-3 py-1.5 rounded-full transition-colors"
+          activeProps={{ className: "!text-white bg-rkz-teal font-semibold px-3 py-1.5 rounded-full" }}
+        >
+          Statistics
+        </Link>
+        <Link
+          to="/history"
+          className="text-white/80 hover:text-white font-medium px-3 py-1.5 rounded-full transition-colors"
+          activeProps={{ className: "!text-white bg-rkz-teal font-semibold px-3 py-1.5 rounded-full" }}
+        >
+          History
+        </Link>
       </div>
-      <hr className="border-t-2 border-teal-100" />
-    </>
+      <div className="flex gap-4 items-center">
+        <Link to="/profiel" className="text-white/80 hover:text-white font-medium">Profile</Link>
+        <Link to="/settings" className="text-white/80 hover:text-white font-medium">Settings</Link>
+        <button className="text-white border border-white/40 rounded-full px-4 py-1.5 text-sm hover:bg-white/10 transition-colors">
+          Log Out
+        </button>
+      </div>
+    </div>
   );
 }

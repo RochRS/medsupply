@@ -23,9 +23,9 @@ function Index() {
     password?: string;
   }>({});
 
-  return (
+   return (
     <div>
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-teal-800 to-teal-600">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-rkz-navy to-rkz-blue">
         <div className="flex flex-col items-center gap-5 max-w-sm w-full px-6">
           <HospitalIcon />
 

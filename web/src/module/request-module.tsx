@@ -1,5 +1,5 @@
-import { useState} from "react";
-import { FormInput} from "../components/global/form-input";
+import { useState } from "react";
+import { FormInput } from "../components/global/form-input";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Label } from "../components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,9 +11,8 @@ export function RequestFields() {
   const [aantal, setAantal] = useState("");
   const [afdeling, setAfdeling] = useState("");
 
-
-  return(
-   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <FormInput
         label="Zoek en/of select supply type"
         name="supplyType"
@@ -46,7 +45,6 @@ export function RequestFields() {
     </div>
   );
 }
-
 
 const URGENTIE_OPTIES = [
   { value: "normaal", label: "Normaal (binnen 3-5 dagen)" },
@@ -90,7 +88,7 @@ export function CommentsTextArea() {
 
 export function RequestForm() {
   return (
-    <div className="bg-white border rounded-lg p-10 flex flex-col gap-6 max-w-7xl w-full mx-auto">
+    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-10 flex flex-col gap-6 max-w-7xl w-full mx-auto">
       <RequestFields />
       <UrgencySelector />
       <CommentsTextArea />
@@ -107,8 +105,6 @@ export function RequestForm() {
   );
 }
 
-
-
 export function RequestFormButtons() {
   const handleVersturen = () => {
     console.log("Aanvraag versturen clicked");
@@ -120,10 +116,10 @@ export function RequestFormButtons() {
 
   return (
     <div className="flex gap-3">
-      <Button onClick={handleVersturen} className="bg-teal-700 hover:bg-teal-800">Aanvraag versturen</Button>
-      <Button onClick={handleWissen} variant="destructive">Wissen</Button> 
+      <Button onClick={handleVersturen} className="bg-rkz-teal hover:bg-rkz-teal/90">
+        Aanvraag versturen
+      </Button>
+      <Button onClick={handleWissen} variant="destructive">Wissen</Button>
     </div>
   );
 }
-
-

@@ -11,9 +11,9 @@ export const Route = createFileRoute("/history")({   // ← was "/geschiedenis"
 function RouteComponent() {
   return (
     <div>
-      <div className="min-h-screen bg-gradient-to-b from-slate-100 to-teal-50">
+      <div className="min-h-screen bg-rkz-bg">
         <div className="text-center pt-4 pb-3">
-          <h1 className="text-2xl font-bold text-teal-800">Geschiedenis</h1>
+          <h1 className="text-2xl font-bold text-rkz-navy">Geschiedenis</h1>
           <p className="text-sm text-slate-500">
             Overzicht van alle activiteiten die hebben plaatsgevonden.
           </p>

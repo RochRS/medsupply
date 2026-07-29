@@ -16,7 +16,7 @@ export function HospitalIcon() {
 
       <div>
         <h1 className="text-white text-2xl font-bold tracking-tight">MedSupply</h1>
-        <p className="text-teal-100 text-sm mt-1">Voorraadbeheer Systeem voor Medische Supplies</p>
+        <p className="text-sky-100 text-sm mt-1">Voorraadbeheer Systeem voor Medische Supplies</p>
       </div>
     </div>
   );
@@ -116,7 +116,7 @@ export function SubmitLoginRequestButton({
 
   return (
     <div className="flex flex-col gap-2 items-center">
-      <Button onClick={sendLoginRequest} disabled={loading} className="bg-teal-700 hover:bg-teal-800 w-full">
+      <Button onClick={sendLoginRequest} disabled={loading} className="bg-rkz-teal hover:bg-rkz-teal/90 w-full">
         {loading ? "Bezig..." : "Login"}
       </Button>
       <p className="text-sm text-red-500 text-center">
