@@ -1,0 +1,26 @@
+---
+title: MedSupply ManagerSystem
+description: Documentatie voor de MedSupply ManagerSystem (MSMS)
+template: splash
+hero:
+  tagline: Documentatie voor gebruikers en beheerders van MedSupply ManagerSystem
+  actions:
+    - text: Gebruikershandleiding
+      link: /gebruikers/01-inleiding/
+      icon: right-arrow
+      variant: primary
+    - text: Systeemhandleiding
+      link: /systeem/01-inleiding/
+      icon: right-arrow
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+	<Card title="Gebruikershandleiding" icon="open-book">
+		Voor medewerkers die dagelijks met MSMS werken: inloggen, aanvragen indienen, voorraad bekijken en meer.
+	</Card>
+	<Card title="Systeemhandleiding" icon="setting">
+		Voor ontwikkelaars en beheerders: installatie, architectuur, beveiliging en aanbevelingen.
+	</Card>
+</CardGrid>
