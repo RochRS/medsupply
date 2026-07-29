@@ -1,49 +1,97 @@
-# Starlight Starter Kit: Basics
+# MedSupply Documentation — README
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+Deze site is gemaakt met [Astro](https://astro.build) + [Starlight](https://starlight.astro.build). Dit document legt uit hoe je de inhoud en het menu aanpast, en hoe je het project lokaal opstart.
 
-```
-npm create astro@latest -- --template starlight
-```
+## Project starten (dev mode)
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Open een terminal in de projectmap en run:
 
-## 🚀 Project Structure
-
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+```bash
+npm run dev
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+Open daarna in je browser: `http://localhost:4321`
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+De site herlaadt automatisch zodra je een bestand opslaat — je hoeft de server niet opnieuw te starten na een tekstwijziging.
 
-Static assets, like favicons, can be placed in the `public/` directory.
+## Inhoud aanpassen
 
-## 🧞 Commands
+Alle pagina's zijn gewone Markdown-bestanden (`.md`). Je kunt ze direct openen en bewerken in Cursor (of elke teksteditor).
 
-All commands are run from the root of the project, from a terminal:
+### Gebruikershandleiding
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Locatie: `src/content/docs/gebruikers/`
 
-## 👀 Want to learn more?
+Elk bestand is één pagina, bijvoorbeeld:
+- `01-inleiding.md`
+- `02-wat-is-medsupply-managersystem.md`
+- `03-inloggen.md`
+- ...enzovoort
 
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+Bovenaan elk bestand staat een "frontmatter"-blok tussen `---` lijnen:
+
+```markdown
+---
+title: "Inloggen"
+sidebar:
+  order: 3
+---
+```
+
+- `title` is de titel die bovenaan de pagina en in het menu verschijnt.
+- `sidebar: order:` bepaalt de volgorde in het menu (lager nummer = hoger in de lijst).
+
+Alles ná de tweede `---` is de eigenlijke inhoud, in gewone Markdown:
+- `**vet**` voor vetgedrukte tekst
+- `- item` voor een bullet-lijst
+- `## Kop` voor een subkop
+
+### Systeemhandleiding
+
+Locatie: `src/content/docs/systeem/`
+
+Werkt op exact dezelfde manier als de Gebruikershandleiding — elk bestand is één pagina met dezelfde frontmatter-structuur (`title` + `sidebar: order:`).
+
+## Een nieuwe pagina toevoegen
+
+1. Maak een nieuw `.md` bestand aan in `src/content/docs/gebruikers/` of `src/content/docs/systeem/`.
+2. Zet er frontmatter bovenaan (kopieer die van een bestaand bestand als voorbeeld).
+3. Voeg de pagina toe aan het menu — zie hieronder.
+
+## Het menu (sidebar) aanpassen
+
+Het menu wordt **niet automatisch** gegenereerd — het staat expliciet in `astro.config.mjs`, in het `sidebar:`-blok.
+
+Om een pagina toe te voegen, verwijderen, of de volgorde te wijzigen, pas je de lijst aan onder `Gebruikershandleiding` of `Systeemhandleiding`:
+
+```js
+{
+    label: 'Gebruikershandleiding',
+    items: [
+        { label: 'Inleiding', slug: 'gebruikers/01-inleiding' },
+        { label: 'Inloggen', slug: 'gebruikers/03-inloggen' },
+        // ...
+    ],
+},
+```
+
+- `label` is de tekst die in het menu wordt getoond.
+- `slug` is het bestandspad **zonder** `.md` extensie (bijvoorbeeld `gebruikers/03-inloggen` voor `src/content/docs/gebruikers/03-inloggen.md`).
+
+Om een pagina te verwijderen uit het menu: verwijder de bijbehorende regel. Om de volgorde te wijzigen: verplaats de regel naar de gewenste positie in de lijst.
+
+Sla `astro.config.mjs` op — de dev server pikt de wijziging automatisch op.
+
+## Website live zetten (production)
+
+```bash
+npm run build
+```
+
+Dit genereert een kant-en-klare statische site in de map `dist/`. Die map kun je uploaden naar elke webhost (Netlify, Vercel, GitHub Pages, etc.).
+
+Om de gebouwde versie lokaal te testen vóór het live zetten:
+
+```bash
+npm run preview
+```
