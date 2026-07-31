@@ -23,13 +23,18 @@ function Index() {
     password?: string;
   }>({});
 
+  const fillDemoData = () => {
+    setEmail("demo@rkz.sr");
+    setPassword("Demo1234!");
+  };
+
   return (
     <div>
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-sky-700 to-slate-600">
-        <div className="flex flex-col items-center gap-6 max-w-sm w-full px-6">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-rkz-navy to-rkz-blue">
+        <div className="flex flex-col items-center gap-5 max-w-sm w-full px-6">
           <HospitalIcon />
 
-          <div className="bg-white w-full rounded-xl shadow-lg p-6 flex flex-col gap-4">
+          <div className="bg-white w-full rounded-2xl shadow-xl p-7 flex flex-col gap-5">
             <UserInputFields
               email={email}
               password={password}
@@ -39,7 +44,7 @@ function Index() {
             />
 
             {formError && (
-              <p className="text-sm text-red-500 text-left">{formError}</p>
+              <p className="text-sm text-rose-600 text-left">{formError}</p>
             )}
 
             <SubmitLoginRequestButton
@@ -48,6 +53,14 @@ function Index() {
               onError={setFormError}
               onFieldErrors={setFieldErrors}
             />
+
+            <button
+              onClick={fillDemoData}
+              type="button"
+              className="text-xs text-slate-400 hover:text-slate-600 underline"
+            >
+              Vul demo-gegevens in
+            </button>
           </div>
         </div>
       </div>

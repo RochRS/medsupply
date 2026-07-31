@@ -10,6 +10,11 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { apiClient } from "../config/api";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+} from "../components/ui/dialog";
+import { Button } from "../components/ui/button";
+
 
 type StockLevel = "kritiek" | "laag" | "goed";
 
@@ -69,7 +74,7 @@ function useInventory(search: string) {
   return { data, loading, error };
 }
 
-export function TotaleVoorraadOverzichtStats({
+export function InventoryOverviewStats({
   summary,
   loading,
 }: {
@@ -88,7 +93,7 @@ export function TotaleVoorraadOverzichtStats({
       {cards.map((card) => (
         <div
           key={card.label}
-          className="border rounded-lg p-4 bg-white text-left"
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 text-left"
         >
           <p className="text-xs text-gray-500">{card.label}</p>
           <p className="text-2xl font-semibold">
@@ -100,7 +105,7 @@ export function TotaleVoorraadOverzichtStats({
   );
 }
 
-export function TotaleVoorraadSearchbar({
+export function InventorySearchbar({
   value,
   onChange,
 }: {
@@ -118,7 +123,7 @@ export function TotaleVoorraadSearchbar({
   );
 }
 
-export function TotaleVoorraadDisplayTable({
+export function InventoryTable({
   items,
   loading,
   error,
@@ -140,7 +145,7 @@ export function TotaleVoorraadDisplayTable({
   }
 
   return (
-    <div className="border rounded-lg bg-white overflow-hidden">
+    <div className="bg-white dark:bg-slate-800  rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
@@ -176,8 +181,45 @@ export function TotaleVoorraadDisplayTable({
   );
 }
 
+export function AddMedicineButton() {
+  const [open, setOpen] = useState(false);
+  const [naam, setNaam] = useState("");
+  const [categorie, setCategorie] = useState("");
+  const [voorraad, setVoorraad] = useState("");
+  const [locatie, setLocatie] = useState("");
+
+  const handleSave = () => {
+    console.log({ naam, categorie, voorraad, locatie });
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger className="bg-rkz-teal hover:bg-rkz-teal/90 text-white px-4 py-2 rounded-md text-sm font-medium">
+        + Nieuw Item
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nieuw item toevoegen</DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-4 py-2">
+          <FormInput label="Naam" name="naam" value={naam} onChange={setNaam} placeholder="Bijv. Paracetamol 500mg" />
+          <FormInput label="Categorie" name="categorie" value={categorie} onChange={setCategorie} placeholder="Bijv. Medicatie, Gassen" />
+          <FormInput label="Voorraad" name="voorraad" type="number" value={voorraad} onChange={setVoorraad} placeholder="Aantal" />
+          <FormInput label="Locatie" name="locatie" value={locatie} onChange={setLocatie} placeholder="Bijv. Apotheek, Centrale voorraad" />
+        </div>
+
+        <DialogFooter>
+          <Button onClick={handleSave} className="bg-rkz-teal hover:bg-rkz-teal/90">Opslaan</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // Page container that owns search + fetch state
-export function TotaleVoorraadPage() {
+export function InventoryPage() {
   const [search, setSearch] = useState("");
   const { data, loading, error } = useInventory(search);
 
@@ -185,21 +227,24 @@ export function TotaleVoorraadPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto p-4">
-      <div className="text-center">
-        <h1 className="text-2xl font-semibold">Totale Voorraad</h1>
-        <p className="text-sm text-gray-500">
-          Overzicht van de totale voorraad in het magazijn.
-        </p>
+      <div className="flex justify-between items-center">
+        <div className="text-center flex-1">
+          <h1 className="text-2xl font-bold text-rkz-navy dark:text-white">Totale Voorraad</h1>
+          <p className="text-sm text-gray-500">
+            Overzicht van de totale voorraad in het magazijn.
+          </p>
+        </div>
+        <AddMedicineButton />
       </div>
 
-      <TotaleVoorraadOverzichtStats
+      <InventoryOverviewStats 
         summary={data?.summary}
         loading={loading && !data}
       />
 
-      <TotaleVoorraadSearchbar value={search} onChange={setSearch} />
+      <InventorySearchbar value={search} onChange={setSearch} />
 
-      <TotaleVoorraadDisplayTable
+      <InventoryTable
         items={items}
         loading={loading && !data}
         error={error}
