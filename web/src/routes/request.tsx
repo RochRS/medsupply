@@ -11,9 +11,9 @@ export const Route = createFileRoute("/request")({
 function RouteComponent() {
   return (
     <div>
-      <div className="min-h-screen bg-rkz-bg">
+      <div className="min-h-screen bg-rkz-bg dark:bg-slate-900">
         <div className="text-center py-3">
-          <h1 className="text-2xl font-bold text-rkz-navy">Aanvraag</h1>
+          <h1 className="text-2xl font-bold text-rkz-navy dark:text-white">Aanvraag</h1>
         </div>
 
         <div className="px-4 pb-8 flex justify-center">

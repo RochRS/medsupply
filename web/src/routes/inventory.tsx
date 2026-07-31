@@ -1,17 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Footer } from "../components/global/footer.tsx";
-import { InventoryPage } from "../module/total-inventory-module.tsx";
+import { InventoryPage } from "../module/inventory-module.tsx";
 
-import "../css/total-inventory.css";
+import "../css/inventory.css";
 
-export const Route = createFileRoute("/total-inventory")({
+export const Route = createFileRoute("/inventory")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <div>
-      <div className="min-h-screen bg-rkz-bg">
+      <div className="min-h-screen bg-rkz-bg dark:bg-slate-900 ">
       <InventoryPage />
       </div>
       <Footer />

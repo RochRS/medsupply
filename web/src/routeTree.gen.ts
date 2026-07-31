@@ -9,28 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TotalInventoryRouteImport } from './routes/total-inventory'
 import { Route as StatisticsRouteImport } from './routes/statistics'
-import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as ProfielRouteImport } from './routes/profiel'
+import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 
-const TotalInventoryRoute = TotalInventoryRouteImport.update({
-  id: '/total-inventory',
-  path: '/total-inventory',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StatisticsRoute = StatisticsRouteImport.update({
   id: '/statistics',
   path: '/statistics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RequestRoute = RequestRouteImport.update({
@@ -41,6 +30,11 @@ const RequestRoute = RequestRouteImport.update({
 const ProfielRoute = ProfielRouteImport.update({
   id: '/profiel',
   path: '/profiel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -63,32 +57,29 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
+  '/inventory': typeof InventoryRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
-  '/settings': typeof SettingsRoute
   '/statistics': typeof StatisticsRoute
-  '/total-inventory': typeof TotalInventoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
+  '/inventory': typeof InventoryRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
-  '/settings': typeof SettingsRoute
   '/statistics': typeof StatisticsRoute
-  '/total-inventory': typeof TotalInventoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
+  '/inventory': typeof InventoryRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
-  '/settings': typeof SettingsRoute
   '/statistics': typeof StatisticsRoute
-  '/total-inventory': typeof TotalInventoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,65 +87,47 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/history'
+    | '/inventory'
     | '/profiel'
     | '/request'
-    | '/settings'
     | '/statistics'
-    | '/total-inventory'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/history'
+    | '/inventory'
     | '/profiel'
     | '/request'
-    | '/settings'
     | '/statistics'
-    | '/total-inventory'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/history'
+    | '/inventory'
     | '/profiel'
     | '/request'
-    | '/settings'
     | '/statistics'
-    | '/total-inventory'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   HistoryRoute: typeof HistoryRoute
+  InventoryRoute: typeof InventoryRoute
   ProfielRoute: typeof ProfielRoute
   RequestRoute: typeof RequestRoute
-  SettingsRoute: typeof SettingsRoute
   StatisticsRoute: typeof StatisticsRoute
-  TotalInventoryRoute: typeof TotalInventoryRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/total-inventory': {
-      id: '/total-inventory'
-      path: '/total-inventory'
-      fullPath: '/total-inventory'
-      preLoaderRoute: typeof TotalInventoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/statistics': {
       id: '/statistics'
       path: '/statistics'
       fullPath: '/statistics'
       preLoaderRoute: typeof StatisticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/request': {
@@ -169,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/profiel'
       fullPath: '/profiel'
       preLoaderRoute: typeof ProfielRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -199,11 +179,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   HistoryRoute: HistoryRoute,
+  InventoryRoute: InventoryRoute,
   ProfielRoute: ProfielRoute,
   RequestRoute: RequestRoute,
-  SettingsRoute: SettingsRoute,
   StatisticsRoute: StatisticsRoute,
-  TotalInventoryRoute: TotalInventoryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

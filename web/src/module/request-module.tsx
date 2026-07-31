@@ -5,26 +5,41 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "../components/ui/button";
 
-export function RequestFields() {
-  const [supplyType, setSupplyType] = useState("");
-  const [naam, setNaam] = useState("");
-  const [aantal, setAantal] = useState("");
-  const [afdeling, setAfdeling] = useState("");
+type RequestFieldsProps = {
+  supplyType: string;
+  naam: string;
+  aantal: string;
+  afdeling: string;
+  onSupplyTypeChange: (v: string) => void;
+  onNaamChange: (v: string) => void;
+  onAantalChange: (v: string) => void;
+  onAfdelingChange: (v: string) => void;
+};
 
+export function RequestFields({
+  supplyType,
+  naam,
+  aantal,
+  afdeling,
+  onSupplyTypeChange,
+  onNaamChange,
+  onAantalChange,
+  onAfdelingChange,
+}: RequestFieldsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <FormInput
         label="Zoek en/of select supply type"
         name="supplyType"
         value={supplyType}
-        onChange={setSupplyType}
+        onChange={onSupplyTypeChange}
         placeholder="Voer supply type in"
       />
       <FormInput
         label="Naam van supplies"
         name="naam"
         value={naam}
-        onChange={setNaam}
+        onChange={onNaamChange}
         placeholder="Voer/zoek op supply naam"
       />
       <FormInput
@@ -32,14 +47,14 @@ export function RequestFields() {
         name="aantal"
         type="number"
         value={aantal}
-        onChange={setAantal}
+        onChange={onAantalChange}
         placeholder="Voer aantal in"
       />
       <FormInput
         label="Afdeling"
         name="afdeling"
         value={afdeling}
-        onChange={setAfdeling}
+        onChange={onAfdelingChange}
         placeholder="Voer afdelingsnaam in"
       />
     </div>
@@ -52,13 +67,16 @@ const URGENTIE_OPTIES = [
   { value: "hoog", label: "Hoog (binnen 24 uur)" },
 ];
 
-export function UrgencySelector() {
-  const [urgentie, setUrgentie] = useState("normaal");
+type UrgencySelectorProps = {
+  urgentie: string;
+  onChange: (v: string) => void;
+};
 
+export function UrgencySelector({ urgentie, onChange }: UrgencySelectorProps) {
   return (
     <div className="flex flex-col gap-2">
       <Label>Urgentie</Label>
-      <RadioGroup value={urgentie} onValueChange={setUrgentie}>
+      <RadioGroup value={urgentie} onValueChange={onChange}>
         {URGENTIE_OPTIES.map((opt) => (
           <div key={opt.value} className="flex items-center gap-2">
             <RadioGroupItem value={opt.value} id={opt.value} />
@@ -70,16 +88,19 @@ export function UrgencySelector() {
   );
 }
 
-export function CommentsTextArea() {
-  const [opmerking, setOpmerking] = useState("");
+type CommentsTextAreaProps = {
+  opmerking: string;
+  onChange: (v: string) => void;
+};
 
+export function CommentsTextArea({ opmerking, onChange }: CommentsTextAreaProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor="opmerking">Opmerkingen (optioneel)</Label>
       <Textarea
         id="opmerking"
         value={opmerking}
-        onChange={(e) => setOpmerking(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         placeholder="Waarom is deze voorraad nodig?"
       />
     </div>
@@ -87,18 +108,44 @@ export function CommentsTextArea() {
 }
 
 export function RequestForm() {
-  return (
-    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-10 flex flex-col gap-6 max-w-7xl w-full mx-auto">
-      <RequestFields />
-      <UrgencySelector />
-      <CommentsTextArea />
+  const [supplyType, setSupplyType] = useState("");
+  const [naam, setNaam] = useState("");
+  const [aantal, setAantal] = useState("");
+  const [afdeling, setAfdeling] = useState("");
+  const [urgentie, setUrgentie] = useState("normaal");
+  const [opmerking, setOpmerking] = useState("");
 
-      <div className="flex flex-col gap-1">
-        <Label>Gebruikers Info</Label>
-        <div className="bg-gray-50 border rounded-md p-3 text-sm text-gray-600">
-          Rol: &nbsp;&nbsp;Afdeling: aangeven
-        </div>
-      </div>
+  const fillDemoData = () => {
+    setSupplyType("Medicatie");
+    setNaam("Paracetamol 500mg");
+    setAantal("50");
+    setAfdeling("SEH");
+    setUrgentie("verhoogd");
+    setOpmerking("Voorraad bijna op, voor demo-doeleinden ingevuld.");
+  };
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-10 flex flex-col gap-6 max-w-7xl w-full mx-auto">
+      <RequestFields
+        supplyType={supplyType}
+        naam={naam}
+        aantal={aantal}
+        afdeling={afdeling}
+        onSupplyTypeChange={setSupplyType}
+        onNaamChange={setNaam}
+        onAantalChange={setAantal}
+        onAfdelingChange={setAfdeling}
+      />
+      <UrgencySelector urgentie={urgentie} onChange={setUrgentie} />
+      <CommentsTextArea opmerking={opmerking} onChange={setOpmerking} />
+
+      <button
+        onClick={fillDemoData}
+        type="button"
+        className="text-xs text-slate-400 hover:text-slate-600 underline self-start"
+      >
+        Vul demo-gegevens in
+      </button>
 
       <RequestFormButtons />
     </div>

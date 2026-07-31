@@ -6,9 +6,7 @@ import {
   StockStatusDistribution,
   CategoryDistribution,
   CurrentStockLevelsPerItem,
-  DailyUsagePerItem,
-  MonthlyUsagePerItem,
-  YearlyUsagePerItem,
+  UsageSection,
   AverageStorageTimePerItem,
 } from "../module/statistics-module.tsx";
 
@@ -21,9 +19,9 @@ export const Route = createFileRoute("/statistics")({
 function RouteComponent() {
   return (
     <div>
-      <div className="min-h-screen bg-rkz-bg">
+      <div className="min-h-screen bg-rkz-bg dark:bg-slate-900">
         <div className="text-center py-3">
-          <h1 className="text-2xl font-bold text-rkz-navy">Analyse &amp; Statistieken</h1>
+          <h1 className="text-2xl font-bold text-rkz-navy dark:text-white">Analyse &amp; Statistieken</h1>
           <p className="text-slate-500 text-sm">
             Gedetailleerd overzicht van voorraadgebruik en trends
           </p>
@@ -38,9 +36,7 @@ function RouteComponent() {
           </div>
 
           <CurrentStockLevelsPerItem />
-          <DailyUsagePerItem />
-          <MonthlyUsagePerItem />
-          <YearlyUsagePerItem />
+          <UsageSection />
           <AverageStorageTimePerItem />
         </div>
       </div>

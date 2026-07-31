@@ -17,7 +17,7 @@ export function EmergencyRequest() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border-t-4 border-t-rkz-red p-4 flex flex-col gap-3">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] border-t-4 border-t-rkz-red p-4 flex flex-col gap-3">
       <div className="flex items-center gap-2">
         <h2 className="font-bold text-rkz-red">Spoedaanvraag</h2>
         <span className="bg-rkz-red text-white text-[10px] font-bold px-2 py-0.5 rounded">SPOED</span>
@@ -72,8 +72,8 @@ const CATEGORIEEN = [
 
 export function CriticalInventoryOverview() {
   return (
-    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
-      <h2 className="font-bold text-rkz-navy">Kritiek Voorraadoverzicht</h2>
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
+      <h2 className="font-bold text-rkz-navy dark:text-white">Kritiek Voorraadoverzicht</h2>
 
       <div className="flex gap-3">
         <Select items={VOORRAAD_NIVEAUS} defaultValue="alle-niveaus">
@@ -117,9 +117,9 @@ const SORTEER_OPTIES = [
 
 export function Notifications() {
   return (
-    <div className="bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">
-        <h2 className="font-bold text-rkz-navy">Meldingen</h2>
+        <h2 className="font-bold text-rkz-navy dark:text-white">Meldingen</h2>
         <span className="bg-rkz-red text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
       </div>
 
@@ -154,6 +154,17 @@ export function Notifications() {
       <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">✓</div>
         <p className="text-sm text-gray-400">Geen nieuwe meldingen</p>
+      </div>
+    </div>
+  );
+}
+
+export function StockStatusOverview() {
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
+      <h2 className="font-bold text-rkz-navy dark:text-white">Voorraad status verdeling</h2>
+      <div className="h-64 border-2 border-dashed border-slate-200 rounded-md flex items-center justify-center">
+        <p className="text-sm text-slate-400">Grafiek komt hier</p>
       </div>
     </div>
   );
