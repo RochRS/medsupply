@@ -83,6 +83,7 @@ export async function getItemsByStock(threshold: number) {
   }));
 }
 
+// Full inventory list + summary (critical/low/ok)
 export async function getAllItems(search?: string) {
   const rows = await db
     .select({
@@ -112,6 +113,7 @@ export async function getAllItems(search?: string) {
     stockLevel: stockLevel(row.remainingAmount),
   }));
 
+  // Summary for dashboard / inventory page
   const totalItems = list.length;
   const totalStock = list.reduce((sum, row) => sum + row.remainingAmount, 0);
   const criticalStock = list.filter((row) => row.stockLevel === "critical").length;
