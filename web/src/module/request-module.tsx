@@ -124,6 +124,19 @@ export function RequestForm() {
     setOpmerking("Voorraad bijna op, voor demo-doeleinden ingevuld.");
   };
 
+    const resetForm = () => {
+    setSupplyType("");
+    setNaam("");
+    setAantal("");
+    setAfdeling("");
+    setUrgentie("normaal");
+    setOpmerking("");
+  };
+
+  const handleVersturen = () => {
+    console.log({ supplyType, naam, aantal, afdeling, urgentie, opmerking });
+  };
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-10 flex flex-col gap-6 max-w-7xl w-full mx-auto">
       <RequestFields
@@ -147,26 +160,23 @@ export function RequestForm() {
         Vul demo-gegevens in
       </button>
 
-      <RequestFormButtons />
+      <RequestFormButtons onVersturen={handleVersturen} onWissen={resetForm}/>
     </div>
   );
 }
 
-export function RequestFormButtons() {
-  const handleVersturen = () => {
-    console.log("Aanvraag versturen clicked");
-  };
+type RequestFormButtonsProps = {
+  onVersturen: () => void;
+  onWissen: () => void;
+};
 
-  const handleWissen = () => {
-    console.log("Wissen clicked");
-  };
-
+export function RequestFormButtons({ onVersturen, onWissen }: RequestFormButtonsProps) {
   return (
     <div className="flex gap-3">
-      <Button onClick={handleVersturen} className="bg-rkz-teal hover:bg-rkz-teal/90">
+      <Button onClick={onVersturen} className="bg-rkz-teal hover:bg-rkz-teal/90">
         Aanvraag versturen
       </Button>
-      <Button onClick={handleWissen} variant="destructive">Wissen</Button>
+      <Button onClick={onWissen} variant="destructive">Wissen</Button>
     </div>
   );
 }

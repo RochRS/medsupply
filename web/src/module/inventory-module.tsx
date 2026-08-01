@@ -14,7 +14,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
-
+import { LoadingSpinner } from "../components/global/loading-spinner";
 
 type StockLevel = "kritiek" | "laag" | "goed";
 
@@ -97,7 +97,7 @@ export function InventoryOverviewStats({
         >
           <p className="text-xs text-gray-500">{card.label}</p>
           <p className="text-2xl font-semibold">
-            {loading ? "..." : card.value}
+            {loading ? <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-rkz-teal rounded-full animate-spin" /> : card.value}
           </p>
         </div>
       ))}
@@ -133,7 +133,7 @@ export function InventoryTable({
   error: string;
 }) {
   if (loading) {
-    return <p className="text-sm text-gray-500">Voorraad laden...</p>;
+    return <LoadingSpinner label="Voorraad laden..." />;
   }
 
   if (error) {
@@ -228,12 +228,7 @@ export function InventoryPage() {
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto p-4">
       <div className="flex justify-between items-center">
-        <div className="text-center flex-1">
-          <h1 className="text-2xl font-bold text-rkz-navy dark:text-white">Totale Voorraad</h1>
-          <p className="text-sm text-gray-500">
-            Overzicht van de totale voorraad in het magazijn.
-          </p>
-        </div>
+       
         <AddMedicineButton />
       </div>
 
