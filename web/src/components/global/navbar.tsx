@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ThemeToggle } from "./theme-toggle";
+import { NotificationBell } from "./notification-bell";
 
 export function Navbar() {
   return (
@@ -42,6 +43,7 @@ export function Navbar() {
         </Link>
       </div>
       <div className="flex gap-4 items-center">
+        <NotificationBell />
         <ThemeToggle />
         <Link to="/profiel" className="text-white/80 hover:text-white font-medium">Profile</Link>
         <button className="text-white border border-white/40 rounded-full px-4 py-1.5 text-sm hover:bg-white/10 transition-colors">

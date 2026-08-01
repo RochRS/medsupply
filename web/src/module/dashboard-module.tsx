@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiClient } from "../config/api";
 import { FormInput } from "../components/global/form-input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
@@ -70,7 +71,31 @@ const CATEGORIEEN = [
   { value: "gassen", label: "Gassen" },
 ];
 
+type InventoryItem = {
+  itemId: number;
+  itemName: string;
+  stockLevel: "kritiek" | "laag" | "goed";
+};
+
+type InventoryResponse = {
+  items: InventoryItem[];
+};
+
 export function CriticalInventoryOverview() {
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    apiClient("/inventory")
+      .then((result) => {
+        const data = result as InventoryResponse;
+        setItems(data.items.filter((i) => i.stockLevel === "kritiek" || i.stockLevel === "laag"));
+      })
+      .catch(() => setError("Voorraadoverzicht kon niet worden geladen."))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
       <h2 className="font-bold text-rkz-navy dark:text-white">Kritiek Voorraadoverzicht</h2>
@@ -99,7 +124,24 @@ export function CriticalInventoryOverview() {
         </Select>
       </div>
 
-      <p className="text-sm text-gray-400">Laden...</p>
+      {loading ? (
+        <p className="text-sm text-gray-400">Laden...</p>
+      ) : error ? (
+        <p className="text-sm text-red-500">{error}</p>
+      ) : items.length === 0 ? (
+        <p className="text-sm text-gray-400">Geen kritieke of lage voorraad.</p>
+      ) : (
+        <ul className="flex flex-col gap-1">
+          {items.map((item) => (
+            <li key={item.itemId} className="text-sm text-gray-700 dark:text-gray-300">
+              <span className={item.stockLevel === "kritiek" ? "text-rkz-red font-medium" : "text-orange-500 font-medium"}>
+                {item.stockLevel === "kritiek" ? "Kritiek" : "Laag"}:
+              </span>{" "}
+              {item.itemName}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -116,19 +158,33 @@ const SORTEER_OPTIES = [
 ];
 
 export function Notifications() {
+  const [alerts, setAlerts] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    apiClient("/inventory")
+      .then((result) => {
+        const data = result as InventoryResponse;
+        setAlerts(data.items.filter((i) => i.stockLevel === "kritiek" || i.stockLevel === "laag"));
+      })
+      .catch(() => setError("Meldingen konden niet worden geladen."))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">
         <h2 className="font-bold text-rkz-navy dark:text-white">Meldingen</h2>
-        <span className="bg-rkz-red text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+        <span className="bg-rkz-red text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+          {alerts.length}
+        </span>
       </div>
 
       <div className="flex flex-col gap-1.5">
         <Label>Type melding</Label>
         <Select items={MELDING_TYPES} defaultValue="alle-meldingen">
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             {MELDING_TYPES.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
@@ -140,9 +196,7 @@ export function Notifications() {
       <div className="flex flex-col gap-1.5">
         <Label>Sorteren</Label>
         <Select items={SORTEER_OPTIES} defaultValue="nieuwste">
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             {SORTEER_OPTIES.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
@@ -151,10 +205,27 @@ export function Notifications() {
         </Select>
       </div>
 
-      <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
-        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">✓</div>
-        <p className="text-sm text-gray-400">Geen nieuwe meldingen</p>
-      </div>
+      {loading ? (
+        <p className="text-sm text-gray-400 text-center py-8">Laden...</p>
+      ) : error ? (
+        <p className="text-sm text-red-500 text-center py-8">{error}</p>
+      ) : alerts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
+          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">✓</div>
+          <p className="text-sm text-gray-400">Geen nieuwe meldingen</p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {alerts.map((item) => (
+            <li key={item.itemId} className="text-sm text-gray-700 dark:text-gray-300">
+              <span className={item.stockLevel === "kritiek" ? "text-rkz-red font-medium" : "text-orange-500 font-medium"}>
+                {item.stockLevel === "kritiek" ? "Kritiek" : "Laag"}:
+              </span>{" "}
+              {item.itemName}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

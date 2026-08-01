@@ -15,21 +15,18 @@ export const Route = createFileRoute("/profiel")({
 function RouteComponent() {
   return (
     <div>
-      <div>
-        <div className="text-center">
-          <h1>Profiel</h1>
-          <p>Hier kan je je profiel aanpassen.</p>
+      <div className="min-h-height bg-rkz-bg dark:bg-slate-900">
+        <div className="text-center py-6">
+          <h1 className="text-2x1 font-bold text-rkz-navy dark:text-white">Profiel</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Hier kan je je profiel aanpassen.</p>
         </div>
 
         <div>
           {/* <image src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" className="avatar" /> */}
         </div>
 
-        <div>
+        <div className="flex flex-col gap-4 px-4 pb-8">
           <ProfielInformation />
-        </div>
-
-        <div>
           <ProfielPageButtons />
         </div>
       </div>

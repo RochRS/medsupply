@@ -228,12 +228,7 @@ export function InventoryPage() {
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto p-4">
       <div className="flex justify-between items-center">
-        <div className="text-center flex-1">
-          <h1 className="text-2xl font-bold text-rkz-navy dark:text-white">Totale Voorraad</h1>
-          <p className="text-sm text-gray-500">
-            Overzicht van de totale voorraad in het magazijn.
-          </p>
-        </div>
+       
         <AddMedicineButton />
       </div>
 
