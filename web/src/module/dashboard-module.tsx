@@ -7,6 +7,7 @@ import { Label } from "../components/ui/label";
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "../components/ui/select";
+import { LoadingSpinner } from "../components/global/loading-spinner";
 
 export function EmergencyRequest() {
   const [search, setSearch] = useState("");
@@ -125,7 +126,7 @@ export function CriticalInventoryOverview() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-400">Laden...</p>
+      <LoadingSpinner label="Overzicht laden..." />      
       ) : error ? (
         <p className="text-sm text-red-500">{error}</p>
       ) : items.length === 0 ? (
@@ -206,7 +207,7 @@ export function Notifications() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-400 text-center py-8">Laden...</p>
+      <LoadingSpinner label="Meldingen laden..." />      
       ) : error ? (
         <p className="text-sm text-red-500 text-center py-8">{error}</p>
       ) : alerts.length === 0 ? (

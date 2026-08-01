@@ -23,7 +23,7 @@ export function FormInput({
 }: FormInputProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={name}>{label}</Label>
+      <Label htmlFor={name} className="font-bold">{label}</Label>
       <Input
         id={name}
         name={name}

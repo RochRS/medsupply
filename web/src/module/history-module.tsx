@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { apiClient } from "../config/api";
+import { LoadingSpinner } from "../components/global/loading-spinner";
 
 type HistoryActivity = {
   id: string;
@@ -121,7 +122,7 @@ export function HistoryDisplay() {
         ))}
       </div>
 
-      {loading && <p className="text-sm text-gray-500">Geschiedenis laden...</p>}
+      {loading && <LoadingSpinner label="Geschiedenis laden..." />}
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       {!loading && !error && (data?.activities.length ?? 0) === 0 && (

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { apiClient } from "../config/api";
 import { Button } from "../components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
+import { LoadingSpinner } from "../components/global/loading-spinner";
 
 type SessionUser = {
   id: string;
@@ -30,7 +31,7 @@ export function ProfielInformation() {
   }, []);
 
   if (loading) {
-    return <p className="text-sm text-gray-500">Profiel laden...</p>;
+    return <LoadingSpinner label="Profiel laden..." />;
   }
 
   if (error || !user) {

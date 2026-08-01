@@ -14,7 +14,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
-
+import { LoadingSpinner } from "../components/global/loading-spinner";
 
 type StockLevel = "kritiek" | "laag" | "goed";
 
@@ -97,7 +97,7 @@ export function InventoryOverviewStats({
         >
           <p className="text-xs text-gray-500">{card.label}</p>
           <p className="text-2xl font-semibold">
-            {loading ? "..." : card.value}
+            {loading ? <span className="inline-block w-3 h-3 border-2 border-gray-300 border-t-rkz-teal rounded-full animate-spin" /> : card.value}
           </p>
         </div>
       ))}
@@ -133,7 +133,7 @@ export function InventoryTable({
   error: string;
 }) {
   if (loading) {
-    return <p className="text-sm text-gray-500">Voorraad laden...</p>;
+    return <LoadingSpinner label="Voorraad laden..." />;
   }
 
   if (error) {
