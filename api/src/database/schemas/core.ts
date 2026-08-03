@@ -1,5 +1,6 @@
 import {
   integer,
+  bigint,
   varchar,
   timestamp,
   boolean,
@@ -48,7 +49,7 @@ export const request = pgTable("request", {
 export const shipments = pgTable("shipments", {
   shipmentId: integer("shipment_id").primaryKey().generatedAlwaysAsIdentity(),
   shipmentBatchId: integer("shipment_batch_id").notNull(),
-  GTIN: integer("gtin").default(0),
+  GTIN: bigint("gtin", { mode: "number" }).default(0),
   experationDate: timestamp("expiration_date").notNull(),
   cost: integer("cost").notNull(),
   deliveryDate: timestamp("delivery_date").defaultNow(),

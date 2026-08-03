@@ -36,6 +36,13 @@
       "when": 1785015445177,
       "tag": "0004_nifty_typhoid_mary",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1785374256239,
+      "tag": "0005_gifted_stardust",
+      "breakpoints": true
     }
   ]
 }

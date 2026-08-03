@@ -1,22 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Footer } from "../components/global/footer.tsx";
 import { HistoryDisplay } from "../module/history-module.tsx";
 
-import "../css/history.css";
-
-export const Route = createFileRoute("/history")({   // ← was "/geschiedenis"
+export const Route = createFileRoute("/history")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
-    <div>
-      <div className="min-h-screen bg-rkz-bg dark:bg-slate-900">
-
-        <HistoryDisplay />
-      </div>
-
-      <Footer />
+    <div className="min-h-full bg-rkz-bg dark:bg-slate-900">
+      <HistoryDisplay />
     </div>
   );
 }
