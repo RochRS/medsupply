@@ -20,6 +20,7 @@ export const items = new Hono<AppEnv>();
 
 // ---- GET / POST (collection) ----
 
+// GET /items — full inventory (default = getAllItems + summary)
 items.get("/", async (c) => {
   const search = c.req.query("search")?.trim();
   const status = c.req.query("status");
@@ -55,6 +56,7 @@ items.get("/", async (c) => {
       return c.json({ items: list });
     }
 
+    // No filter → full inventory
     const result = await getAllItems(search);
     return c.json(result);
   } catch (error) {
