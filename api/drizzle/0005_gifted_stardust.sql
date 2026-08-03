@@ -1,0 +1,1 @@
+ALTER TABLE "shipments" ALTER COLUMN "gtin" SET DATA TYPE bigint;

@@ -16,6 +16,7 @@
     "db:seed:suppliers": "tsx src/database/seed/seed-suppliers.ts",
     "db:seed:departments": "tsx src/database/seed/seed-departments.ts",
     "db:seed:users": "tsx src/database/seed/seed-users.ts",
+    "db:seed:auth-user": "tsx src/database/seed/seed-auth-user.ts",
     "db:seed:request-descriptions": "tsx src/database/seed/seed-request-descriptions.ts",
     "db:seed:roles": "tsx src/database/seed/seed-roles.ts",
     "db:seed:shipments": "tsx src/database/seed/seed-shipments.ts",

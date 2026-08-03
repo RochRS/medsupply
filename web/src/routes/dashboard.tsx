@@ -1,13 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Footer } from "../components/global/footer.tsx";
-
 import {
   SpoedAanvraag,
   KritiekeVoorraadOverzicht,
   KritikeMeldingen,
 } from "../module/dashboard-module.tsx";
-
-import "../css/dashboard.css";
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
@@ -15,21 +11,30 @@ export const Route = createFileRoute("/dashboard")({
 
 function RouteComponent() {
   return (
-    <div>
-      <div className="min-h-screen bg-slate-50">
-        <div className="text-center py-6">
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
+    <div className="min-h-full bg-rkz-bg dark:bg-slate-900">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-8 sm:px-8">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-rkz-navy dark:text-white">
+            Dashboard
+          </h1>
+          <p className="text-sm text-slate-500">
+            Spoedaanvragen, kritieke voorraad en meldingen
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 max-w-7xl mx-auto">
-          <SpoedAanvraag />
-          <KritiekeVoorraadOverzicht />
-          <KritikeMeldingen />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="min-w-0">
+            <EmergencyRequest />
+          </div>
+          <div className="min-w-0">
+            <CriticalInventoryOverview />
+          </div>
+          <div className="min-w-0 md:col-span-2 xl:col-span-1">
+            <Notifications />
+          </div>
         </div>
-      </div>
 
-      <div>
-        <Footer />
+        <StockStatusOverview />
       </div>
     </div>
   );
