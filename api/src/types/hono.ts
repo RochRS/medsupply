@@ -1,10 +1,11 @@
 import type { AuthSession, AuthUser } from "../auth/auth.js";
+import type { UserRole } from "../services/users.service.js";
 
-// Values we attach to each Hono request (see middleware)
 export type AppVariables = {
   user: AuthUser | null;
   session: AuthSession | null;
-  validated: unknown; // set by the validate() middleware
+  role: UserRole | null;
+  validated: unknown;
 };
 
 export type AppEnv = {

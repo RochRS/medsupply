@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -11,44 +11,71 @@ import {
   Settings01Icon,
   Logout01Icon,
   Menu01Icon,
+  UserMultipleIcon,
+  ClipboardListIcon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useCart } from "@/lib/cart";
+import { roleLabel, useAppUser, type AppRole } from "@/lib/roles";
 import logo from "@/assets/rkz-logo.png";
 
 type NavIcon = typeof DashboardSquare01Icon;
 
-const mainLinks = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: NavIcon;
+  roles?: AppRole[];
+};
+
+const mainLinks: NavItem[] = [
   {
     to: "/dashboard",
     label: "Dashboard",
     icon: DashboardSquare01Icon,
+    roles: ["admin", "apotheker", "verpleging"],
   },
   {
     to: "/request",
     label: "Aanvraag",
     icon: ShoppingBagAddIcon,
+    roles: ["admin", "verpleging"],
+  },
+  {
+    to: "/aanvragen",
+    label: "Aanvragen",
+    icon: ClipboardListIcon,
+    roles: ["admin", "apotheker"],
   },
   {
     to: "/inventory",
     label: "Totale Voorraad",
     icon: PackageIcon,
+    roles: ["admin", "apotheker", "verpleging"],
   },
   {
     to: "/statistics",
     label: "Statistieken",
     icon: BarChartIcon,
+    roles: ["admin", "apotheker"],
   },
   {
     to: "/history",
     label: "Geschiedenis",
     icon: HistoryIcon,
+    roles: ["admin", "apotheker", "verpleging"],
   },
-] as const;
+  {
+    to: "/admin",
+    label: "Gebruikers",
+    icon: UserMultipleIcon,
+    roles: ["admin"],
+  },
+];
 
-const accountLinks = [
+const accountLinks: NavItem[] = [
   {
     to: "/profiel",
     label: "Profiel",
@@ -59,7 +86,7 @@ const accountLinks = [
     label: "Instellingen",
     icon: Settings01Icon,
   },
-] as const;
+];
 
 function NavLink({
   to,
@@ -103,6 +130,15 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { totalCount } = useCart();
   const { data: session } = useSession();
+  const { user, role } = useAppUser();
+
+  const visibleMain = useMemo(() => {
+    return mainLinks.filter((link) => {
+      if (!link.roles) return true;
+      if (!role) return true; // show until role loads; API still enforces
+      return link.roles.includes(role as AppRole);
+    });
+  }, [role]);
 
   const handleLogout = async () => {
     await signOut();
@@ -136,7 +172,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         <p className="mb-1 px-3 text-[11px] font-semibold tracking-wide text-slate-400 uppercase">
           Menu
         </p>
-        {mainLinks.map((link) => (
+        {visibleMain.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
@@ -164,12 +200,17 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="flex flex-col gap-3 border-t border-sky-100 px-3 py-4">
-        {session?.user ? (
+        {session?.user || user ? (
           <div className="truncate rounded-xl bg-sky-50 px-3 py-2.5">
             <p className="truncate text-sm font-medium text-sky-950">
-              {session.user.name || "Gebruiker"}
+              {user?.name || session?.user.name || "Gebruiker"}
             </p>
-            <p className="truncate text-xs text-slate-500">{session.user.email}</p>
+            <p className="truncate text-xs text-slate-500">
+              {user?.email || session?.user.email}
+            </p>
+            <p className="mt-1 text-[11px] font-medium text-sky-700">
+              {roleLabel(role)}
+            </p>
           </div>
         ) : null}
         <Button
@@ -194,6 +235,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { totalCount } = useCart();
+  const { role } = useAppUser();
+  const canRequest = !role || role === "verpleging" || role === "admin";
 
   useEffect(() => {
     setOpen(false);
@@ -235,22 +278,24 @@ export function AppShell({ children }: { children: ReactNode }) {
             <img src={logo} alt="" className="h-8 w-auto object-contain" />
             <span className="font-bold tracking-tight text-sky-950">MedSupply</span>
           </Link>
-          <Link
-            to="/request"
-            className="relative ml-auto inline-flex h-9 w-9 items-center justify-center rounded-xl text-sky-900 hover:bg-sky-50"
-            aria-label="Aanvraagmand"
-          >
-            <HugeiconsIcon
-              icon={ShoppingBagAddIcon}
-              strokeWidth={2}
-              className="size-5"
-            />
-            {totalCount > 0 ? (
-              <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sky-700 px-1 text-[10px] font-semibold text-white">
-                {totalCount}
-              </span>
-            ) : null}
-          </Link>
+          {canRequest ? (
+            <Link
+              to="/request"
+              className="relative ml-auto inline-flex h-9 w-9 items-center justify-center rounded-xl text-sky-900 hover:bg-sky-50"
+              aria-label="Aanvraagmand"
+            >
+              <HugeiconsIcon
+                icon={ShoppingBagAddIcon}
+                strokeWidth={2}
+                className="size-5"
+              />
+              {totalCount > 0 ? (
+                <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sky-700 px-1 text-[10px] font-semibold text-white">
+                  {totalCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
         </header>
 
         <div className="min-h-0 flex-1">{children}</div>

@@ -63,7 +63,8 @@ app.use(
 );
 
 // better-auth handles login / signup / logout / session
-app.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
+// Use /auth/* (not /**) so nested paths like /auth/sign-in/email match under basePath /api
+app.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
 
 // Load user/session on every request (may be null)
 app.use("*", loadSession);

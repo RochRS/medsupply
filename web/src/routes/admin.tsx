@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProfielPage } from "../module/profiel-module.tsx";
+import { AdminUsersPage } from "../module/admin-module.tsx";
 
-export const Route = createFileRoute("/profiel")({
+export const Route = createFileRoute("/admin")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <div className="min-h-full bg-rkz-bg dark:bg-slate-900">
-      <ProfielPage />
+      <AdminUsersPage />
     </div>
   );
 }

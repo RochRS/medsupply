@@ -12,7 +12,16 @@ export async function apiClient(path: string, options?: RequestInit) {
   });
 
   if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
+    let message = `API error: ${res.status}`;
+    try {
+      const data = (await res.json()) as { message?: string; error?: string };
+      if (typeof data.message === "string" && data.message.trim()) {
+        message = data.message;
+      }
+    } catch {
+      // keep status fallback
+    }
+    throw new Error(message);
   }
 
   return res.json();

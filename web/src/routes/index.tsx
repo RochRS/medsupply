@@ -27,7 +27,7 @@ function Index() {
   }>({});
 
   const fillDemoData = () => {
-    setEmail("test@medsupply.com");
+    setEmail("admin@medsupply.com");
     setPassword("Test1234!");
     setFormError("");
     setFieldErrors({});

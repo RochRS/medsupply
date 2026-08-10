@@ -14,6 +14,8 @@ type FormInputProps = {
   autoComplete?: string;
   className?: string;
   icon?: ReactNode;
+  /** Toont een rode ster naast het label */
+  required?: boolean;
 };
 
 export function FormInput({
@@ -27,11 +29,17 @@ export function FormInput({
   autoComplete,
   className,
   icon,
+  required = false,
 }: FormInputProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={name} className="text-sm font-medium text-sky-950">
         {label}
+        {required ? (
+          <span className="ml-0.5 text-rkz-red" aria-hidden="true">
+            *
+          </span>
+        ) : null}
       </Label>
       <div className="relative">
         {icon ? (
@@ -46,11 +54,15 @@ export function FormInput({
           value={value}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          required={required}
+          aria-required={required || undefined}
           aria-invalid={Boolean(error)}
           onChange={(e) => onChange(e.target.value)}
           className={cn(
             "h-10 border-sky-200 bg-white text-sm shadow-none md:text-sm",
             icon && "pl-10",
+            error &&
+              "border-red-300 focus-visible:border-red-400 focus-visible:ring-red-200",
             className,
           )}
         />

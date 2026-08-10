@@ -25,6 +25,7 @@ export const categories = pgTable("categories", {
   categoryId: integer("category_id").primaryKey().generatedAlwaysAsIdentity(),
   categoryName: varchar("category_name", { length: 255 }).notNull(),
   categoryDescription: text("category_description"),
+  icon: varchar("icon", { length: 100 }).default("PackageIcon"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updateAt: timestamp("updated_at"),
 });
@@ -34,6 +35,8 @@ export const request = pgTable("request", {
   requestBatchId: integer("request_batch_id").notNull(),
   requestedAmount: integer("requested_amount").notNull(),
   isUrgent: boolean("is_urgent").notNull(),
+  /** open → approved (klaargezet voor ophaler) → completed (opgehaald) */
+  status: varchar("status", { length: 32 }).notNull().default("open"),
   isCompleted: boolean("is_completed").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

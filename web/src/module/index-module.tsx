@@ -58,6 +58,7 @@ export function UserInputFields({
         onChange={onEmailChange}
         error={errors?.email}
         autoComplete="email"
+        required
         className="h-11 rounded-xl border-sky-200 bg-white shadow-none"
         icon={
           <HugeiconsIcon
@@ -76,6 +77,7 @@ export function UserInputFields({
         onChange={onPasswordChange}
         error={errors?.password}
         autoComplete="current-password"
+        required
         className="h-11 rounded-xl border-sky-200 bg-white shadow-none"
         icon={
           <HugeiconsIcon

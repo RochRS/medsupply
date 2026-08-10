@@ -15,6 +15,8 @@ import { Route as ProfielRouteImport } from './routes/profiel'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AanvragenRouteImport } from './routes/aanvragen'
 import { Route as IndexRouteImport } from './routes/index'
 
 const StatisticsRoute = StatisticsRouteImport.update({
@@ -47,6 +49,16 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AanvragenRoute = AanvragenRouteImport.update({
+  id: '/aanvragen',
+  path: '/aanvragen',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -55,6 +67,8 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aanvragen': typeof AanvragenRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
@@ -64,6 +78,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aanvragen': typeof AanvragenRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
@@ -74,6 +90,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aanvragen': typeof AanvragenRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
@@ -85,6 +103,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/aanvragen'
+    | '/admin'
     | '/dashboard'
     | '/history'
     | '/inventory'
@@ -94,6 +114,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/aanvragen'
+    | '/admin'
     | '/dashboard'
     | '/history'
     | '/inventory'
@@ -103,6 +125,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/aanvragen'
+    | '/admin'
     | '/dashboard'
     | '/history'
     | '/inventory'
@@ -113,6 +137,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AanvragenRoute: typeof AanvragenRoute
+  AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   HistoryRoute: typeof HistoryRoute
   InventoryRoute: typeof InventoryRoute
@@ -165,6 +191,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aanvragen': {
+      id: '/aanvragen'
+      path: '/aanvragen'
+      fullPath: '/aanvragen'
+      preLoaderRoute: typeof AanvragenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -177,6 +217,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AanvragenRoute: AanvragenRoute,
+  AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   HistoryRoute: HistoryRoute,
   InventoryRoute: InventoryRoute,
