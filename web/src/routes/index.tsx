@@ -12,23 +12,48 @@ import {
   UserInputFields,
   SubmitLoginRequestButton,
 } from "../module/index-module.tsx";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const DEMO_PASSWORD = "Test1234!";
+
+const DEMO_ACCOUNTS = [
+  {
+    id: "apotheker",
+    label: "Apotheker",
+    email: "apotheker@medsupply.com",
+    password: DEMO_PASSWORD,
+  },
+  {
+    id: "verpleging",
+    label: "Verpleging",
+    email: "verpleging@medsupply.com",
+    password: DEMO_PASSWORD,
+  },
+] as const;
+
+type DemoId = (typeof DEMO_ACCOUNTS)[number]["id"];
+
 function Index() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const defaultDemo = DEMO_ACCOUNTS[0];
+  const [activeDemo, setActiveDemo] = useState<DemoId>(defaultDemo.id);
+  const [email, setEmail] = useState(defaultDemo.email);
+  const [password, setPassword] = useState(defaultDemo.password);
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
     password?: string;
   }>({});
 
-  const fillDemoData = () => {
-    setEmail("admin@medsupply.com");
-    setPassword("Test1234!");
+  const fillDemo = (id: DemoId) => {
+    const account = DEMO_ACCOUNTS.find((a) => a.id === id);
+    if (!account) return;
+    setActiveDemo(id);
+    setEmail(account.email);
+    setPassword(account.password);
     setFormError("");
     setFieldErrors({});
   };
@@ -54,6 +79,34 @@ function Index() {
           </CardHeader>
 
           <CardContent className="flex flex-col gap-6 px-8">
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-medium text-slate-500">
+                Demo-accounts (auto ingevuld)
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {DEMO_ACCOUNTS.map((account) => (
+                  <button
+                    key={account.id}
+                    type="button"
+                    onClick={() => fillDemo(account.id)}
+                    className={cn(
+                      "rounded-xl border px-3 py-2.5 text-left transition-colors",
+                      activeDemo === account.id
+                        ? "border-sky-300 bg-sky-50 text-sky-950"
+                        : "border-slate-200 bg-slate-50/80 text-slate-600 hover:border-sky-200 hover:bg-sky-50/60",
+                    )}
+                  >
+                    <span className="block text-sm font-semibold">
+                      {account.label}
+                    </span>
+                    <span className="mt-0.5 block truncate text-[11px] text-slate-400">
+                      {account.email}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <UserInputFields
               email={email}
               password={password}
@@ -74,14 +127,6 @@ function Index() {
               onError={setFormError}
               onFieldErrors={setFieldErrors}
             />
-
-            <button
-              type="button"
-              onClick={fillDemoData}
-              className="text-center text-xs text-slate-400 underline hover:text-slate-600"
-            >
-              Vul demo-gegevens in
-            </button>
           </CardContent>
         </Card>
 

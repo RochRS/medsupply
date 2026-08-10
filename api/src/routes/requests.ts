@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import {
   getAllRequests,
+  getRequestsForUser,
   getRequestById,
   sendUrgentRequest,
   createRequest,
@@ -15,29 +16,59 @@ import { ROLE_NAMES } from "../database/seed/seed-roles.js";
 
 export const requests = new Hono<AppEnv>();
 
+function applyListFilters(
+  rows: Awaited<ReturnType<typeof getAllRequests>>,
+  opts: { urgent?: string; openOnly?: string; status?: string },
+) {
+  let next = rows;
+
+  if (opts.urgent === "1" || opts.urgent === "true") {
+    next = next.filter((r) => r.isUrgent);
+  } else if (opts.urgent === "0" || opts.urgent === "false") {
+    next = next.filter((r) => !r.isUrgent);
+  }
+
+  if (opts.status === "open") {
+    next = next.filter((r) => r.status === "open");
+  } else if (opts.status === "approved") {
+    next = next.filter((r) => r.status === "approved");
+  } else if (opts.status === "completed") {
+    next = next.filter((r) => r.status === "completed");
+  } else if (opts.openOnly === "1" || opts.openOnly === "true") {
+    next = next.filter((r) => !r.isCompleted);
+  }
+
+  return next;
+}
+
 requests.get("/", async (c) => {
   try {
+    const sessionUser = c.get("user");
+    const role = c.get("role");
     const urgent = c.req.query("urgent");
     const openOnly = c.req.query("open");
     const status = c.req.query("status");
-    let rows = await getAllRequests();
+    const mine = c.req.query("mine");
 
-    if (urgent === "1" || urgent === "true") {
-      rows = rows.filter((r) => r.isUrgent);
-    } else if (urgent === "0" || urgent === "false") {
-      rows = rows.filter((r) => !r.isUrgent);
+    const roleName = role?.roleName ?? null;
+    // Verpleging altijd alleen eigen aanvragen; optioneel ?mine=1 voor admin
+    const ownOnly =
+      roleName === ROLE_NAMES.VERPLEGING ||
+      mine === "1" ||
+      mine === "true";
+
+    if (ownOnly && !sessionUser?.id) {
+      return c.json(
+        { message: "Unauthorized", error: "AUTHENTICATION_REQUIRED" },
+        ERROR_CODE_MAP.UNAUTHORIZED,
+      );
     }
 
-    if (status === "open") {
-      rows = rows.filter((r) => r.status === "open");
-    } else if (status === "approved") {
-      rows = rows.filter((r) => r.status === "approved");
-    } else if (status === "completed") {
-      rows = rows.filter((r) => r.status === "completed");
-    } else if (openOnly === "1" || openOnly === "true") {
-      // Not yet fully done (open + waiting for pickup)
-      rows = rows.filter((r) => !r.isCompleted);
-    }
+    let rows = ownOnly
+      ? await getRequestsForUser(sessionUser!.id)
+      : await getAllRequests();
+
+    rows = applyListFilters(rows, { urgent, openOnly, status });
 
     return c.json({ requests: rows });
   } catch (error) {
@@ -86,6 +117,18 @@ requests.get("/:id", async (c) => {
       return c.json(
         { message: "Request not found", error: "REQUEST_NOT_FOUND" },
         ERROR_CODE_MAP.NOT_FOUND,
+      );
+    }
+
+    const sessionUser = c.get("user");
+    const role = c.get("role");
+    if (
+      role?.roleName === ROLE_NAMES.VERPLEGING &&
+      row.requesterId !== sessionUser?.id
+    ) {
+      return c.json(
+        { message: "Forbidden", error: "REQUEST_FORBIDDEN" },
+        ERROR_CODE_MAP.FORBIDDEN,
       );
     }
 

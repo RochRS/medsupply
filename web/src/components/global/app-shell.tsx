@@ -35,13 +35,31 @@ const mainLinks: NavItem[] = [
     to: "/dashboard",
     label: "Dashboard",
     icon: DashboardSquare01Icon,
-    roles: ["admin", "apotheker", "verpleging"],
+    roles: ["admin", "apotheker"],
+  },
+  {
+    to: "/dashboard",
+    label: "Start",
+    icon: DashboardSquare01Icon,
+    roles: ["verpleging"],
+  },
+  {
+    to: "/inventory",
+    label: "Supplies",
+    icon: PackageIcon,
+    roles: ["verpleging"],
+  },
+  {
+    to: "/request",
+    label: "Mijn mand",
+    icon: ShoppingBagAddIcon,
+    roles: ["verpleging"],
   },
   {
     to: "/request",
     label: "Aanvraag",
     icon: ShoppingBagAddIcon,
-    roles: ["admin", "verpleging"],
+    roles: ["admin"],
   },
   {
     to: "/aanvragen",
@@ -53,7 +71,7 @@ const mainLinks: NavItem[] = [
     to: "/inventory",
     label: "Totale Voorraad",
     icon: PackageIcon,
-    roles: ["admin", "apotheker", "verpleging"],
+    roles: ["admin", "apotheker"],
   },
   {
     to: "/statistics",
@@ -62,10 +80,16 @@ const mainLinks: NavItem[] = [
     roles: ["admin", "apotheker"],
   },
   {
+    to: "/mijn-aanvragen",
+    label: "Mijn aanvragen",
+    icon: ClipboardListIcon,
+    roles: ["verpleging"],
+  },
+  {
     to: "/history",
     label: "Geschiedenis",
     icon: HistoryIcon,
-    roles: ["admin", "apotheker", "verpleging"],
+    roles: ["admin", "apotheker"],
   },
   {
     to: "/admin",
@@ -128,7 +152,7 @@ function NavLink({
 function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { totalCount } = useCart();
+  const { productCount } = useCart();
   const { data: session } = useSession();
   const { user, role } = useAppUser();
 
@@ -140,6 +164,8 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     });
   }, [role]);
 
+  const homeTo = role === "verpleging" ? "/inventory" : "/dashboard";
+
   const handleLogout = async () => {
     await signOut();
     onNavigate?.();
@@ -150,7 +176,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex h-full flex-col">
       <div className="border-b border-sky-100 px-4 py-5">
         <Link
-          to="/dashboard"
+          to={homeTo}
           onClick={onNavigate}
           className="flex items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40"
         >
@@ -163,7 +189,9 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             <p className="truncate text-base font-bold tracking-tight text-sky-950">
               MedSupply
             </p>
-            <p className="truncate text-xs text-slate-500">Apotheek voorraad</p>
+            <p className="truncate text-xs text-slate-500">
+              {role === "verpleging" ? "Supplies aanvragen" : "Apotheek voorraad"}
+            </p>
           </div>
         </Link>
       </div>
@@ -174,12 +202,12 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         </p>
         {visibleMain.map((link) => (
           <NavLink
-            key={link.to}
+            key={`${link.to}-${link.label}`}
             to={link.to}
             label={link.label}
             icon={link.icon}
             active={pathname === link.to}
-            badge={link.to === "/request" ? totalCount : undefined}
+            badge={link.to === "/request" ? productCount : undefined}
             onNavigate={onNavigate}
           />
         ))}
@@ -234,9 +262,10 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { totalCount } = useCart();
+  const { productCount } = useCart();
   const { role } = useAppUser();
   const canRequest = !role || role === "verpleging" || role === "admin";
+  const homeTo = role === "verpleging" ? "/inventory" : "/dashboard";
 
   useEffect(() => {
     setOpen(false);
@@ -274,7 +303,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <HugeiconsIcon icon={Menu01Icon} strokeWidth={2} className="size-5" />
           </Button>
-          <Link to="/dashboard" className="flex items-center gap-2">
+          <Link to={homeTo} className="flex items-center gap-2">
             <img src={logo} alt="" className="h-8 w-auto object-contain" />
             <span className="font-bold tracking-tight text-sky-950">MedSupply</span>
           </Link>
@@ -289,9 +318,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 strokeWidth={2}
                 className="size-5"
               />
-              {totalCount > 0 ? (
+              {productCount > 0 ? (
                 <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sky-700 px-1 text-[10px] font-semibold text-white">
-                  {totalCount}
+                  {productCount}
                 </span>
               ) : null}
             </Link>

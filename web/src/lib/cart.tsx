@@ -16,7 +16,10 @@ export type CartItem = {
 
 type CartContextValue = {
   items: CartItem[];
+  /** Sum of all quantities */
   totalCount: number;
+  /** Number of distinct products in cart */
+  productCount: number;
   addItem: (item: Omit<CartItem, "amount">, amount?: number) => void;
   updateAmount: (itemId: number, amount: number) => void;
   removeItem: (itemId: number) => void;
@@ -78,6 +81,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return {
       items,
       totalCount: items.reduce((sum, row) => sum + row.amount, 0),
+      productCount: items.length,
       addItem,
       updateAmount,
       removeItem,

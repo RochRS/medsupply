@@ -24,6 +24,7 @@ export type RequestListRow = {
   stockSufficient: boolean;
   stockShortfall: number;
   requestDescription: string | null;
+  requesterId: string | null;
   requesterName: string | null;
   requesterEmail: string | null;
   createdAt: Date | null;
@@ -50,6 +51,7 @@ function mapRow(row: {
   itemName: string | null;
   stockAmount: number | null;
   requestDescription: string | null;
+  requesterId: string | null;
   requesterName: string | null;
   requesterEmail: string | null;
   createdAt: Date | null;
@@ -75,6 +77,7 @@ function mapRow(row: {
     stockSufficient: !needsStock || stockAmount >= row.requestedAmount,
     stockShortfall: shortfall,
     requestDescription: row.requestDescription,
+    requesterId: row.requesterId,
     requesterName: row.requesterName,
     requesterEmail: row.requesterEmail,
     createdAt: row.createdAt,
@@ -93,6 +96,7 @@ const requestSelect = {
   itemName: items.itemName,
   stockAmount: items.remainingAmount,
   requestDescription: requestDescription.requestDescriptionField,
+  requesterId: request.userId,
   requesterName: user.name,
   requesterEmail: user.email,
   createdAt: request.createdAt,
@@ -112,6 +116,23 @@ export async function getAllRequests() {
     )
     .leftJoin(user, eq(request.userId, user.id))
     .orderBy(desc(request.isUrgent), desc(request.createdAt));
+
+  return rows.map(mapRow);
+}
+
+/** Only requests created by this auth user (verpleging: own list). */
+export async function getRequestsForUser(userId: string) {
+  const rows = await db
+    .select(requestSelect)
+    .from(request)
+    .leftJoin(items, eq(request.itemId, items.itemId))
+    .leftJoin(
+      requestDescription,
+      eq(request.requestDescriptionId, requestDescription.requestDescriptionId),
+    )
+    .leftJoin(user, eq(request.userId, user.id))
+    .where(eq(request.userId, userId))
+    .orderBy(desc(request.createdAt));
 
   return rows.map(mapRow);
 }

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatisticsRouteImport } from './routes/statistics'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as ProfielRouteImport } from './routes/profiel'
+import { Route as MijnAanvragenRouteImport } from './routes/mijn-aanvragen'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -32,6 +33,11 @@ const RequestRoute = RequestRouteImport.update({
 const ProfielRoute = ProfielRouteImport.update({
   id: '/profiel',
   path: '/profiel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MijnAanvragenRoute = MijnAanvragenRouteImport.update({
+  id: '/mijn-aanvragen',
+  path: '/mijn-aanvragen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InventoryRoute = InventoryRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
+  '/mijn-aanvragen': typeof MijnAanvragenRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
   '/statistics': typeof StatisticsRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
+  '/mijn-aanvragen': typeof MijnAanvragenRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
   '/statistics': typeof StatisticsRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
+  '/mijn-aanvragen': typeof MijnAanvragenRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
   '/statistics': typeof StatisticsRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/inventory'
+    | '/mijn-aanvragen'
     | '/profiel'
     | '/request'
     | '/statistics'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/inventory'
+    | '/mijn-aanvragen'
     | '/profiel'
     | '/request'
     | '/statistics'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/inventory'
+    | '/mijn-aanvragen'
     | '/profiel'
     | '/request'
     | '/statistics'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   HistoryRoute: typeof HistoryRoute
   InventoryRoute: typeof InventoryRoute
+  MijnAanvragenRoute: typeof MijnAanvragenRoute
   ProfielRoute: typeof ProfielRoute
   RequestRoute: typeof RequestRoute
   StatisticsRoute: typeof StatisticsRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/profiel'
       fullPath: '/profiel'
       preLoaderRoute: typeof ProfielRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mijn-aanvragen': {
+      id: '/mijn-aanvragen'
+      path: '/mijn-aanvragen'
+      fullPath: '/mijn-aanvragen'
+      preLoaderRoute: typeof MijnAanvragenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inventory': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   HistoryRoute: HistoryRoute,
   InventoryRoute: InventoryRoute,
+  MijnAanvragenRoute: MijnAanvragenRoute,
   ProfielRoute: ProfielRoute,
   RequestRoute: RequestRoute,
   StatisticsRoute: StatisticsRoute,

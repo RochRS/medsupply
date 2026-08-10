@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Search01Icon,
@@ -84,10 +85,12 @@ function toUiStockLevel(level: InventoryItem["stockLevel"]): StockLevel {
 }
 
 export function InventoryPage() {
-  const { addItem } = useCart();
+  const navigate = useNavigate();
+  const { addItem, productCount, totalCount } = useCart();
   const { isApotheker, role } = useAppUser();
   const canManageItems = isApotheker;
   const canAddToCart = role === "verpleging";
+  const isVerpleging = role === "verpleging";
 
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -314,18 +317,22 @@ export function InventoryPage() {
     ) : null;
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 p-4 sm:p-6">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 p-4 pb-24 sm:p-6 sm:pb-24">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-rkz-navy dark:text-white">
-            Totale Voorraad
+            {isVerpleging ? "Supplies" : "Totale Voorraad"}
           </h1>
           <p className="text-sm text-slate-500">
             {inCategory
-              ? "Medicijnen en supplies in deze categorie"
+              ? isVerpleging
+                ? "Kies producten en zet ze in je mand"
+                : "Medicijnen en supplies in deze categorie"
               : isGlobalSearch
                 ? "Zoekresultaten in alle categorieën"
-                : "Kies een categorie of zoek direct op product"}
+                : isVerpleging
+                  ? "Kies een categorie en voeg producten toe aan je mand"
+                  : "Kies een categorie of zoek direct op product"}
           </p>
         </div>
         {canManageItems ? (
@@ -526,6 +533,31 @@ export function InventoryPage() {
           {renderPagination()}
         </>
       )}
+
+      {isVerpleging && productCount > 0 ? (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-sky-200/80 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_rgba(14,116,144,0.08)] backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 md:left-64">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-rkz-navy dark:text-white">
+                {productCount} product{productCount === 1 ? "" : "en"} in mand
+              </p>
+              <p className="text-xs text-slate-500">{totalCount} stuks totaal</p>
+            </div>
+            <Button
+              type="button"
+              className="h-11 gap-2 rounded-xl bg-sky-800 px-5 font-semibold hover:bg-sky-900"
+              onClick={() => void navigate({ to: "/request" })}
+            >
+              Aanvraag plaatsen
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
+                strokeWidth={2}
+                className="size-4"
+              />
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
