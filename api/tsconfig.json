@@ -2,15 +2,17 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext", // <-- Add this so TypeScript knows how to resolve your imports/exports
-    "isolatedModules": true, // <-- Add this to fix the ts-jest hybrid module warning/error
+    "moduleResolution": "NodeNext",
+    "isolatedModules": true,
     "strict": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "types": ["node"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "outDir": "../api/dist"
+    "rootDir": "src",
+    "outDir": "dist"
   },
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/test", "**/*.test.ts"]
 }

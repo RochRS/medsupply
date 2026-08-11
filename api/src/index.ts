@@ -92,10 +92,14 @@ const startServer = async () => {
   await testDbConnection();
   await dizzleCheck();
 
+  // Railway provides PORT; local dev uses SERVER_PORT
+  const port = Number(process.env.PORT || process.env.SERVER_PORT || 3000);
+
   serve(
     {
       fetch: app.fetch,
-      port: Number(process.env.SERVER_PORT || 3000),
+      port,
+      hostname: "0.0.0.0",
     },
     (info) => {
       console.log(`\nServer is running on http://localhost:${info.port}`);
