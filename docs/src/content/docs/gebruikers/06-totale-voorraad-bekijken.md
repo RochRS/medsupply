@@ -18,9 +18,8 @@ balk.
 
 -   Laag: supplies die aan het afnemen zijn (oranje)
 
--   Goed: supplies die voldoende aanwezig zijn (groen)
+-  Totale voorraad: het totale aantal stuks over alle supplies heen
 
 **De tabel**
 
-Per supply zie je: naam, categorie, voorraad, locatie, leverancier,
-dagelijks verbruik, datum laatste bestelling en acties.
+Per supply zie je: naam, categorie, voorraad en status. Via de knop "Mand" kun je een supply direct toevoegen aan je aanvraagmandje.

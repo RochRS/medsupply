@@ -19,11 +19,11 @@ Dit doe je door op "Statistieken" te klikken bovenaan de navigatie balk.
 
 - Huidige voorraadniveaus per item: een staafdiagram
 
-- Dagelijks gebruik (laatste week): hoeveel er elke dag gebruikt wordt
+- Kernstatistieken: gemiddeld dagelijks gebruik, gemiddelde opslagtijd en meest gebruikte categorie
 
-- Maandelijks gebruik (2025): gebruik per maand
+- Gebruik: een grafiek die je kunt wisselen tussen dagelijks, maandelijks of jaarlijks gebruik via het dropdownmenu
 
-- Jaarlijkse vergelijking: dit jaar vs vorig jaar
+- Tijd in opslag: gemiddelde opslagtijd per item
 
 **Voorbeeld statistieken**
 

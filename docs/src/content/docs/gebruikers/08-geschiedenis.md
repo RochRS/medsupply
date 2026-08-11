@@ -12,6 +12,4 @@ Dit doe je door op "Geschiedenis" te klikken bovenaan de navigatie balk.
 
 **De tabel**
 
--   Per activiteit zie je: datum, wat er is gebeurd, welke afdeling en
-    de status (bijv. Voltooid of Spoedaanvraag of Aanvraag)
-
+-   Per activiteit zie je: datum, type (aanvraag of levering), item, aantal, details (bijv. spoedaanvraag, reguliere aanvraag of leverancier) en status (bijv. Voltooid of Spoed).
