@@ -4,9 +4,33 @@ import "dotenv/config";
 import { db } from "../database/database.js";
 import * as schema from "../database/schemas/schema.js";
 
+/** Strip accidental quotes from Railway env values */
+function cleanEnvUrl(value: string | undefined, fallback: string): string {
+  const raw = (value ?? fallback).trim().replace(/^["']|["']$/g, "");
+  return raw.replace(/\/$/, "") || fallback;
+}
+
 // Allow cookies/CORS only from our frontend
-const frontendOrigin =
-  process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
+const frontendOrigin = cleanEnvUrl(
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+);
+
+const authBaseURL = cleanEnvUrl(
+  process.env.BETTER_AUTH_URL,
+  "http://localhost:5000",
+);
+
+/** SPA and API on different hostnames (Railway web ≠ api) need cross-site cookies */
+function needsCrossSiteCookies(): boolean {
+  try {
+    return new URL(frontendOrigin).origin !== new URL(authBaseURL).origin;
+  } catch {
+    return false;
+  }
+}
+
+const crossSiteCookies = needsCrossSiteCookies();
 
 // Main auth setup: login, signup, sessions (stored in PostgreSQL)
 export const auth = betterAuth({
@@ -20,8 +44,8 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
-  baseURL: process.env.BETTER_AUTH_URL,
-  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: authBaseURL,
+  secret: process.env.BETTER_AUTH_SECRET?.replace(/^["']|["']$/g, ""),
   trustedOrigins: [frontendOrigin],
   // Email + password login for RKZ staff
   emailAndPassword: {
@@ -35,6 +59,16 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 60 * 5, // cache session check for 5 minutes
+    },
+  },
+  // Without SameSite=None, session cookies are not sent from
+  // medsupply.up.railway.app → api-medsupply.up.railway.app (cross-site fetch).
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: crossSiteCookies ? "none" : "lax",
+      secure: crossSiteCookies || process.env.COOKIE_SECURE === "true",
+      httpOnly: true,
+      path: "/",
     },
   },
 });

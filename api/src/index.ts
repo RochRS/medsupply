@@ -25,8 +25,16 @@ import type { AppEnv } from "./types/hono.js";
 
 //----------------------------------
 
-const frontendOrigin =
-  process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
+/** Strip accidental quotes from Railway env values */
+function cleanEnvUrl(value: string | undefined, fallback: string): string {
+  const raw = (value ?? fallback).trim().replace(/^["']|["']$/g, "");
+  return raw.replace(/\/$/, "") || fallback;
+}
+
+const frontendOrigin = cleanEnvUrl(
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+);
 
 // Public root — Railway health check / browser open
 const app = new Hono();
