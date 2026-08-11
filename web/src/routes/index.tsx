@@ -40,8 +40,8 @@ type DemoId = (typeof DEMO_ACCOUNTS)[number]["id"];
 function Index() {
   const defaultDemo = DEMO_ACCOUNTS[0];
   const [activeDemo, setActiveDemo] = useState<DemoId>(defaultDemo.id);
-  const [email, setEmail] = useState(defaultDemo.email);
-  const [password, setPassword] = useState(defaultDemo.password);
+  const [email, setEmail] = useState<string>(defaultDemo.email);
+  const [password, setPassword] = useState<string>(defaultDemo.password);
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
