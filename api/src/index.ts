@@ -28,10 +28,14 @@ import type { AppEnv } from "./types/hono.js";
 const frontendOrigin =
   process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:5173";
 
-// All API routes live under /api
-const app = new Hono<AppEnv>().basePath("/api");
+// Public root — Railway health check / browser open
+const app = new Hono();
+app.get("/", (c) => c.text("API running"));
 
-app.get("/", async (c) => {
+// All API routes live under /api
+const api = new Hono<AppEnv>().basePath("/api");
+
+api.get("/", async (c) => {
   return c.json({
     name: "MedSupply API",
     version: "1.0.0",
@@ -50,7 +54,7 @@ app.get("/", async (c) => {
 });
 
 // Allow the Vite frontend to call this API (with cookies)
-app.use(
+api.use(
   "*",
   cors({
     origin: frontendOrigin,
@@ -64,20 +68,20 @@ app.use(
 
 // better-auth handles login / signup / logout / session
 // Use /auth/* (not /**) so nested paths like /auth/sign-in/email match under basePath /api
-app.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
+api.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
 
 // Load user/session on every request (may be null)
-app.use("*", loadSession);
+api.use("*", loadSession);
 
 // Public session helpers (/sessions/me, /sessions/health)
-app.route("/sessions", session);
+api.route("/sessions", session);
 
 // Protected API routes (require a logged-in session)
 const mountProtected = (path: string, route: Hono<AppEnv>) => {
   const secured = new Hono<AppEnv>();
   secured.use("*", requireAuth);
   secured.route("/", route);
-  app.route(path, secured);
+  api.route(path, secured);
 };
 
 mountProtected("/requests", requests);
@@ -86,6 +90,8 @@ mountProtected("/statistics", statistics);
 mountProtected("/history", history);
 mountProtected("/settings", settings);
 mountProtected("/users", users);
+
+app.route("/", api);
 
 // Start and listen to server
 const startServer = async () => {
