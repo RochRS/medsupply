@@ -1,17 +1,25 @@
 import { createRootRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Navbar } from "../components/global/navbar";
-
-import "../css/__root.css";
+import { AppShell } from "../components/global/app-shell";
 
 const RootLayout = () => {
   const location = useLocation();
-  const hideNavbar = location.pathname === "/";
+  const isLogin = location.pathname === "/";
+
+  if (isLogin) {
+    return (
+      <>
+        <Outlet />
+        <TanStackRouterDevtools />
+      </>
+    );
+  }
 
   return (
     <>
-      {!hideNavbar && <Navbar />}
-      <Outlet />
+      <AppShell>
+        <Outlet />
+      </AppShell>
       <TanStackRouterDevtools />
     </>
   );

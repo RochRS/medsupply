@@ -1,12 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Footer } from "../components/global/footer.tsx";
-
-import {
-  ProfielInformation,
-  ProfielPageButtons,
-} from "../module/profiel-module.tsx";
-
-import "../css/profiel.css";
+import { ProfielPage } from "../module/profiel-module.tsx";
 
 export const Route = createFileRoute("/profiel")({
   component: RouteComponent,
@@ -14,29 +7,8 @@ export const Route = createFileRoute("/profiel")({
 
 function RouteComponent() {
   return (
-    <div>
-      <div>
-        <div className="text-center">
-          <h1>Profiel</h1>
-          <p>Hier kan je je profiel aanpassen.</p>
-        </div>
-
-        <div>
-          {/* <image src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" className="avatar" /> */}
-        </div>
-
-        <div>
-          <ProfielInformation />
-        </div>
-
-        <div>
-          <ProfielPageButtons />
-        </div>
-      </div>
-
-      <div>
-        <Footer />
-      </div>
+    <div className="min-h-full bg-rkz-bg dark:bg-slate-900">
+      <ProfielPage />
     </div>
   );
 }

@@ -1,7 +1,9 @@
+import { seed as seedRoles } from "./seed-roles.js";
 import { seed as seedCategories } from "./seed-categories.js";
 import { seed as seedSuppliers } from "./seed-suppliers.js";
 import { seed as seedDepartments } from "./seed-departments.js";
 import { seed as seedUsers } from "./seed-users.js";
+import { seed as seedAuthUsers } from "./seed-auth-user.js";
 import { seed as seedRequestDescriptions } from "./seed-request-descriptions.js";
 import { seed as seedItems } from "./seed-items.js";
 import { seed as seedShipments } from "./seed-shipments.js";
@@ -11,10 +13,12 @@ async function seed() {
   console.log("🌱 Seeding database...\n");
   const results: { name: string; count: number }[] = [];
   const runners = [
+    { name: "roles", fn: seedRoles },
     { name: "categories", fn: seedCategories },
     { name: "suppliers", fn: seedSuppliers },
     { name: "departments", fn: seedDepartments },
     { name: "users", fn: seedUsers },
+    { name: "auth users", fn: seedAuthUsers },
     { name: "request descriptions", fn: seedRequestDescriptions },
     { name: "items", fn: seedItems },
     { name: "shipments", fn: seedShipments },

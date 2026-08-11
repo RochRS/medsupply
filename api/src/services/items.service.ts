@@ -1,20 +1,16 @@
 import { db } from "../database/database.js";
 import { items as itemsTable, categories, request } from "../database/schemas/schema.js";
-import { eq, asc, ilike, or, lte, and, not, exists } from "drizzle-orm";
+import { eq, asc, ilike, or, lte, and, not, exists, count } from "drizzle-orm";
 import type { CreateItemInput, UpdateItemInput } from "../schemas/item.js";
 
 const CRITICAL_MAX = 5;
 const LOW_MAX = 20;
-
-// ---- helpers ----
 
 export function stockLevel(amount: number): "critical" | "low" | "ok" {
   if (amount <= CRITICAL_MAX) return "critical";
   if (amount <= LOW_MAX) return "low";
   return "ok";
 }
-
-// ---- queries ----
 
 export async function getUrgentItems(search?: string) {
   return db
@@ -83,7 +79,57 @@ export async function getItemsByStock(threshold: number) {
   }));
 }
 
-export async function getAllItems(search?: string) {
+export async function listCategories() {
+  const [rows, counts] = await Promise.all([
+    db
+      .select({
+        categoryId: categories.categoryId,
+        categoryName: categories.categoryName,
+        categoryDescription: categories.categoryDescription,
+        icon: categories.icon,
+      })
+      .from(categories)
+      .orderBy(asc(categories.categoryName)),
+    db
+      .select({
+        categoryId: itemsTable.categoryId,
+        itemCount: count(),
+      })
+      .from(itemsTable)
+      .groupBy(itemsTable.categoryId),
+  ]);
+
+  const countMap = new Map(
+    counts
+      .filter((c) => c.categoryId != null)
+      .map((c) => [c.categoryId as number, Number(c.itemCount)]),
+  );
+
+  return rows.map((row) => ({
+    ...row,
+    itemCount: countMap.get(row.categoryId) ?? 0,
+  }));
+}
+
+function buildItemFilters(search?: string, categoryId?: number) {
+  const conditions = [];
+  if (search?.trim()) {
+    const q = `%${search.trim()}%`;
+    conditions.push(
+      or(
+        ilike(itemsTable.itemName, q),
+        ilike(categories.categoryName, q),
+        ilike(itemsTable.description, q),
+      ),
+    );
+  }
+  if (categoryId) {
+    conditions.push(eq(itemsTable.categoryId, categoryId));
+  }
+  return conditions.length ? and(...conditions) : undefined;
+}
+
+export async function getAllItems(search?: string, categoryId?: number) {
   const rows = await db
     .select({
       itemId: itemsTable.itemId,
@@ -92,19 +138,13 @@ export async function getAllItems(search?: string) {
       remainingAmount: itemsTable.remainingAmount,
       categoryId: itemsTable.categoryId,
       categoryName: categories.categoryName,
+      categoryIcon: categories.icon,
       createdAt: itemsTable.createdAt,
       updatedAt: itemsTable.updatedAt,
     })
     .from(itemsTable)
     .leftJoin(categories, eq(itemsTable.categoryId, categories.categoryId))
-    .where(
-      search
-        ? or(
-            ilike(itemsTable.itemName, `%${search}%`),
-            ilike(categories.categoryName, `%${search}%`),
-          )
-        : undefined,
-    )
+    .where(buildItemFilters(search, categoryId))
     .orderBy(asc(itemsTable.itemName));
 
   const list = rows.map((row) => ({
@@ -112,12 +152,73 @@ export async function getAllItems(search?: string) {
     stockLevel: stockLevel(row.remainingAmount),
   }));
 
-  const totalItems = list.length;
-  const totalStock = list.reduce((sum, row) => sum + row.remainingAmount, 0);
-  const criticalStock = list.filter((row) => row.stockLevel === "critical").length;
-  const lowStock = list.filter((row) => row.stockLevel === "low").length;
+  return {
+    items: list,
+    summary: {
+      totalItems: list.length,
+      totalStock: list.reduce((sum, row) => sum + row.remainingAmount, 0),
+      criticalStock: list.filter((row) => row.stockLevel === "critical").length,
+      lowStock: list.filter((row) => row.stockLevel === "low").length,
+    },
+  };
+}
 
-  return { items: list, summary: { totalItems, totalStock, criticalStock, lowStock } };
+export async function getPaginatedItems(opts: {
+  search?: string;
+  categoryId?: number;
+  page?: number;
+  pageSize?: number;
+}) {
+  const page = Math.max(1, opts.page ?? 1);
+  const pageSize = Math.min(48, Math.max(1, opts.pageSize ?? 12));
+  const offset = (page - 1) * pageSize;
+  const whereClause = buildItemFilters(opts.search, opts.categoryId);
+
+  const [totalRow] = await db
+    .select({ n: count() })
+    .from(itemsTable)
+    .leftJoin(categories, eq(itemsTable.categoryId, categories.categoryId))
+    .where(whereClause);
+
+  const rows = await db
+    .select({
+      itemId: itemsTable.itemId,
+      itemName: itemsTable.itemName,
+      description: itemsTable.description,
+      remainingAmount: itemsTable.remainingAmount,
+      categoryId: itemsTable.categoryId,
+      categoryName: categories.categoryName,
+      categoryIcon: categories.icon,
+      createdAt: itemsTable.createdAt,
+      updatedAt: itemsTable.updatedAt,
+    })
+    .from(itemsTable)
+    .leftJoin(categories, eq(itemsTable.categoryId, categories.categoryId))
+    .where(whereClause)
+    .orderBy(asc(itemsTable.itemName))
+    .limit(pageSize)
+    .offset(offset);
+
+  const list = rows.map((row) => ({
+    ...row,
+    stockLevel: stockLevel(row.remainingAmount),
+  }));
+
+  const summarySource = await getAllItems(opts.search, opts.categoryId);
+  const total = Number(totalRow?.n ?? 0);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize) || 1);
+
+  return {
+    items: list,
+    summary: summarySource.summary,
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages,
+      hasMore: page < totalPages,
+    },
+  };
 }
 
 export async function getItemById(id: number) {
@@ -129,6 +230,7 @@ export async function getItemById(id: number) {
       remainingAmount: itemsTable.remainingAmount,
       categoryId: itemsTable.categoryId,
       categoryName: categories.categoryName,
+      categoryIcon: categories.icon,
       createdAt: itemsTable.createdAt,
       updatedAt: itemsTable.updatedAt,
     })
@@ -138,28 +240,27 @@ export async function getItemById(id: number) {
     .limit(1);
 
   if (!row) return null;
-
   return { ...row, stockLevel: stockLevel(row.remainingAmount) };
 }
-
-// ---- mutations ----
 
 export async function createItem(data: CreateItemInput) {
   const [created] = await db
     .insert(itemsTable)
-    .values(data)
+    .values({
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
     .returning();
-
   return created;
 }
 
 export async function updateItem(id: number, data: UpdateItemInput) {
   const [updated] = await db
     .update(itemsTable)
-    .set(data)
+    .set({ ...data, updatedAt: new Date() })
     .where(eq(itemsTable.itemId, id))
     .returning();
-
   return updated ?? null;
 }
 
@@ -168,6 +269,5 @@ export async function deleteItem(id: number) {
     .delete(itemsTable)
     .where(eq(itemsTable.itemId, id))
     .returning();
-
   return deleted ?? null;
 }
