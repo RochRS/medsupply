@@ -165,7 +165,8 @@ export function AanvragenPage() {
     return (
       <div className="mx-auto max-w-lg p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-6 text-center text-sm text-red-600">
-          Alleen apotheker en admin kunnen alle aanvragen inzien.
+          Kon aanvragen niet laden (geen rollen/sessie, of API fout). Seed de
+          database en log in met een demo-account (apotheker/admin).
         </div>
       </div>
     );

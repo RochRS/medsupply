@@ -46,8 +46,21 @@ export function AdminUsersPage() {
       ]);
       setUsers(usersRes.users);
       setRoles(rolesRes.roles);
-    } catch {
-      setError("Alleen admins kunnen gebruikers en rollen beheren.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("Unauthorized") || msg.includes("AUTHENTICATION")) {
+        setError("Niet ingelogd of sessie verlopen. Log opnieuw in.");
+      } else if (msg.includes("Forbidden") || msg.includes("INSUFFICIENT")) {
+        setError(
+          "Geen admin-rol. Open Gebruikers niet, of wijs admin toe na seed (zie demo-accounts).",
+        );
+      } else {
+        setError(
+          msg
+            ? `Laden mislukt: ${msg}`
+            : "Gebruikers laden mislukt. Controleer API-URL en of de database geseeded is.",
+        );
+      }
     } finally {
       setLoading(false);
     }
