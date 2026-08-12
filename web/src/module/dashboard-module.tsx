@@ -141,12 +141,12 @@ export function EmergencyRequest() {
       />
 
       <CardBody>
-        <FormInput
-          label="Zoek supplies"
-          name="search"
-          value={search}
-          onChange={setSearch}
-          placeholder="Zoek op naam of categorie"
+      <FormInput
+        label="Zoek supplies"
+        name="search"
+        value={search}
+        onChange={setSearch}
+        placeholder="Zoek op naam of categorie"
           className="rounded-xl bg-white"
           icon={
             <HugeiconsIcon
@@ -155,14 +155,14 @@ export function EmergencyRequest() {
               className="size-4"
             />
           }
-        />
+      />
 
-        <FormInput
-          label="Afdeling"
-          name="afdeling"
-          value={afdeling}
-          onChange={setAfdeling}
-          placeholder="Bijv. SEH, Cardiologie"
+      <FormInput
+        label="Afdeling"
+        name="afdeling"
+        value={afdeling}
+        onChange={setAfdeling}
+        placeholder="Bijv. SEH, Cardiologie"
           className="rounded-xl bg-white"
           icon={
             <HugeiconsIcon
@@ -180,11 +180,11 @@ export function EmergencyRequest() {
           >
             Noodsituatie
           </Label>
-          <Textarea
-            id="noodsituatie"
-            value={noodsituatie}
-            onChange={(e) => setNoodsituatie(e.target.value)}
-            placeholder="Beschrijf kort de noodsituatie"
+        <Textarea
+          id="noodsituatie"
+          value={noodsituatie}
+          onChange={(e) => setNoodsituatie(e.target.value)}
+          placeholder="Beschrijf kort de noodsituatie"
             className="min-h-24 flex-1 resize-none rounded-xl bg-white"
           />
         </div>
@@ -650,7 +650,7 @@ export function IncomingRequestNotifications() {
                       strokeWidth={2}
                       className="size-3.5 shrink-0 text-slate-400"
                     />
-                  </div>
+    </div>
                   <p className="mt-1 font-medium text-rkz-navy dark:text-white">
                     {formatBatchTitle(batch)}{" "}
                     <span className="font-normal text-slate-500">
@@ -830,16 +830,16 @@ export function CriticalInventoryOverview() {
             onValueChange={(v) => setLevel(v ?? "alle-niveaus")}
           >
             <SelectTrigger className="w-full rounded-xl">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
               {VOORRAAD_NIVEAUS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -850,16 +850,16 @@ export function CriticalInventoryOverview() {
             onValueChange={(v) => setCategory(v ?? "alle-categorieen")}
           >
             <SelectTrigger className="w-full rounded-xl">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
               {CATEGORIEEN.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         </div>
       </div>
 
@@ -867,7 +867,7 @@ export function CriticalInventoryOverview() {
         {loading ? (
           <div className="flex flex-1 items-center justify-center">
             <LoadingSpinner label="Overzicht laden..." />
-          </div>
+    </div>
         ) : error ? (
           <ErrorState message={error} />
         ) : filtered.length === 0 ? (
@@ -962,36 +962,36 @@ export function Notifications() {
       />
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5">
           <Label className="text-xs text-slate-500">Type melding</Label>
           <Select items={MELDING_TYPES} defaultValue="alle-meldingen">
             <SelectTrigger className="w-full rounded-xl">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
               {MELDING_TYPES.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5">
           <Label className="text-xs text-slate-500">Sorteren</Label>
           <Select items={SORTEER_OPTIES} defaultValue="nieuwste">
             <SelectTrigger className="w-full rounded-xl">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
               {SORTEER_OPTIES.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         </div>
       </div>
 
@@ -1194,7 +1194,7 @@ export function StockStatusOverview() {
                       style={{ height: barHeight }}
                       title={`${pct}%`}
                     />
-                  </div>
+      </div>
 
                   <p className="text-center text-xs font-medium text-slate-500">
                     {pct}% van totaal
@@ -1203,7 +1203,7 @@ export function StockStatusOverview() {
               );
             })}
           </div>
-        </div>
+    </div>
       )}
     </DashboardCard>
   );

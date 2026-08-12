@@ -2,6 +2,7 @@ import { createAuthClient } from "better-auth/react";
 
 // API base URL from Vite env (fallback for local dev)
 const baseURL =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
   import.meta.env.VITE_SERVER_URL?.replace(/\/$/, "") ||
   "http://localhost:5000";
 

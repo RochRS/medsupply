@@ -1,8 +1,9 @@
 import "dotenv/config";
 import { eq, notInArray } from "drizzle-orm";
+import { hashPassword } from "better-auth/crypto";
 import { auth } from "../../auth/auth.js";
 import { db } from "../database.js";
-import { user, role, request } from "../schemas/schema.js";
+import { user, role, request, account } from "../schemas/schema.js";
 import { ROLE_NAMES } from "./seed-roles.js";
 
 /** Exactly one loginable account per role */
@@ -62,6 +63,13 @@ export async function seed() {
     }
 
     if (userId) {
+      // Always reset demo credentials so live re-seed restores Test1234! login.
+      const hashed = await hashPassword(account.password);
+      await db
+        .update(account)
+        .set({ password: hashed })
+        .where(eq(account.userId, userId));
+
       await db
         .update(user)
         .set({ roleId, name: account.name, mustChangePassword: false })
