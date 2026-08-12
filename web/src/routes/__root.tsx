@@ -3,6 +3,7 @@ import { createRootRoute, Outlet, useLocation, useNavigate } from "@tanstack/rea
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AppShell } from "../components/global/app-shell";
 import { useAppUser } from "../lib/roles";
+import { useDocumentSeo } from "../lib/use-document-seo";
 
 const RootLayout = () => {
   const location = useLocation();
@@ -10,6 +11,8 @@ const RootLayout = () => {
   const { mustChangePassword, loading } = useAppUser();
   const isLogin = location.pathname === "/";
   const isChangePassword = location.pathname === "/change-password";
+
+  useDocumentSeo(location.pathname);
 
   useEffect(() => {
     if (loading || isLogin) return;

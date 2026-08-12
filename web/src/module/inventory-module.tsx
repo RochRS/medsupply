@@ -301,7 +301,7 @@ export function InventoryPage() {
           </p>
         </div>
         <StatusBadge status={toUiStockLevel(item.stockLevel)} />
-      </div>
+    </div>
 
       <p className="line-clamp-2 flex-1 text-sm text-slate-600 dark:text-slate-300">
         {item.description || "Geen beschrijving"}
@@ -313,7 +313,7 @@ export function InventoryPage() {
           <p className="text-lg font-bold text-sky-900 dark:text-sky-100">
             {item.remainingAmount}
           </p>
-        </div>
+                </div>
         {canManageItems ? (
           <ItemManageActions
             item={item}
@@ -323,25 +323,25 @@ export function InventoryPage() {
             onAutoStockConsumed={() => setFocusItemId(null)}
           />
         ) : canAddToCart ? (
-          <Button
-            type="button"
-            size="sm"
+                <Button
+                  type="button"
+                  size="sm"
             className="h-9 gap-1.5 rounded-xl"
-            onClick={() =>
-              addItem({
-                itemId: item.itemId,
-                itemName: item.itemName,
-                remainingAmount: item.remainingAmount,
-              })
-            }
-          >
+                  onClick={() =>
+                    addItem({
+                      itemId: item.itemId,
+                      itemName: item.itemName,
+                      remainingAmount: item.remainingAmount,
+                    })
+                  }
+                >
             <HugeiconsIcon
               icon={ShoppingBagAddIcon}
               strokeWidth={2}
               className="size-4"
             />
-            Mand
-          </Button>
+                  Mand
+                </Button>
         ) : null}
       </div>
     </article>
@@ -697,7 +697,7 @@ function AddMedicineDialog({
           categoryId: Number(categoryId),
         }),
       });
-      setOpen(false);
+    setOpen(false);
       resetForm();
       onCreated();
     } catch {

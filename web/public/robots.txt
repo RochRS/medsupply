@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /inventory
+Disallow: /request
+Disallow: /aanvragen
+Disallow: /mijn-aanvragen
+Disallow: /statistics
+Disallow: /history
+Disallow: /admin
+Disallow: /profiel
+Disallow: /settings
+Disallow: /change-password
