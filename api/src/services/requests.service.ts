@@ -9,6 +9,19 @@ import {
 import type { CreateRequestInput } from "../schemas/request.js";
 import { IS_URGENT, NOT_URGENT } from "../constants/magic-numbers.js";
 
+const PG_INT_MAX = 2_147_483_647;
+
+/** Batch ids must fit PostgreSQL integer (ms timestamps overflow). */
+function normalizeBatchId(batchId?: number): number {
+  if (batchId == null || !Number.isFinite(batchId)) {
+    return Math.floor(Date.now() / 1000);
+  }
+  if (batchId > PG_INT_MAX) {
+    return Math.floor(batchId / 1000);
+  }
+  return Math.trunc(batchId);
+}
+
 export type RequestStatus = "open" | "approved" | "completed";
 
 export type RequestListRow = {
@@ -171,7 +184,7 @@ async function insertRequest(data: CreateRequestInput, isUrgentValue: boolean) {
   const [newRequest] = await db
     .insert(request)
     .values({
-      requestBatchId: data.requestBatchId ?? Date.now(),
+      requestBatchId: normalizeBatchId(data.requestBatchId),
       requestedAmount: data.requestedAmount,
       isUrgent: isUrgentValue,
       status: "open",
@@ -284,6 +297,117 @@ export async function completeRequest(id: number) {
     .where(eq(request.requestId, id));
 
   return getRequestById(id);
+}
+
+export async function getRequestsByBatchId(batchId: number) {
+  const rows = await db
+    .select(requestSelect)
+    .from(request)
+    .leftJoin(items, eq(request.itemId, items.itemId))
+    .leftJoin(
+      requestDescription,
+      eq(request.requestDescriptionId, requestDescription.requestDescriptionId),
+    )
+    .leftJoin(user, eq(request.userId, user.id))
+    .where(eq(request.requestBatchId, batchId))
+    .orderBy(request.requestId);
+
+  return rows.map(mapRow);
+}
+
+/** Goedkeur alle open regels in één aanvraag-batch. */
+export async function approveRequestBatch(batchId: number) {
+  await db.transaction(async (tx) => {
+    const rows = await tx
+      .select({
+        requestId: request.requestId,
+        itemId: request.itemId,
+        itemName: items.itemName,
+        requestedAmount: request.requestedAmount,
+        status: request.status,
+        isCompleted: request.isCompleted,
+        stockAmount: items.remainingAmount,
+      })
+      .from(request)
+      .leftJoin(items, eq(request.itemId, items.itemId))
+      .where(eq(request.requestBatchId, batchId));
+
+    if (rows.length === 0) {
+      throw new Error("Aanvraag niet gevonden");
+    }
+
+    const openRows = rows.filter(
+      (row) => normalizeStatus(row.status, row.isCompleted) === "open",
+    );
+
+    if (openRows.length === 0) {
+      throw new Error("Deze aanvraag is al goedgekeurd of afgehandeld");
+    }
+
+    for (const row of openRows) {
+      if (row.itemId == null) {
+        throw new Error("Aanvraag bevat een regel zonder gekoppeld product");
+      }
+      const stock = row.stockAmount ?? 0;
+      if (stock < row.requestedAmount) {
+        const label = row.itemName ?? "product";
+        throw new Error(
+          `Niet genoeg op voorraad voor ${label}: ${stock} beschikbaar, ${row.requestedAmount} gevraagd`,
+        );
+      }
+    }
+
+    for (const row of openRows) {
+      const stock = row.stockAmount ?? 0;
+      await tx
+        .update(items)
+        .set({
+          remainingAmount: stock - row.requestedAmount,
+          updatedAt: new Date(),
+        })
+        .where(eq(items.itemId, row.itemId!));
+
+      await tx
+        .update(request)
+        .set({
+          status: "approved",
+          isCompleted: false,
+          updatedAt: new Date(),
+        })
+        .where(eq(request.requestId, row.requestId));
+    }
+  });
+
+  return getRequestsByBatchId(batchId);
+}
+
+/** Bevestig ophaling voor alle goedgekeurde regels in een batch. */
+export async function completeRequestBatch(batchId: number) {
+  const rows = await getRequestsByBatchId(batchId);
+  if (rows.length === 0) {
+    throw new Error("Aanvraag niet gevonden");
+  }
+
+  const approved = rows.filter((row) => row.status === "approved");
+  if (approved.length === 0) {
+    if (rows.every((row) => row.status === "completed")) {
+      throw new Error("Deze aanvraag is al afgehandeld");
+    }
+    throw new Error(
+      "Keur de aanvraag eerst volledig goed voordat je ophalen bevestigt",
+    );
+  }
+
+  await db
+    .update(request)
+    .set({
+      status: "completed",
+      isCompleted: true,
+      updatedAt: new Date(),
+    })
+    .where(eq(request.requestBatchId, batchId));
+
+  return getRequestsByBatchId(batchId);
 }
 
 /** @deprecated Prefer approveRequest / completeRequest */

@@ -10,6 +10,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import logo from "../assets/rkz-logo.png";
 import { signIn } from "../lib/auth-client";
+import { apiClient } from "../config/api";
 import { loginSchema } from "../schemas/login";
 
 export function BrandHeader() {
@@ -134,6 +135,18 @@ export function SubmitLoginRequestButton({
       if (error) {
         onError(error.message || "Inloggen mislukt. Controleer je gegevens.");
         return;
+      }
+
+      try {
+        const me = (await apiClient("/sessions/me")) as {
+          user?: { mustChangePassword?: boolean };
+        };
+        if (me.user?.mustChangePassword) {
+          await navigate({ to: "/change-password" });
+          return;
+        }
+      } catch {
+        // fall through to dashboard
       }
 
       await navigate({ to: "/dashboard" });

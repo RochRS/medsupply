@@ -12,11 +12,9 @@ import {
 import { FormInput } from "../components/global/form-input";
 import { LoadingSpinner } from "../components/global/loading-spinner";
 import {
-  RequestDetailDialog,
+  RequestBatchDetailDialog,
   StatusBadge,
-  StockBadge,
   formatRequestWhen,
-  requestStatusOf,
   type RequestDetail,
 } from "../components/requests/request-detail-dialog";
 import { Button } from "../components/ui/button";
@@ -28,6 +26,12 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { apiClient } from "../config/api";
+import {
+  formatBatchProducts,
+  formatBatchTitle,
+  groupRequestsByBatch,
+  type RequestBatch,
+} from "../lib/request-batches";
 import { useAppUser } from "../lib/roles";
 import { cn } from "../lib/utils";
 
@@ -63,10 +67,12 @@ export function AanvragenPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("open");
   const [type, setType] = useState("alle");
-  const [busyId, setBusyId] = useState<number | null>(null);
+  const [busyBatchId, setBusyBatchId] = useState<number | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [selected, setSelected] = useState<RequestRow | null>(null);
+  const [selected, setSelected] = useState<RequestBatch | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+
+  const batches = useMemo(() => groupRequestsByBatch(rows), [rows]);
 
   useEffect(() => {
     if (roleLoading || !isApotheker) return;
@@ -80,7 +86,9 @@ export function AanvragenPage() {
         setRows(list);
         setError("");
         if (selected) {
-          const updated = list.find((r) => r.requestId === selected.requestId);
+          const updated = groupRequestsByBatch(list).find(
+            (b) => b.requestBatchId === selected.requestBatchId,
+          );
           setSelected(updated ?? null);
           if (!updated) setDetailOpen(false);
         }
@@ -100,47 +108,53 @@ export function AanvragenPage() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return rows.filter((r) => {
-      const s = requestStatusOf(r);
-      if (status === "open" && s !== "open") return false;
-      if (status === "approved" && s !== "approved") return false;
-      if (status === "afgehandeld" && s !== "completed") return false;
-      if (type === "spoed" && !r.isUrgent) return false;
-      if (type === "normaal" && r.isUrgent) return false;
+    return batches.filter((batch) => {
+      if (status === "open" && batch.status !== "open") return false;
+      if (status === "approved" && batch.status !== "approved") return false;
+      if (status === "afgehandeld" && batch.status !== "completed") return false;
+      if (type === "spoed" && !batch.isUrgent) return false;
+      if (type === "normaal" && batch.isUrgent) return false;
       if (!q) return true;
       return (
-        (r.itemName ?? "").toLowerCase().includes(q) ||
-        (r.requesterName ?? "").toLowerCase().includes(q) ||
-        (r.requestDescription ?? "").toLowerCase().includes(q) ||
-        (r.requesterEmail ?? "").toLowerCase().includes(q)
+        String(batch.requestBatchId).includes(q) ||
+        (batch.requesterName ?? "").toLowerCase().includes(q) ||
+        (batch.requestDescription ?? "").toLowerCase().includes(q) ||
+        batch.items.some(
+          (item) =>
+            (item.itemName ?? "").toLowerCase().includes(q) ||
+            (item.requesterEmail ?? "").toLowerCase().includes(q),
+        )
       );
     });
-  }, [rows, search, status, type]);
+  }, [batches, search, status, type]);
 
   const stats = useMemo(() => {
-    const open = rows.filter((r) => requestStatusOf(r) === "open");
-    const approved = rows.filter((r) => requestStatusOf(r) === "approved");
+    const open = batches.filter((b) => b.status === "open");
+    const approved = batches.filter((b) => b.status === "approved");
     return {
-      total: rows.length,
+      total: batches.length,
       open: open.length,
-      spoed: open.filter((r) => r.isUrgent).length,
+      spoed: open.filter((b) => b.isUrgent).length,
       approved: approved.length,
-      done: rows.filter((r) => requestStatusOf(r) === "completed").length,
+      done: batches.filter((b) => b.status === "completed").length,
     };
-  }, [rows]);
+  }, [batches]);
 
-  const openDetails = (req: RequestRow) => {
-    setSelected(req);
+  const openDetails = (batch: RequestBatch) => {
+    setSelected(batch);
     setActionError("");
     setDetailOpen(true);
   };
 
-  const runAction = async (id: number, action: "approve" | "complete") => {
-    setBusyId(id);
+  const runBatchAction = async (
+    batchId: number,
+    action: "approve" | "complete",
+  ) => {
+    setBusyBatchId(batchId);
     setActionError("");
     setError("");
     try {
-      await apiClient(`/requests/${id}`, {
+      await apiClient(`/requests/batch/${batchId}`, {
         method: "PATCH",
         body: JSON.stringify({ action }),
       });
@@ -153,7 +167,7 @@ export function AanvragenPage() {
       setActionError(message);
       setError(message);
     } finally {
-      setBusyId(null);
+      setBusyBatchId(null);
     }
   };
 
@@ -303,25 +317,25 @@ export function AanvragenPage() {
         </div>
       ) : (
         <ul className="flex flex-col gap-2.5">
-          {filtered.map((req) => {
-            const s = requestStatusOf(req);
-            const short = s === "open" && !req.stockSufficient;
+          {filtered.map((batch) => {
+            const s = batch.status;
+            const short = s === "open" && batch.hasStockIssue;
             return (
-              <li key={req.requestId}>
+              <li key={batch.requestBatchId}>
                 <article
                   role="button"
                   tabIndex={0}
-                  onClick={() => openDetails(req)}
+                  onClick={() => openDetails(batch)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      openDetails(req);
+                      openDetails(batch);
                     }
                   }}
                   className={cn(
                     "group cursor-pointer overflow-hidden rounded-2xl border bg-white transition-colors dark:bg-slate-800",
                     "hover:border-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/30",
-                    req.isUrgent && s !== "completed"
+                    batch.isUrgent && s !== "completed"
                       ? "border-l-[3px] border-l-rkz-red border-slate-200/80 dark:border-slate-700"
                       : "border-slate-200/80 dark:border-slate-700",
                     short ? "border-red-200/80 dark:border-red-900/40" : null,
@@ -330,7 +344,7 @@ export function AanvragenPage() {
                   <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        {req.isUrgent ? (
+                        {batch.isUrgent ? (
                           <span className="inline-flex items-center gap-1 rounded-md bg-rkz-red px-2 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase">
                             <HugeiconsIcon
                               icon={FlashIcon}
@@ -345,35 +359,33 @@ export function AanvragenPage() {
                           </span>
                         )}
                         <StatusBadge status={s} />
-                        <StockBadge
-                          status={s}
-                          stockSufficient={req.stockSufficient}
-                          stockAmount={req.stockAmount}
-                          requestedAmount={req.requestedAmount}
-                          stockShortfall={req.stockShortfall}
-                        />
                         <span className="text-[11px] text-slate-400">
-                          #{req.requestBatchId} · {formatRequestWhen(req.createdAt)}
+                          #{batch.requestBatchId} ·{" "}
+                          {formatRequestWhen(batch.createdAt)}
                         </span>
                       </div>
 
                       <h2 className="mt-2 text-base font-bold text-rkz-navy dark:text-white">
-                        {req.itemName ?? "Onbekend item"}
+                        {formatBatchTitle(batch)}
                         <span className="ml-1.5 font-semibold text-sky-800 dark:text-sky-200">
-                          ×{req.requestedAmount}
+                          · {batch.totalUnits} stuks
                         </span>
                       </h2>
 
+                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                        {formatBatchProducts(batch)}
+                      </p>
+
                       <p className="mt-0.5 text-sm text-slate-500">
-                        {req.requesterName ?? "Onbekende aanvrager"}
-                        {req.requestDescription ? (
+                        {batch.requesterName ?? "Onbekende aanvrager"}
+                        {batch.requestDescription ? (
                           <span className="text-slate-400">
                             {" "}
                             ·{" "}
                             <span className="text-slate-600 dark:text-slate-300">
-                              {req.requestDescription.length > 72
-                                ? `${req.requestDescription.slice(0, 72)}…`
-                                : req.requestDescription}
+                              {batch.requestDescription.length > 72
+                                ? `${batch.requestDescription.slice(0, 72)}…`
+                                : batch.requestDescription}
                             </span>
                           </span>
                         ) : null}
@@ -386,11 +398,8 @@ export function AanvragenPage() {
                             strokeWidth={2}
                             className="mt-0.5 size-3.5 shrink-0"
                           />
-                          Niet genoeg op voorraad
-                          {req.stockShortfall > 0
-                            ? ` — tekort ${req.stockShortfall}`
-                            : ""}
-                          . Vul eerst voorraad bij.
+                          Minstens één product heeft te weinig voorraad. Vul
+                          eerst voorraad bij.
                         </p>
                       ) : null}
                     </div>
@@ -403,7 +412,7 @@ export function AanvragenPage() {
                         type="button"
                         variant="outline"
                         className="h-10 gap-1.5 rounded-xl border-slate-200"
-                        onClick={() => openDetails(req)}
+                        onClick={() => openDetails(batch)}
                       >
                         Details
                         <HugeiconsIcon
@@ -415,13 +424,17 @@ export function AanvragenPage() {
                       {s === "open" ? (
                         <Button
                           type="button"
-                          disabled={busyId === req.requestId || short}
+                          disabled={
+                            busyBatchId === batch.requestBatchId || short
+                          }
                           title={
                             short
                               ? "Niet genoeg voorraad om goed te keuren"
-                              : "Goedkeuren en klaarzetten"
+                              : "Hele aanvraag goedkeuren"
                           }
-                          onClick={() => void runAction(req.requestId, "approve")}
+                          onClick={() =>
+                            void runBatchAction(batch.requestBatchId, "approve")
+                          }
                           className="h-10 gap-1.5 rounded-xl bg-sky-700 hover:bg-sky-800 disabled:opacity-50"
                         >
                           <HugeiconsIcon
@@ -429,15 +442,20 @@ export function AanvragenPage() {
                             strokeWidth={2}
                             className="size-4"
                           />
-                          {busyId === req.requestId ? "Bezig…" : "Goedkeuren"}
+                          {busyBatchId === batch.requestBatchId
+                            ? "Bezig…"
+                            : `Goedkeuren (${batch.productCount})`}
                         </Button>
                       ) : null}
                       {s === "approved" ? (
                         <Button
                           type="button"
-                          disabled={busyId === req.requestId}
+                          disabled={busyBatchId === batch.requestBatchId}
                           onClick={() =>
-                            void runAction(req.requestId, "complete")
+                            void runBatchAction(
+                              batch.requestBatchId,
+                              "complete",
+                            )
                           }
                           className="h-10 gap-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800"
                         >
@@ -446,7 +464,7 @@ export function AanvragenPage() {
                             strokeWidth={2}
                             className="size-4"
                           />
-                          {busyId === req.requestId
+                          {busyBatchId === batch.requestBatchId
                             ? "Bezig…"
                             : "Opgehaald"}
                         </Button>
@@ -460,20 +478,20 @@ export function AanvragenPage() {
         </ul>
       )}
 
-      <RequestDetailDialog
-        request={selected}
+      <RequestBatchDetailDialog
+        batch={selected}
         open={detailOpen}
         onOpenChange={(open) => {
           setDetailOpen(open);
           if (!open) setActionError("");
         }}
-        busy={selected != null && busyId === selected.requestId}
+        busy={selected != null && busyBatchId === selected.requestBatchId}
         actionError={actionError}
         onApprove={(id) => {
-          void runAction(id, "approve");
+          void runBatchAction(id, "approve");
         }}
         onComplete={(id) => {
-          void runAction(id, "complete");
+          void runBatchAction(id, "complete");
         }}
       />
     </div>

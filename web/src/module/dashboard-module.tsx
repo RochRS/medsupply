@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Building03Icon,
@@ -21,12 +22,17 @@ import {
 } from "../components/ui/select";
 import { Textarea } from "../components/ui/textarea";
 import {
-  RequestDetailDialog,
+  RequestBatchDetailDialog,
   formatRequestWhen,
-  requestStatusOf,
   type RequestDetail,
 } from "../components/requests/request-detail-dialog";
 import { apiClient } from "../config/api";
+import {
+  formatBatchProducts,
+  formatBatchTitle,
+  groupRequestsByBatch,
+  type RequestBatch,
+} from "../lib/request-batches";
 import { cn } from "../lib/utils";
 import { useAppUser } from "../lib/roles";
 
@@ -207,10 +213,12 @@ export function IncomingUrgentRequests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionError, setActionError] = useState("");
-  const [busyId, setBusyId] = useState<number | null>(null);
+  const [busyBatchId, setBusyBatchId] = useState<number | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [selected, setSelected] = useState<IncomingRequest | null>(null);
+  const [selected, setSelected] = useState<RequestBatch | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+
+  const batches = groupRequestsByBatch(rows);
 
   useEffect(() => {
     let cancelled = false;
@@ -222,7 +230,9 @@ export function IncomingUrgentRequests() {
         setRows(list);
         setError("");
         if (selected) {
-          const updated = list.find((r) => r.requestId === selected.requestId);
+          const updated = groupRequestsByBatch(list).find(
+            (b) => b.requestBatchId === selected.requestBatchId,
+          );
           setSelected(updated ?? null);
           if (!updated) setDetailOpen(false);
         }
@@ -239,17 +249,20 @@ export function IncomingUrgentRequests() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sync selected on reload only
   }, [reloadKey]);
 
-  const openDetails = (req: IncomingRequest) => {
-    setSelected(req);
+  const openDetails = (batch: RequestBatch) => {
+    setSelected(batch);
     setActionError("");
     setDetailOpen(true);
   };
 
-  const runAction = async (id: number, action: "approve" | "complete") => {
-    setBusyId(id);
+  const runBatchAction = async (
+    batchId: number,
+    action: "approve" | "complete",
+  ) => {
+    setBusyBatchId(batchId);
     setActionError("");
     try {
-      await apiClient(`/requests/${id}`, {
+      await apiClient(`/requests/batch/${batchId}`, {
         method: "PATCH",
         body: JSON.stringify({ action }),
       });
@@ -263,7 +276,7 @@ export function IncomingUrgentRequests() {
       setActionError(message);
       setError(message);
     } finally {
-      setBusyId(null);
+      setBusyBatchId(null);
     }
   };
 
@@ -275,7 +288,7 @@ export function IncomingUrgentRequests() {
         subtitle="Open spoedaanvragen — klik voor details"
         badge={
           <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-rkz-red px-1.5 text-xs font-semibold text-white">
-            {rows.length}
+            {batches.length}
           </span>
         }
       />
@@ -285,25 +298,24 @@ export function IncomingUrgentRequests() {
           <div className="flex flex-1 items-center justify-center">
             <LoadingSpinner label="Spoed laden..." />
           </div>
-        ) : error && rows.length === 0 ? (
+        ) : error && batches.length === 0 ? (
           <ErrorState message={error} />
-        ) : rows.length === 0 ? (
+        ) : batches.length === 0 ? (
           <EmptyState message="Geen open spoedaanvragen." />
         ) : (
           <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5">
-            {rows.map((req) => {
-              const status = requestStatusOf(req);
-              const short = status === "open" && req.stockSufficient === false;
+            {batches.map((batch) => {
+              const short = batch.status === "open" && batch.hasStockIssue;
               return (
-                <li key={req.requestId}>
+                <li key={batch.requestBatchId}>
                   <article
                     role="button"
                     tabIndex={0}
-                    onClick={() => openDetails(req)}
+                    onClick={() => openDetails(batch)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        openDetails(req);
+                        openDetails(batch);
                       }
                     }}
                     className={cn(
@@ -323,24 +335,23 @@ export function IncomingUrgentRequests() {
                             Spoed
                           </span>
                           <span className="text-[11px] text-slate-400">
-                            {formatWhen(req.createdAt)}
+                            {formatWhen(batch.createdAt)}
                           </span>
                         </div>
                         <p className="mt-1.5 truncate text-sm font-semibold text-rkz-navy dark:text-white">
-                          {req.itemName ?? "Onbekend item"}
+                          {formatBatchTitle(batch)}
                         </p>
                         <p className="text-xs text-slate-500">
-                          Aantal:{" "}
-                          <span className="font-semibold text-slate-700 dark:text-slate-200">
-                            {req.requestedAmount}
-                          </span>
-                          {req.requesterName
-                            ? ` · ${req.requesterName}`
+                          {batch.productCount > 1
+                            ? formatBatchProducts(batch)
+                            : `Aantal: ${batch.totalUnits}`}
+                          {batch.requesterName
+                            ? ` · ${batch.requesterName}`
                             : null}
                         </p>
-                        {req.requestDescription ? (
+                        {batch.requestDescription ? (
                           <p className="mt-1 line-clamp-2 text-xs text-slate-600 dark:text-slate-300">
-                            {req.requestDescription}
+                            {batch.requestDescription}
                           </p>
                         ) : null}
                       </div>
@@ -354,18 +365,20 @@ export function IncomingUrgentRequests() {
                       className="mt-2 flex gap-2"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {status === "open" ? (
+                      {batch.status === "open" ? (
                         <Button
                           type="button"
                           size="sm"
-                          disabled={busyId === req.requestId || short}
+                          disabled={
+                            busyBatchId === batch.requestBatchId || short
+                          }
                           title={
                             short
                               ? "Niet genoeg voorraad"
-                              : "Goedkeuren en klaarzetten"
+                              : "Hele aanvraag goedkeuren"
                           }
                           onClick={() =>
-                            void runAction(req.requestId, "approve")
+                            void runBatchAction(batch.requestBatchId, "approve")
                           }
                           className="h-8 flex-1 gap-1.5 rounded-lg bg-sky-700 text-xs hover:bg-sky-800"
                         >
@@ -374,15 +387,20 @@ export function IncomingUrgentRequests() {
                             strokeWidth={2}
                             className="size-3.5"
                           />
-                          {busyId === req.requestId ? "Bezig..." : "Goedkeuren"}
+                          {busyBatchId === batch.requestBatchId
+                            ? "Bezig..."
+                            : `Goedkeuren (${batch.productCount})`}
                         </Button>
                       ) : (
                         <Button
                           type="button"
                           size="sm"
-                          disabled={busyId === req.requestId}
+                          disabled={busyBatchId === batch.requestBatchId}
                           onClick={() =>
-                            void runAction(req.requestId, "complete")
+                            void runBatchAction(
+                              batch.requestBatchId,
+                              "complete",
+                            )
                           }
                           className="h-8 flex-1 gap-1.5 rounded-lg bg-emerald-700 text-xs hover:bg-emerald-800"
                         >
@@ -391,7 +409,9 @@ export function IncomingUrgentRequests() {
                             strokeWidth={2}
                             className="size-3.5"
                           />
-                          {busyId === req.requestId ? "Bezig..." : "Opgehaald"}
+                          {busyBatchId === batch.requestBatchId
+                            ? "Bezig..."
+                            : "Opgehaald"}
                         </Button>
                       )}
                     </div>
@@ -403,17 +423,17 @@ export function IncomingUrgentRequests() {
         )}
       </CardBody>
 
-      <RequestDetailDialog
-        request={selected}
+      <RequestBatchDetailDialog
+        batch={selected}
         open={detailOpen}
         onOpenChange={(open) => {
           setDetailOpen(open);
           if (!open) setActionError("");
         }}
-        busy={selected != null && busyId === selected.requestId}
+        busy={selected != null && busyBatchId === selected.requestBatchId}
         actionError={actionError}
-        onApprove={(id) => void runAction(id, "approve")}
-        onComplete={(id) => void runAction(id, "complete")}
+        onApprove={(id) => void runBatchAction(id, "approve")}
+        onComplete={(id) => void runBatchAction(id, "complete")}
       />
     </DashboardCard>
   );
@@ -427,9 +447,9 @@ export function IncomingRequestNotifications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionError, setActionError] = useState("");
-  const [busyId, setBusyId] = useState<number | null>(null);
+  const [busyBatchId, setBusyBatchId] = useState<number | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [selected, setSelected] = useState<IncomingRequest | null>(null);
+  const [selected, setSelected] = useState<RequestBatch | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
   useEffect(() => {
@@ -442,7 +462,9 @@ export function IncomingRequestNotifications() {
         setRows(list);
         setError("");
         if (selected) {
-          const updated = list.find((r) => r.requestId === selected.requestId);
+          const updated = groupRequestsByBatch(list).find(
+            (b) => b.requestBatchId === selected.requestBatchId,
+          );
           setSelected(updated ?? null);
           if (!updated) setDetailOpen(false);
         }
@@ -460,17 +482,20 @@ export function IncomingRequestNotifications() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sync selected on reload only
   }, [reloadKey]);
 
-  const openDetails = (req: IncomingRequest) => {
-    setSelected(req);
+  const openDetails = (batch: RequestBatch) => {
+    setSelected(batch);
     setActionError("");
     setDetailOpen(true);
   };
 
-  const runAction = async (id: number, action: "approve" | "complete") => {
-    setBusyId(id);
+  const runBatchAction = async (
+    batchId: number,
+    action: "approve" | "complete",
+  ) => {
+    setBusyBatchId(batchId);
     setActionError("");
     try {
-      await apiClient(`/requests/${id}`, {
+      await apiClient(`/requests/batch/${batchId}`, {
         method: "PATCH",
         body: JSON.stringify({ action }),
       });
@@ -484,14 +509,14 @@ export function IncomingRequestNotifications() {
       setActionError(message);
       setError(message);
     } finally {
-      setBusyId(null);
+      setBusyBatchId(null);
     }
   };
 
-  const filtered = rows
-    .filter((r) => {
-      if (filter === "spoed") return r.isUrgent;
-      if (filter === "normaal") return !r.isUrgent;
+  const filtered = groupRequestsByBatch(rows)
+    .filter((batch) => {
+      if (filter === "spoed") return batch.isUrgent;
+      if (filter === "normaal") return !batch.isUrgent;
       return true;
     })
     .sort((a, b) => {
@@ -580,45 +605,45 @@ export function IncomingRequestNotifications() {
           <EmptyState message="Geen open aanvragen." />
         ) : (
           <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
-            {filtered.map((req) => (
-              <li key={req.requestId}>
+            {filtered.map((batch) => (
+              <li key={batch.requestBatchId}>
                 <article
                   role="button"
                   tabIndex={0}
-                  onClick={() => openDetails(req)}
+                  onClick={() => openDetails(batch)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      openDetails(req);
+                      openDetails(batch);
                     }
                   }}
                   className={cn(
                     "cursor-pointer rounded-xl border px-3 py-2.5 text-sm transition-colors",
                     "hover:border-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/30",
-                    req.isUrgent
+                    batch.isUrgent
                       ? "border-red-100 bg-red-50/60 dark:border-red-900/40 dark:bg-red-950/20"
                       : "border-slate-100 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-900/40",
                   )}
                 >
                   <div className="flex items-center gap-1.5">
                     <HugeiconsIcon
-                      icon={req.isUrgent ? FlashIcon : Alert02Icon}
+                      icon={batch.isUrgent ? FlashIcon : Alert02Icon}
                       strokeWidth={2}
                       className={cn(
                         "size-3.5 shrink-0",
-                        req.isUrgent ? "text-rkz-red" : "text-sky-700",
+                        batch.isUrgent ? "text-rkz-red" : "text-sky-700",
                       )}
                     />
                     <span
                       className={cn(
                         "text-[11px] font-bold tracking-wide uppercase",
-                        req.isUrgent ? "text-rkz-red" : "text-sky-800",
+                        batch.isUrgent ? "text-rkz-red" : "text-sky-800",
                       )}
                     >
-                      {req.isUrgent ? "Spoed" : "Aanvraag"}
+                      {batch.isUrgent ? "Spoed" : "Aanvraag"}
                     </span>
                     <span className="ml-auto text-[11px] text-slate-400">
-                      {formatWhen(req.createdAt)}
+                      {formatWhen(batch.createdAt)}
                     </span>
                     <HugeiconsIcon
                       icon={ArrowRight01Icon}
@@ -627,16 +652,18 @@ export function IncomingRequestNotifications() {
                     />
                   </div>
                   <p className="mt-1 font-medium text-rkz-navy dark:text-white">
-                    {req.itemName ?? "Onbekend item"}{" "}
+                    {formatBatchTitle(batch)}{" "}
                     <span className="font-normal text-slate-500">
-                      ×{req.requestedAmount}
+                      · {batch.totalUnits} stuks
                     </span>
                   </p>
                   <p className="truncate text-xs text-slate-500">
-                    {req.requesterName ?? "Onbekende aanvrager"}
-                    {req.requestDescription
-                      ? ` · ${req.requestDescription}`
-                      : ""}
+                    {batch.requesterName ?? "Onbekende aanvrager"}
+                    {batch.productCount > 1
+                      ? ` · ${formatBatchProducts(batch)}`
+                      : batch.requestDescription
+                        ? ` · ${batch.requestDescription}`
+                        : ""}
                   </p>
                 </article>
               </li>
@@ -645,17 +672,17 @@ export function IncomingRequestNotifications() {
         )}
       </CardBody>
 
-      <RequestDetailDialog
-        request={selected}
+      <RequestBatchDetailDialog
+        batch={selected}
         open={detailOpen}
         onOpenChange={(open) => {
           setDetailOpen(open);
           if (!open) setActionError("");
         }}
-        busy={selected != null && busyId === selected.requestId}
+        busy={selected != null && busyBatchId === selected.requestBatchId}
         actionError={actionError}
-        onApprove={(id) => void runAction(id, "approve")}
-        onComplete={(id) => void runAction(id, "complete")}
+        onApprove={(id) => void runBatchAction(id, "approve")}
+        onComplete={(id) => void runBatchAction(id, "complete")}
       />
     </DashboardCard>
   );
@@ -723,6 +750,7 @@ type InventoryItem = {
   itemId: number;
   itemName: string;
   stockLevel: StockLevel;
+  categoryId?: number | null;
 };
 
 type InventoryResponse = {
@@ -741,6 +769,7 @@ function isAttention(level: StockLevel) {
 }
 
 export function CriticalInventoryOverview() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -774,6 +803,16 @@ export function CriticalInventoryOverview() {
     if (level === "alle-niveaus") return true;
     return toUiLevel(item.stockLevel) === level;
   });
+
+  const openProduct = (item: InventoryItem) => {
+    void navigate({
+      to: "/inventory",
+      search: {
+        ...(item.categoryId != null ? { categoryId: item.categoryId } : {}),
+        itemId: item.itemId,
+      },
+    });
+  };
 
   return (
     <DashboardCard>
@@ -838,20 +877,30 @@ export function CriticalInventoryOverview() {
             {filtered.map((item) => {
               const ui = toUiLevel(item.stockLevel);
               return (
-                <li
-                  key={item.itemId}
-                  className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300"
-                >
-                  <span
-                    className={
-                      ui === "kritiek"
-                        ? "font-medium text-rkz-red"
-                        : "font-medium text-orange-500"
-                    }
+                <li key={item.itemId}>
+                  <button
+                    type="button"
+                    onClick={() => openProduct(item)}
+                    className="flex w-full items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:border-sky-200 hover:bg-sky-50/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300 dark:hover:border-sky-800 dark:hover:bg-sky-950/40"
                   >
-                    {ui === "kritiek" ? "Kritiek" : "Laag"}:
-                  </span>{" "}
-                  {item.itemName}
+                    <span className="min-w-0 truncate">
+                      <span
+                        className={
+                          ui === "kritiek"
+                            ? "font-medium text-rkz-red"
+                            : "font-medium text-orange-500"
+                        }
+                      >
+                        {ui === "kritiek" ? "Kritiek" : "Laag"}:
+                      </span>{" "}
+                      {item.itemName}
+                    </span>
+                    <HugeiconsIcon
+                      icon={ArrowRight01Icon}
+                      strokeWidth={2}
+                      className="size-4 shrink-0 text-slate-400"
+                    />
+                  </button>
                 </li>
               );
             })}
@@ -985,15 +1034,177 @@ export function Notifications() {
 }
 
 export function StockStatusOverview() {
+  const [summary, setSummary] = useState<{
+    totalItems: number;
+    criticalStock: number;
+    lowStock: number;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    apiClient("/items?page=1&pageSize=1")
+      .then((result) => {
+        if (cancelled) return;
+        const data = result as {
+          summary?: {
+            totalItems: number;
+            criticalStock: number;
+            lowStock: number;
+          };
+        };
+        const s = data.summary;
+        if (!s) {
+          setError("Geen voorraadgegevens beschikbaar.");
+          return;
+        }
+        setSummary({
+          totalItems: s.totalItems,
+          criticalStock: s.criticalStock,
+          lowStock: s.lowStock,
+        });
+        setError("");
+      })
+      .catch(() => {
+        if (!cancelled) setError("Voorraadstatus kon niet worden geladen.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const kritiek = summary?.criticalStock ?? 0;
+  const laag = summary?.lowStock ?? 0;
+  const total = summary?.totalItems ?? 0;
+  const goed = Math.max(0, total - kritiek - laag);
+
+  const segments = [
+    {
+      key: "kritiek",
+      label: "Kritiek",
+      hint: "≤ 5 stuks",
+      count: kritiek,
+      color: "bg-rkz-red",
+      bar: "bg-rkz-red",
+      text: "text-rkz-red",
+      soft: "bg-red-50 dark:bg-red-950/30",
+    },
+    {
+      key: "laag",
+      label: "Laag",
+      hint: "6 – 10 stuks",
+      count: laag,
+      color: "bg-orange-500",
+      bar: "bg-orange-500",
+      text: "text-orange-600",
+      soft: "bg-orange-50 dark:bg-orange-950/30",
+    },
+    {
+      key: "goed",
+      label: "Goed",
+      hint: "> 10 stuks",
+      count: goed,
+      color: "bg-emerald-500",
+      bar: "bg-emerald-500",
+      text: "text-emerald-700",
+      soft: "bg-emerald-50 dark:bg-emerald-950/30",
+    },
+  ] as const;
+
+  const maxCount = Math.max(1, ...segments.map((s) => s.count));
+
   return (
     <DashboardCard>
       <CardHeader
         title="Voorraad status verdeling"
         subtitle="Overzicht van niveaus"
+        action={
+          summary ? (
+            <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-800 dark:bg-sky-950/50 dark:text-sky-200">
+              {total} items
+            </span>
+          ) : null
+        }
       />
-      <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 dark:border-slate-700">
-        <p className="text-sm text-slate-400">Grafiek komt hier</p>
-      </div>
+
+      {loading ? (
+        <div className="flex h-64 items-center justify-center">
+          <LoadingSpinner label="Grafiek laden..." />
+        </div>
+      ) : error ? (
+        <ErrorState message={error} />
+      ) : total === 0 ? (
+        <EmptyState message="Nog geen producten in de voorraad." />
+      ) : (
+        <div className="flex flex-col gap-6">
+          {/* Stacked distribution bar */}
+          <div className="flex h-4 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-900">
+            {segments.map((seg) => {
+              if (seg.count <= 0) return null;
+              const pct = (seg.count / total) * 100;
+              return (
+                <div
+                  key={seg.key}
+                  title={`${seg.label}: ${seg.count}`}
+                  className={cn(seg.bar, "transition-all")}
+                  style={{ width: `${pct}%` }}
+                />
+              );
+            })}
+          </div>
+
+          {/* Bars + legend */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            {segments.map((seg) => {
+              const pct = total > 0 ? Math.round((seg.count / total) * 100) : 0;
+              const barHeight = `${Math.max(8, (seg.count / maxCount) * 100)}%`;
+              return (
+                <div
+                  key={seg.key}
+                  className={cn(
+                    "flex flex-col gap-3 rounded-2xl border border-slate-100 p-4 dark:border-slate-700",
+                    seg.soft,
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className={cn("text-sm font-semibold", seg.text)}>
+                        {seg.label}
+                      </p>
+                      <p className="text-[11px] text-slate-500">{seg.hint}</p>
+                    </div>
+                    <span className="text-lg font-bold text-sky-950 dark:text-sky-50">
+                      {seg.count}
+                    </span>
+                  </div>
+
+                  <div className="flex h-28 items-end rounded-xl bg-white/70 px-3 pb-2 pt-3 dark:bg-slate-900/40">
+                    <div
+                      className={cn(
+                        "mx-auto w-12 rounded-t-lg transition-all",
+                        seg.bar,
+                      )}
+                      style={{ height: barHeight }}
+                      title={`${pct}%`}
+                    />
+                  </div>
+
+                  <p className="text-center text-xs font-medium text-slate-500">
+                    {pct}% van totaal
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </DashboardCard>
   );
 }

@@ -4,10 +4,20 @@ import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 import { requireRole } from "../middleware/auth.js";
 import { ROLE_NAMES } from "../database/seed/seed-roles.js";
 import {
+  adminCreateUserSchema,
+  adminUpdateUserSchema,
+  changePasswordSchema,
+} from "../schemas/user-login.js";
+import {
   assignUserRole,
+  changeOwnPassword,
+  createUserAdmin,
   deleteUserById,
+  getMustChangePassword,
   listRoles,
   listUsersWithRoles,
+  updateUserAdmin,
+  UserAdminError,
 } from "../services/users.service.js";
 
 export const users = new Hono<AppEnv>();
@@ -19,6 +29,7 @@ users.get("/me", async (c) => {
   if (!currentUser) {
     return c.json({ message: "Not authenticated" }, ERROR_CODE_MAP.UNAUTHORIZED);
   }
+  const mustChangePassword = await getMustChangePassword(currentUser.id);
   return c.json({
     user: {
       id: currentUser.id,
@@ -26,8 +37,49 @@ users.get("/me", async (c) => {
       email: currentUser.email,
       roleId: role?.roleId ?? null,
       roleName: role?.roleName ?? null,
+      mustChangePassword,
     },
   });
+});
+
+// Authenticated user: change own password (first login)
+users.post("/me/password", async (c) => {
+  const currentUser = c.get("user");
+  if (!currentUser) {
+    return c.json({ message: "Not authenticated" }, ERROR_CODE_MAP.UNAUTHORIZED);
+  }
+
+  const parsed = changePasswordSchema.safeParse(await c.req.json());
+  if (!parsed.success) {
+    return c.json(
+      {
+        message: parsed.error.issues[0]?.message ?? "Invalid input",
+        error: "VALIDATION_ERROR",
+      },
+      ERROR_CODE_MAP.BAD_REQUEST,
+    );
+  }
+
+  try {
+    await changeOwnPassword(
+      currentUser.id,
+      parsed.data.currentPassword,
+      parsed.data.newPassword,
+    );
+    return c.json({ ok: true });
+  } catch (error) {
+    if (error instanceof UserAdminError && error.code === "INVALID_PASSWORD") {
+      return c.json(
+        { message: "Huidig wachtwoord is onjuist", error: error.code },
+        ERROR_CODE_MAP.BAD_REQUEST,
+      );
+    }
+    console.error("users POST /me/password error:", error);
+    return c.json(
+      { message: "Could not change password", error: "PASSWORD_CHANGE_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
 });
 
 // Admin: list all users
@@ -53,6 +105,86 @@ users.get("/roles", requireRole(ROLE_NAMES.ADMIN), async (c) => {
     console.error("users GET /roles error:", error);
     return c.json(
       { message: "Could not load roles", error: "ROLES_FETCH_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
+});
+
+// Admin: create user (temporary password generated server-side)
+users.post("/", requireRole(ROLE_NAMES.ADMIN), async (c) => {
+  const parsed = adminCreateUserSchema.safeParse(await c.req.json());
+  if (!parsed.success) {
+    return c.json(
+      {
+        message: parsed.error.issues[0]?.message ?? "Invalid input",
+        error: "VALIDATION_ERROR",
+      },
+      ERROR_CODE_MAP.BAD_REQUEST,
+    );
+  }
+
+  try {
+    const created = await createUserAdmin(parsed.data);
+    return c.json(
+      {
+        user: created,
+        temporaryPassword: created.temporaryPassword,
+      },
+      201,
+    );
+  } catch (error) {
+    if (error instanceof UserAdminError) {
+      if (error.code === "EMAIL_EXISTS") {
+        return c.json(
+          { message: "E-mailadres is al in gebruik", error: error.code },
+          ERROR_CODE_MAP.CONFLICT,
+        );
+      }
+    }
+    console.error("users POST / error:", error);
+    return c.json(
+      { message: "Could not create user", error: "USER_CREATE_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
+});
+
+// Admin: update user (name, email, password, role)
+users.patch("/:id", requireRole(ROLE_NAMES.ADMIN), async (c) => {
+  const userId = c.req.param("id");
+  const parsed = adminUpdateUserSchema.safeParse(await c.req.json());
+  if (!parsed.success) {
+    return c.json(
+      {
+        message: parsed.error.issues[0]?.message ?? "Invalid input",
+        error: "VALIDATION_ERROR",
+      },
+      ERROR_CODE_MAP.BAD_REQUEST,
+    );
+  }
+
+  try {
+    const updated = await updateUserAdmin(userId, parsed.data);
+    if (!updated) {
+      return c.json(
+        { message: "User not found", error: "NOT_FOUND" },
+        ERROR_CODE_MAP.NOT_FOUND,
+      );
+    }
+    return c.json({
+      user: updated,
+      temporaryPassword: updated.temporaryPassword ?? null,
+    });
+  } catch (error) {
+    if (error instanceof UserAdminError && error.code === "EMAIL_EXISTS") {
+      return c.json(
+        { message: "E-mailadres is al in gebruik", error: error.code },
+        ERROR_CODE_MAP.CONFLICT,
+      );
+    }
+    console.error("users PATCH /:id error:", error);
+    return c.json(
+      { message: "Could not update user", error: "USER_UPDATE_FAILED" },
       ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
     );
   }

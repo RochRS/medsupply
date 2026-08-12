@@ -16,6 +16,7 @@ import { items } from "./routes/items.js";
 import { statistics } from "./routes/statistics.js";
 import { history } from "./routes/history.js";
 import { users } from "./routes/users.js";
+import { notifications } from "./routes/notifications.js";
 import { session } from "./routes/session.js";
 
 // Auth
@@ -56,6 +57,7 @@ api.get("/", async (c) => {
       history: "/api/history",
       settings: "/api/settings",
       users: "/api/users",
+      notifications: "/api/notifications",
       sessions: "/api/sessions",
     },
   });
@@ -98,6 +100,7 @@ mountProtected("/statistics", statistics);
 mountProtected("/history", history);
 mountProtected("/settings", settings);
 mountProtected("/users", users);
+mountProtected("/notifications", notifications);
 
 app.route("/", api);
 

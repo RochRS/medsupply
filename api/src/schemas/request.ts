@@ -5,7 +5,12 @@ import { z } from "zod";
 export const createRequestSchema = z.object({
   itemId: z.number().int().positive(),
   requestedAmount: z.number().int().positive(),
-  requestBatchId: z.number().int().positive().optional(),
+  requestBatchId: z
+    .number()
+    .int()
+    .positive()
+    .max(2_147_483_647)
+    .optional(),
   userId: z.string().nullable().optional(),
   departmentId: z.number().int().positive().nullable().optional(),
   requestDescriptionField: z.string().nullable().optional(),

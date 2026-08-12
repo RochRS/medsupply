@@ -64,7 +64,7 @@ export async function seed() {
     if (userId) {
       await db
         .update(user)
-        .set({ roleId, name: account.name })
+        .set({ roleId, name: account.name, mustChangePassword: false })
         .where(eq(user.id, userId));
     }
   }

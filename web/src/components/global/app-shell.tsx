@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useCart } from "@/lib/cart";
 import { roleLabel, useAppUser, type AppRole } from "@/lib/roles";
+import { NotificationBell } from "@/components/global/notification-bell";
 import logo from "@/assets/rkz-logo.png";
 
 type NavIcon = typeof DashboardSquare01Icon;
@@ -54,12 +55,6 @@ const mainLinks: NavItem[] = [
     label: "Mijn mand",
     icon: ShoppingBagAddIcon,
     roles: ["verpleging"],
-  },
-  {
-    to: "/request",
-    label: "Aanvraag",
-    icon: ShoppingBagAddIcon,
-    roles: ["admin"],
   },
   {
     to: "/aanvragen",
@@ -264,7 +259,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { productCount } = useCart();
   const { role } = useAppUser();
-  const canRequest = !role || role === "verpleging" || role === "admin";
+  const canRequest = role === "verpleging";
   const homeTo = role === "verpleging" ? "/inventory" : "/dashboard";
 
   useEffect(() => {
@@ -308,24 +303,33 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="font-bold tracking-tight text-sky-950">MedSupply</span>
           </Link>
           {canRequest ? (
-            <Link
-              to="/request"
-              className="relative ml-auto inline-flex h-9 w-9 items-center justify-center rounded-xl text-sky-900 hover:bg-sky-50"
-              aria-label="Aanvraagmand"
-            >
-              <HugeiconsIcon
-                icon={ShoppingBagAddIcon}
-                strokeWidth={2}
-                className="size-5"
-              />
-              {productCount > 0 ? (
-                <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sky-700 px-1 text-[10px] font-semibold text-white">
-                  {productCount}
-                </span>
-              ) : null}
-            </Link>
+            <div className="ml-auto flex items-center gap-1">
+              <NotificationBell align="right" />
+              <Link
+                to="/request"
+                className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl text-sky-900 hover:bg-sky-50"
+                aria-label="Aanvraagmand"
+              >
+                <HugeiconsIcon
+                  icon={ShoppingBagAddIcon}
+                  strokeWidth={2}
+                  className="size-5"
+                />
+                {productCount > 0 ? (
+                  <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sky-700 px-1 text-[10px] font-semibold text-white">
+                    {productCount}
+                  </span>
+                ) : null}
+              </Link>
+            </div>
           ) : null}
         </header>
+
+        {canRequest ? (
+          <header className="sticky top-0 z-40 hidden h-12 shrink-0 items-center justify-end gap-2 border-b border-sky-200/80 bg-white/90 px-6 backdrop-blur-md md:flex">
+            <NotificationBell align="right" />
+          </header>
+        ) : null}
 
         <div className="min-h-0 flex-1">{children}</div>
       </div>

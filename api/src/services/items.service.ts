@@ -4,7 +4,7 @@ import { eq, asc, ilike, or, lte, and, not, exists, count } from "drizzle-orm";
 import type { CreateItemInput, UpdateItemInput } from "../schemas/item.js";
 
 const CRITICAL_MAX = 5;
-const LOW_MAX = 20;
+const LOW_MAX = 10;
 
 export function stockLevel(amount: number): "critical" | "low" | "ok" {
   if (amount <= CRITICAL_MAX) return "critical";

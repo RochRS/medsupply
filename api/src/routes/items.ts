@@ -18,7 +18,7 @@ import { requireRole } from "../middleware/auth.js";
 import { ROLE_NAMES } from "../database/seed/seed-roles.js";
 
 const CRITICAL_MAX = 5;
-const LOW_MAX = 20;
+const LOW_MAX = 10;
 
 export const items = new Hono<AppEnv>();
 

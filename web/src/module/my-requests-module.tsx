@@ -11,7 +11,6 @@ import { LoadingSpinner } from "../components/global/loading-spinner";
 import {
   StatusBadge,
   formatRequestWhen,
-  requestStatusOf,
   type RequestDetail,
   type RequestStatus,
 } from "../components/requests/request-detail-dialog";
@@ -25,6 +24,11 @@ import {
 import { apiClient } from "../config/api";
 import { useAppUser } from "../lib/roles";
 import { cn } from "../lib/utils";
+import {
+  formatBatchProducts,
+  formatBatchTitle,
+  groupRequestsByBatch,
+} from "../lib/request-batches";
 
 const STATUS_OPTS = [
   { value: "alle", label: "Alle statussen" },
@@ -87,48 +91,52 @@ export function MyRequestsPage() {
     };
   }, [roleLoading]);
 
+  const batches = useMemo(() => groupRequestsByBatch(rows), [rows]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return rows.filter((r) => {
-      const s = requestStatusOf(r);
-      if (status !== "alle" && s !== status) return false;
-      if (type === "spoed" && !r.isUrgent) return false;
-      if (type === "normaal" && r.isUrgent) return false;
+    return batches.filter((batch) => {
+      if (status !== "alle" && batch.status !== status) return false;
+      if (type === "spoed" && !batch.isUrgent) return false;
+      if (type === "normaal" && batch.isUrgent) return false;
       if (!q) return true;
       return (
-        (r.itemName ?? "").toLowerCase().includes(q) ||
-        (r.requestDescription ?? "").toLowerCase().includes(q) ||
-        String(r.requestBatchId).includes(q)
+        String(batch.requestBatchId).includes(q) ||
+        (batch.requestDescription ?? "").toLowerCase().includes(q) ||
+        batch.items.some((item) =>
+          (item.itemName ?? "").toLowerCase().includes(q),
+        )
       );
     });
-  }, [rows, search, status, type]);
+  }, [batches, search, status, type]);
 
   const stats = useMemo(() => {
     return {
-      total: rows.length,
-      open: rows.filter((r) => requestStatusOf(r) === "open").length,
-      approved: rows.filter((r) => requestStatusOf(r) === "approved").length,
-      done: rows.filter((r) => requestStatusOf(r) === "completed").length,
+      total: batches.length,
+      open: batches.filter((b) => b.status === "open").length,
+      approved: batches.filter((b) => b.status === "approved").length,
+      done: batches.filter((b) => b.status === "completed").length,
     };
-  }, [rows]);
+  }, [batches]);
 
   if (roleLoading) {
     return <LoadingSpinner label="Laden..." />;
   }
 
-  // Only verpleging (and admin testing as nurse flows with mine=1)
-  if (role === "apotheker") {
+  // Only verpleging places and tracks own requests
+  if (role === "apotheker" || role === "admin") {
     return (
       <div className="mx-auto max-w-lg p-6">
         <div className="rounded-2xl border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-600">
-          Als apotheker zie je alle inkomende aanvragen onder{" "}
+          Als {role === "admin" ? "admin" : "apotheker"} zie je alle inkomende
+          aanvragen onder{" "}
           <span className="font-semibold">Aanvragen</span> in het menu.
         </div>
       </div>
     );
   }
 
-  if (!isVerpleging && role !== "admin") {
+  if (!isVerpleging) {
     return (
       <div className="mx-auto max-w-lg p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-6 text-center text-sm text-red-600">
@@ -273,14 +281,14 @@ export function MyRequestsPage() {
         </div>
       ) : (
         <ul className="flex flex-col gap-2.5">
-          {filtered.map((req) => {
-            const s = requestStatusOf(req);
+          {filtered.map((batch) => {
+            const s = batch.status;
             return (
-              <li key={req.requestId}>
+              <li key={batch.requestBatchId}>
                 <article
                   className={cn(
                     "rounded-2xl border bg-white p-4 dark:bg-slate-800",
-                    req.isUrgent && s !== "completed"
+                    batch.isUrgent && s !== "completed"
                       ? "border-l-[3px] border-l-rkz-red border-slate-200/80"
                       : "border-slate-200/80 dark:border-slate-700",
                     s === "approved" &&
@@ -288,7 +296,7 @@ export function MyRequestsPage() {
                   )}
                 >
                   <div className="flex flex-wrap items-center gap-1.5">
-                    {req.isUrgent ? (
+                    {batch.isUrgent ? (
                       <span className="inline-flex items-center gap-1 rounded-md bg-rkz-red px-2 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase">
                         <HugeiconsIcon
                           icon={FlashIcon}
@@ -304,8 +312,8 @@ export function MyRequestsPage() {
                     )}
                     <StatusBadge status={s} />
                     <span className="text-[11px] text-slate-400">
-                      #{req.requestBatchId} ·{" "}
-                      {formatRequestWhen(req.createdAt)}
+                      #{batch.requestBatchId} ·{" "}
+                      {formatRequestWhen(batch.createdAt)}
                     </span>
                   </div>
 
@@ -319,11 +327,14 @@ export function MyRequestsPage() {
                     </span>
                     <div className="min-w-0">
                       <h2 className="text-base font-bold text-rkz-navy dark:text-white">
-                        {req.itemName ?? "Onbekend item"}
+                        {formatBatchTitle(batch)}
                         <span className="ml-1.5 font-semibold text-sky-800 dark:text-sky-200">
-                          ×{req.requestedAmount}
+                          · {batch.totalUnits} stuks
                         </span>
                       </h2>
+                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                        {formatBatchProducts(batch)}
+                      </p>
                       <p
                         className={cn(
                           "mt-1 text-sm font-medium",
@@ -334,9 +345,9 @@ export function MyRequestsPage() {
                       >
                         {nurseHint(s)}
                       </p>
-                      {req.requestDescription ? (
+                      {batch.requestDescription ? (
                         <p className="mt-1 line-clamp-2 text-xs text-slate-500">
-                          {req.requestDescription}
+                          {batch.requestDescription}
                         </p>
                       ) : null}
                     </div>

@@ -10,6 +10,8 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { FormInput } from "../components/global/form-input";
+import { DemoFillButton } from "../components/global/demo-fill-button";
+import { demoRequestDetails } from "../lib/demo-form-data";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Label } from "../components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -124,7 +126,7 @@ export function RequestForm() {
     }
 
     setLoading(true);
-    const batchId = Date.now();
+    const batchId = Math.floor(Date.now() / 1000);
     const urgent = urgentie === "hoog";
     const description = [
       `Afdeling: ${afdeling.trim()}`,
@@ -328,11 +330,11 @@ export function RequestForm() {
             </button>
           </div>
 
-          <div className="mt-5 flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-between dark:border-slate-700">
+          <div className="mt-5 flex flex-row gap-2 border-t border-slate-100 pt-4 dark:border-slate-700">
             <Button
               type="button"
               variant="outline"
-              className="h-11 rounded-xl"
+              className="h-11 min-w-0 flex-1 rounded-xl"
               onClick={() => clear()}
             >
               Mand legen
@@ -340,7 +342,7 @@ export function RequestForm() {
             <Button
               type="button"
               onClick={goToStep2}
-              className="h-11 gap-2 rounded-xl bg-sky-800 font-semibold hover:bg-sky-900 sm:min-w-44"
+              className="h-11 min-w-0 flex-1 gap-2 rounded-xl bg-sky-800 font-semibold hover:bg-sky-900"
             >
               Volgende
               <HugeiconsIcon
@@ -368,9 +370,21 @@ export function RequestForm() {
             </button>
           </div>
 
-          <h2 className="text-sm font-semibold text-rkz-navy dark:text-white">
-            Gegevens
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-rkz-navy dark:text-white">
+              Gegevens
+            </h2>
+            <DemoFillButton
+              onClick={() => {
+                const demo = demoRequestDetails();
+                setAfdeling(demo.afdeling);
+                setUrgentie(demo.urgentie);
+                setOpmerking(demo.opmerking);
+                setFieldErrors({});
+                setError("");
+              }}
+            />
+          </div>
           <FormInput
             label="Afdeling"
             name="afdeling"
@@ -431,7 +445,7 @@ export function RequestForm() {
             </p>
           ) : null}
 
-          <div className="flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-between dark:border-slate-700">
+          <div className="flex flex-row gap-2 border-t border-slate-100 pt-4 dark:border-slate-700">
             <Button
               type="button"
               variant="outline"
@@ -441,12 +455,12 @@ export function RequestForm() {
                 setFieldErrors({});
                 setStep(1);
               }}
-              className="h-11 gap-2 rounded-xl"
+              className="h-11 min-w-0 flex-1 gap-2 rounded-xl"
             >
               <HugeiconsIcon
                 icon={ArrowLeft01Icon}
                 strokeWidth={2}
-                className="size-4"
+                className="size-4 shrink-0"
               />
               Vorige
             </Button>
@@ -454,14 +468,14 @@ export function RequestForm() {
               type="button"
               disabled={loading}
               onClick={() => void handleVersturen()}
-              className="h-11 gap-2 rounded-xl bg-sky-800 font-semibold hover:bg-sky-900 sm:min-w-48"
+              className="h-11 min-w-0 flex-[1.4] gap-1.5 rounded-xl bg-sky-800 px-2 text-sm font-semibold hover:bg-sky-900 sm:flex-1 sm:gap-2 sm:px-4 sm:text-base"
             >
               {loading ? "Bezig…" : "Aanvraag versturen"}
               {!loading ? (
                 <HugeiconsIcon
                   icon={Tick02Icon}
                   strokeWidth={2}
-                  className="size-4"
+                  className="size-4 shrink-0"
                 />
               ) : null}
             </Button>

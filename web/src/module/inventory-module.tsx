@@ -14,6 +14,8 @@ import {
   FloppyDiskIcon,
 } from "@hugeicons/core-free-icons";
 import { FormInput } from "../components/global/form-input";
+import { DemoFillButton } from "../components/global/demo-fill-button";
+import { demoMedicineItem } from "../lib/demo-form-data";
 import { LoadingSpinner } from "../components/global/loading-spinner";
 import { StatusBadge } from "../components/global/status-badge";
 import { CategoryIcon } from "../components/global/category-icon";
@@ -37,6 +39,7 @@ import { apiClient } from "../config/api";
 import { useCart } from "../lib/cart";
 import { useAppUser } from "../lib/roles";
 import { cn } from "../lib/utils";
+import { Route as InventoryRoute } from "../routes/inventory";
 
 type StockLevel = "kritiek" | "laag" | "goed";
 
@@ -86,6 +89,7 @@ function toUiStockLevel(level: InventoryItem["stockLevel"]): StockLevel {
 
 export function InventoryPage() {
   const navigate = useNavigate();
+  const searchParams = InventoryRoute.useSearch();
   const { addItem, productCount, totalCount } = useCart();
   const { isApotheker, role } = useAppUser();
   const canManageItems = isApotheker;
@@ -104,6 +108,55 @@ export function InventoryPage() {
   const [globalSummary, setGlobalSummary] = useState<InventorySummary | null>(
     null,
   );
+  const [focusItemId, setFocusItemId] = useState<number | null>(
+    searchParams.itemId ?? null,
+  );
+
+  // Deep-link from dashboard: open category (+ focus item for edit)
+  useEffect(() => {
+    const cat = searchParams.categoryId;
+    const item = searchParams.itemId;
+    if (cat == null && item == null) return;
+
+    if (cat != null) {
+      setCategoryId(cat);
+      setPage(1);
+    }
+    if (item != null) setFocusItemId(item);
+
+    void navigate({
+      to: "/inventory",
+      search: {},
+      replace: true,
+    });
+  }, [searchParams.categoryId, searchParams.itemId, navigate]);
+
+  // Resolve category / search for focused product so it shows and can be edited
+  useEffect(() => {
+    if (focusItemId == null) return;
+
+    let cancelled = false;
+    apiClient(`/items/${focusItemId}`)
+      .then((res) => {
+        if (cancelled) return;
+        const product = (res as { item: InventoryItem }).item;
+        if (!product) return;
+        if (product.categoryId != null) {
+          setCategoryId(product.categoryId);
+        }
+        if (product.itemName) {
+          setSearch(product.itemName);
+        }
+        setPage(1);
+      })
+      .catch(() => {
+        /* keep category view even if lookup fails */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [focusItemId]);
 
   const refreshList = () => {
     setPage(1);
@@ -227,7 +280,13 @@ export function InventoryPage() {
   const renderItemCard = (item: InventoryItem) => (
     <article
       key={item.itemId}
-      className="flex h-full flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+      id={`inventory-item-${item.itemId}`}
+      className={cn(
+        "flex h-full flex-col gap-3 rounded-2xl border bg-white p-4 shadow-sm dark:bg-slate-800",
+        focusItemId === item.itemId
+          ? "border-sky-400 ring-2 ring-sky-300/50 dark:border-sky-500"
+          : "border-slate-200/80 dark:border-slate-700",
+      )}
     >
       <div className="flex items-start gap-3">
         <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 dark:bg-slate-900">
@@ -260,6 +319,8 @@ export function InventoryPage() {
             item={item}
             categories={categories}
             onChanged={() => setReloadKey((k) => k + 1)}
+            autoOpenStock={focusItemId === item.itemId}
+            onAutoStockConsumed={() => setFocusItemId(null)}
           />
         ) : canAddToCart ? (
           <Button
@@ -660,9 +721,27 @@ function AddMedicineDialog({
       </DialogTrigger>
       <DialogContent className="gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-md">
         <DialogHeader className="border-b border-slate-100 px-5 py-4 dark:border-slate-700">
-          <DialogTitle className="text-base font-bold text-rkz-navy dark:text-white">
-            Nieuw medicijn / item
-          </DialogTitle>
+          <div className="flex flex-wrap items-start justify-between gap-2 pr-8">
+            <DialogTitle className="text-base font-bold text-rkz-navy dark:text-white">
+              Nieuw medicijn / item
+            </DialogTitle>
+            <DemoFillButton
+              disabled={saving}
+              onClick={() => {
+                const firstCat =
+                  categories[0]?.categoryId != null
+                    ? String(categories[0].categoryId)
+                    : categoryId;
+                const demo = demoMedicineItem(firstCat);
+                setNaam(demo.naam);
+                setCategoryId(demo.categoryId);
+                setVoorraad(demo.voorraad);
+                setDescription(demo.description);
+                setFieldErrors({});
+                setSubmitError("");
+              }}
+            />
+          </div>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 px-5 py-4">
@@ -772,10 +851,14 @@ function ItemManageActions({
   item,
   categories,
   onChanged,
+  autoOpenStock = false,
+  onAutoStockConsumed,
 }: {
   item: InventoryItem;
   categories: Category[];
   onChanged: () => void;
+  autoOpenStock?: boolean;
+  onAutoStockConsumed?: () => void;
 }) {
   const [editOpen, setEditOpen] = useState(false);
   const [stockOpen, setStockOpen] = useState(false);
@@ -810,6 +893,16 @@ function ItemManageActions({
     setError("");
     setStockOpen(true);
   };
+
+  useEffect(() => {
+    if (!autoOpenStock) return;
+    openStock();
+    onAutoStockConsumed?.();
+    document
+      .getElementById(`inventory-item-${item.itemId}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when deep-linked
+  }, [autoOpenStock]);
 
   const handleEdit = async () => {
     setError("");

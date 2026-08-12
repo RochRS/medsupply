@@ -16,6 +16,8 @@ export const user = pgTable("user", {
   image: text("image"),
   roleId: integer("role_id").references(() => role.roleId),
   departmentId: integer("department_id").references(() => department.departmentId),
+  /** True when admin set a temporary password — user must change on next login */
+  mustChangePassword: boolean("must_change_password").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

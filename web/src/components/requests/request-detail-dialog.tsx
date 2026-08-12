@@ -19,6 +19,8 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { cn } from "../../lib/utils";
+import type { RequestBatch } from "../../lib/request-batches";
+import { formatBatchProducts } from "../../lib/request-batches";
 
 export type RequestStatus = "open" | "approved" | "completed";
 
@@ -435,6 +437,212 @@ export function RequestDetailDialog({
               type="button"
               disabled={busy}
               onClick={() => onComplete(request.requestId)}
+              className="h-11 w-full gap-2 rounded-xl bg-emerald-700 font-semibold hover:bg-emerald-800 sm:w-auto"
+            >
+              <HugeiconsIcon
+                icon={CheckmarkCircle02Icon}
+                strokeWidth={2}
+                className="size-4"
+              />
+              {busy ? "Bezig..." : "Opgehaald — afhandelen"}
+            </Button>
+          ) : null}
+          {status === "completed" ? (
+            <p className="w-full text-center text-sm text-emerald-700 sm:text-right">
+              Opgehaald — geen verdere actie.
+            </p>
+          ) : null}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function RequestBatchDetailDialog({
+  batch,
+  open,
+  onOpenChange,
+  onApprove,
+  onComplete,
+  busy,
+  actionError,
+}: {
+  batch: RequestBatch | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onApprove: (batchId: number) => void;
+  onComplete: (batchId: number) => void;
+  busy: boolean;
+  actionError: string;
+}) {
+  if (!batch) return null;
+
+  const status = batch.status;
+  const short = status === "open" && batch.hasStockIssue;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-lg">
+        <DialogHeader
+          className={cn(
+            "border-b px-5 py-4",
+            batch.isUrgent && status !== "completed"
+              ? "border-red-100 bg-red-50/50 dark:border-red-900/40 dark:bg-red-950/20"
+              : "border-slate-100 dark:border-slate-700",
+          )}
+        >
+          <div className="flex flex-wrap items-center gap-2 pr-8">
+            {batch.isUrgent ? (
+              <span className="inline-flex items-center gap-1 rounded-md bg-rkz-red px-2 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase">
+                <HugeiconsIcon
+                  icon={FlashIcon}
+                  strokeWidth={2}
+                  className="size-3"
+                />
+                Spoed
+              </span>
+            ) : (
+              <span className="rounded-md bg-sky-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-sky-900 uppercase dark:bg-sky-950 dark:text-sky-100">
+                Normaal
+              </span>
+            )}
+            <StatusBadge status={status} />
+          </div>
+          <DialogTitle className="mt-2 text-lg font-bold text-rkz-navy dark:text-white">
+            Aanvraag #{batch.requestBatchId}
+          </DialogTitle>
+          <p className="text-xs text-slate-500">
+            {batch.productCount} producten · {batch.totalUnits} stuks totaal
+          </p>
+        </DialogHeader>
+
+        <div className="flex max-h-[min(70vh,32rem)] flex-col gap-4 overflow-y-auto px-5 py-4">
+          <section className="rounded-2xl border border-sky-100 bg-sky-50/60 p-4 dark:border-sky-900 dark:bg-sky-950/30">
+            <div className="mb-2 flex items-center gap-2 text-sky-900 dark:text-sky-100">
+              <HugeiconsIcon
+                icon={PackageIcon}
+                strokeWidth={2}
+                className="size-4"
+              />
+              <h3 className="text-xs font-bold tracking-wide uppercase">
+                Producten
+              </h3>
+            </div>
+            <ul className="flex flex-col gap-2">
+              {batch.items.map((item) => {
+                const itemStatus = requestStatusOf(item);
+                const itemShort =
+                  itemStatus === "open" && !(item.stockSufficient ?? true);
+                return (
+                  <li
+                    key={item.requestId}
+                    className="rounded-xl border border-white/80 bg-white/90 px-3 py-2.5 dark:border-slate-700 dark:bg-slate-900/60"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-rkz-navy dark:text-white">
+                          {item.itemName ?? "Onbekend product"}
+                        </p>
+                        <p className="text-sm text-slate-600 dark:text-slate-300">
+                          Aantal:{" "}
+                          <span className="font-bold">{item.requestedAmount}</span>
+                          {itemStatus === "open" && item.stockAmount != null ? (
+                            <span className="text-slate-500">
+                              {" "}
+                              · voorraad {item.stockAmount}
+                            </span>
+                          ) : null}
+                        </p>
+                      </div>
+                      <StockBadge
+                        status={itemStatus}
+                        stockSufficient={item.stockSufficient ?? true}
+                        stockAmount={item.stockAmount}
+                        requestedAmount={item.requestedAmount}
+                        stockShortfall={item.stockShortfall ?? 0}
+                      />
+                    </div>
+                    {itemShort ? (
+                      <p className="mt-1 text-xs font-medium text-red-600">
+                        Niet genoeg op voorraad voor dit product
+                      </p>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          {status === "open" && short ? (
+            <Alert variant="destructive">
+              <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} />
+              <AlertTitle>Niet genoeg op voorraad</AlertTitle>
+              <AlertDescription>
+                Minstens één product heeft te weinig voorraad. Vul voorraad aan
+                vóór je de hele aanvraag goedkeurt:{" "}
+                {formatBatchProducts(batch)}.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
+          {batch.requestDescription ? (
+            <section className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-900/40">
+              <h3 className="text-xs font-bold tracking-wide text-slate-400 uppercase">
+                Toelichting / behoefte
+              </h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
+                {batch.requestDescription}
+              </p>
+            </section>
+          ) : null}
+
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <DetailRow
+              label="Aanvrager"
+              value={batch.requesterName ?? "Onbekend"}
+            />
+            <DetailRow
+              label="Aangemaakt"
+              value={formatRequestWhen(batch.createdAt)}
+            />
+            <DetailRow
+              label="Prioriteit"
+              value={
+                batch.isUrgent ? "Spoed — hoogste prioriteit" : "Normaal"
+              }
+            />
+          </section>
+
+          {actionError ? (
+            <p className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
+              {actionError}
+            </p>
+          ) : null}
+        </div>
+
+        <DialogFooter className="gap-2 border-t border-slate-100 bg-slate-50/80 px-5 py-4 dark:border-slate-700 dark:bg-slate-900/40 sm:flex-row sm:justify-end">
+          {status === "open" ? (
+            <Button
+              type="button"
+              disabled={busy || short}
+              onClick={() => onApprove(batch.requestBatchId)}
+              className="h-11 w-full gap-2 rounded-xl bg-sky-700 font-semibold hover:bg-sky-800 sm:w-auto"
+            >
+              <HugeiconsIcon
+                icon={Tick02Icon}
+                strokeWidth={2}
+                className="size-4"
+              />
+              {busy
+                ? "Bezig..."
+                : `Hele aanvraag goedkeuren (${batch.productCount})`}
+            </Button>
+          ) : null}
+          {status === "approved" ? (
+            <Button
+              type="button"
+              disabled={busy}
+              onClick={() => onComplete(batch.requestBatchId)}
               className="h-11 w-full gap-2 rounded-xl bg-emerald-700 font-semibold hover:bg-emerald-800 sm:w-auto"
             >
               <HugeiconsIcon

@@ -6,7 +6,9 @@ import {
   sendUrgentRequest,
   createRequest,
   approveRequest,
+  approveRequestBatch,
   completeRequest,
+  completeRequestBatch,
 } from "../services/requests.service.js";
 import { ERROR_CODE_MAP } from "../constants/http-status-codes.js";
 import type { CreateRequestInput } from "../schemas/request.js";
@@ -80,7 +82,7 @@ requests.get("/", async (c) => {
   }
 });
 
-requests.post("/", async (c) => {
+requests.post("/", requireRole(ROLE_NAMES.VERPLEGING), async (c) => {
   try {
     const urgent = c.req.query("urgent");
     const body = await c.req.json<CreateRequestInput>();
@@ -106,6 +108,76 @@ requests.post("/", async (c) => {
     );
   }
 });
+
+requests.patch(
+  "/batch/:batchId",
+  requireRole(ROLE_NAMES.ADMIN, ROLE_NAMES.APOTHEKER),
+  async (c) => {
+    const batchId = Number(c.req.param("batchId"));
+    if (!Number.isInteger(batchId) || batchId < 1) {
+      return c.json(
+        { message: "Invalid batch id", error: "VALIDATION_ERROR" },
+        ERROR_CODE_MAP.BAD_REQUEST,
+      );
+    }
+
+    let body: { action?: string };
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json(
+        { message: "Ongeldige body", error: "VALIDATION_ERROR" },
+        ERROR_CODE_MAP.BAD_REQUEST,
+      );
+    }
+
+    const action =
+      body.action === "approve"
+        ? "approve"
+        : body.action === "complete"
+          ? "complete"
+          : null;
+
+    if (!action) {
+      return c.json(
+        {
+          message: "Geef action: 'approve' of 'complete'",
+          error: "VALIDATION_ERROR",
+        },
+        ERROR_CODE_MAP.BAD_REQUEST,
+      );
+    }
+
+    try {
+      const requestsInBatch =
+        action === "approve"
+          ? await approveRequestBatch(batchId)
+          : await completeRequestBatch(batchId);
+      return c.json({ requests: requestsInBatch });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not update request batch";
+      const isClientError =
+        message.includes("voorraad") ||
+        message.includes("eerst") ||
+        message.includes("al ") ||
+        message.includes("niet gevonden") ||
+        message.includes("geen gekoppeld") ||
+        message.includes("bevat");
+
+      console.error("requests PATCH /batch/:batchId error:", error);
+      return c.json(
+        {
+          message,
+          error: isClientError ? "REQUEST_UPDATE_REJECTED" : "REQUEST_UPDATE_FAILED",
+        },
+        isClientError
+          ? ERROR_CODE_MAP.BAD_REQUEST
+          : ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+      );
+    }
+  },
+);
 
 requests.get("/:id", async (c) => {
   const id = Number(c.req.param("id"));

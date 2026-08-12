@@ -10,12 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatisticsRouteImport } from './routes/statistics'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as ProfielRouteImport } from './routes/profiel'
 import { Route as MijnAanvragenRouteImport } from './routes/mijn-aanvragen'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ChangePasswordRouteImport } from './routes/change-password'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AanvragenRouteImport } from './routes/aanvragen'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +25,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const StatisticsRoute = StatisticsRouteImport.update({
   id: '/statistics',
   path: '/statistics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RequestRoute = RequestRouteImport.update({
@@ -55,6 +62,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChangePasswordRoute = ChangePasswordRouteImport.update({
+  id: '/change-password',
+  path: '/change-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -75,24 +87,28 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aanvragen': typeof AanvragenRoute
   '/admin': typeof AdminRoute
+  '/change-password': typeof ChangePasswordRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
   '/mijn-aanvragen': typeof MijnAanvragenRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
+  '/settings': typeof SettingsRoute
   '/statistics': typeof StatisticsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aanvragen': typeof AanvragenRoute
   '/admin': typeof AdminRoute
+  '/change-password': typeof ChangePasswordRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
   '/mijn-aanvragen': typeof MijnAanvragenRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
+  '/settings': typeof SettingsRoute
   '/statistics': typeof StatisticsRoute
 }
 export interface FileRoutesById {
@@ -100,12 +116,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/aanvragen': typeof AanvragenRoute
   '/admin': typeof AdminRoute
+  '/change-password': typeof ChangePasswordRoute
   '/dashboard': typeof DashboardRoute
   '/history': typeof HistoryRoute
   '/inventory': typeof InventoryRoute
   '/mijn-aanvragen': typeof MijnAanvragenRoute
   '/profiel': typeof ProfielRoute
   '/request': typeof RequestRoute
+  '/settings': typeof SettingsRoute
   '/statistics': typeof StatisticsRoute
 }
 export interface FileRouteTypes {
@@ -114,36 +132,42 @@ export interface FileRouteTypes {
     | '/'
     | '/aanvragen'
     | '/admin'
+    | '/change-password'
     | '/dashboard'
     | '/history'
     | '/inventory'
     | '/mijn-aanvragen'
     | '/profiel'
     | '/request'
+    | '/settings'
     | '/statistics'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/aanvragen'
     | '/admin'
+    | '/change-password'
     | '/dashboard'
     | '/history'
     | '/inventory'
     | '/mijn-aanvragen'
     | '/profiel'
     | '/request'
+    | '/settings'
     | '/statistics'
   id:
     | '__root__'
     | '/'
     | '/aanvragen'
     | '/admin'
+    | '/change-password'
     | '/dashboard'
     | '/history'
     | '/inventory'
     | '/mijn-aanvragen'
     | '/profiel'
     | '/request'
+    | '/settings'
     | '/statistics'
   fileRoutesById: FileRoutesById
 }
@@ -151,12 +175,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AanvragenRoute: typeof AanvragenRoute
   AdminRoute: typeof AdminRoute
+  ChangePasswordRoute: typeof ChangePasswordRoute
   DashboardRoute: typeof DashboardRoute
   HistoryRoute: typeof HistoryRoute
   InventoryRoute: typeof InventoryRoute
   MijnAanvragenRoute: typeof MijnAanvragenRoute
   ProfielRoute: typeof ProfielRoute
   RequestRoute: typeof RequestRoute
+  SettingsRoute: typeof SettingsRoute
   StatisticsRoute: typeof StatisticsRoute
 }
 
@@ -167,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/statistics'
       fullPath: '/statistics'
       preLoaderRoute: typeof StatisticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/request': {
@@ -211,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/change-password': {
+      id: '/change-password'
+      path: '/change-password'
+      fullPath: '/change-password'
+      preLoaderRoute: typeof ChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -239,12 +279,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AanvragenRoute: AanvragenRoute,
   AdminRoute: AdminRoute,
+  ChangePasswordRoute: ChangePasswordRoute,
   DashboardRoute: DashboardRoute,
   HistoryRoute: HistoryRoute,
   InventoryRoute: InventoryRoute,
   MijnAanvragenRoute: MijnAanvragenRoute,
   ProfielRoute: ProfielRoute,
   RequestRoute: RequestRoute,
+  SettingsRoute: SettingsRoute,
   StatisticsRoute: StatisticsRoute,
 }
 export const routeTree = rootRouteImport

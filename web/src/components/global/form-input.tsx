@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -31,6 +33,10 @@ export function FormInput({
   icon,
   required = false,
 }: FormInputProps) {
+  const isPassword = type === "password";
+  const [showPassword, setShowPassword] = useState(false);
+  const inputType = isPassword && showPassword ? "text" : type;
+
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={name} className="text-sm font-medium text-sky-950">
@@ -50,7 +56,7 @@ export function FormInput({
         <Input
           id={name}
           name={name}
-          type={type}
+          type={inputType}
           value={value}
           placeholder={placeholder}
           autoComplete={autoComplete}
@@ -61,11 +67,27 @@ export function FormInput({
           className={cn(
             "h-10 border-sky-200 bg-white text-sm shadow-none md:text-sm",
             icon && "pl-10",
+            isPassword && "pr-10",
             error &&
               "border-red-300 focus-visible:border-red-400 focus-visible:ring-red-200",
             className,
           )}
         />
+        {isPassword ? (
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+            className="absolute top-1/2 right-2.5 z-10 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-lg text-sky-700/70 transition-colors hover:bg-sky-50 hover:text-sky-900"
+          >
+            <HugeiconsIcon
+              icon={showPassword ? ViewOffSlashIcon : ViewIcon}
+              strokeWidth={2}
+              className="size-4"
+            />
+          </button>
+        ) : null}
       </div>
       {error ? <p className="text-sm text-red-500">{error}</p> : null}
     </div>
