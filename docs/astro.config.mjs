@@ -3,6 +3,12 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
+	vite: {
+		preview: {
+			// Railway assigns a *.up.railway.app hostname; Vite blocks unknown hosts by default.
+			allowedHosts: ['.railway.app', 'localhost'],
+		},
+	},
 	integrations: [
 		starlight({
 			title: 'MedSupply Documentation',
