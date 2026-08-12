@@ -1,18 +1,24 @@
 import { createAuthClient } from "better-auth/react";
 
-// API base URL from Vite env (fallback for local dev)
-const baseURL =
-  import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
-  import.meta.env.VITE_SERVER_URL?.replace(/\/$/, "") ||
-  "http://localhost:5000";
+/**
+ * Better Auth expects the server origin (no path). It appends `/api/auth` itself.
+ * `VITE_API_URL` often ends with `/api` for apiClient — strip that here.
+ */
+function getAuthBaseURL(): string {
+  const raw =
+    import.meta.env.VITE_AUTH_URL?.replace(/\/$/, "") ||
+    import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
+    import.meta.env.VITE_SERVER_URL?.replace(/\/$/, "") ||
+    "http://localhost:5000";
+
+  return raw.replace(/\/api$/, "");
+}
 
 export const authClient = createAuthClient({
-  baseURL,
-  // Send cookies so the session works (frontend :5173 → API :5000)
+  baseURL: getAuthBaseURL(),
   fetchOptions: {
     credentials: "include",
   },
 });
 
-// Helpers used on login / logout pages
 export const { signIn, signUp, signOut, useSession } = authClient;

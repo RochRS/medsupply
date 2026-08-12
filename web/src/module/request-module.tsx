@@ -65,7 +65,7 @@ function Stepper({ step }: { step: 1 | 2 }) {
               >
                 {s.label}
               </span>
-            </div>
+          </div>
             {index < STEPS.length - 1 ? (
               <div
                 className={cn(
@@ -75,8 +75,8 @@ function Stepper({ step }: { step: 1 | 2 }) {
                 aria-hidden
               />
             ) : null}
-          </div>
-        );
+    </div>
+  );
       })}
     </nav>
   );
@@ -153,9 +153,9 @@ export function RequestForm() {
       clear();
       setSuccess(true);
       setStep(1);
-      setAfdeling("");
+    setAfdeling("");
       setOpmerking("");
-      setUrgentie("normaal");
+    setUrgentie("normaal");
     } catch (err) {
       setError(
         err instanceof Error && err.message
@@ -168,7 +168,7 @@ export function RequestForm() {
   };
 
   if (success) {
-    return (
+  return (
       <div className="mx-auto w-full max-w-xl rounded-2xl border border-emerald-100 bg-white p-8 shadow-sm dark:border-emerald-900 dark:bg-slate-800">
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="flex size-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40">
@@ -197,7 +197,7 @@ export function RequestForm() {
               Nog een aanvraag
             </Button>
             <Button
-              type="button"
+        type="button"
               variant="outline"
               className="h-11 flex-1 rounded-xl"
               onClick={() => void navigate({ to: "/mijn-aanvragen" })}
@@ -206,9 +206,9 @@ export function RequestForm() {
             </Button>
           </div>
         </div>
-      </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (items.length === 0) {
     return (
@@ -478,7 +478,7 @@ export function RequestForm() {
                   className="size-4 shrink-0"
                 />
               ) : null}
-            </Button>
+      </Button>
           </div>
         </section>
       )}

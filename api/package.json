@@ -20,6 +20,8 @@
     "db:seed:users": "tsx src/database/seed/seed-users.ts",
     "db:seed:auth-user": "tsx src/database/seed/seed-auth-user.ts",
     "db:seed:auth-user:deploy": "drizzle-kit push && tsx src/database/seed/seed-auth-user.ts",
+    "db:reset-admin": "tsx src/database/seed/reset-admin.ts",
+    "db:reset-admin:deploy": "drizzle-kit push && tsx src/database/seed/reset-admin.ts",
     "db:seed:roles": "tsx src/database/seed/seed-roles.ts",
     "db:seed:request-descriptions": "tsx src/database/seed/seed-request-descriptions.ts",
     "db:seed:shipments": "tsx src/database/seed/seed-shipments.ts",

@@ -22,6 +22,12 @@ const DEMO_PASSWORD = "Test1234!";
 
 const DEMO_ACCOUNTS = [
   {
+    id: "admin",
+    label: "Admin",
+    email: "admin@medsupply.com",
+    password: DEMO_PASSWORD,
+  },
+  {
     id: "apotheker",
     label: "Apotheker",
     email: "apotheker@medsupply.com",
@@ -38,7 +44,7 @@ const DEMO_ACCOUNTS = [
 type DemoId = (typeof DEMO_ACCOUNTS)[number]["id"];
 
 function Index() {
-  const defaultDemo = DEMO_ACCOUNTS[0];
+  const defaultDemo = DEMO_ACCOUNTS[0]; // Admin
   const [activeDemo, setActiveDemo] = useState<DemoId>(defaultDemo.id);
   const [email, setEmail] = useState<string>(defaultDemo.email);
   const [password, setPassword] = useState<string>(defaultDemo.password);
@@ -83,7 +89,7 @@ function Index() {
               <p className="text-xs font-medium text-slate-500">
                 Demo-accounts (auto ingevuld)
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {DEMO_ACCOUNTS.map((account) => (
                   <button
                     key={account.id}
