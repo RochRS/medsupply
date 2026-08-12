@@ -35,12 +35,12 @@ export async function seed() {
   const roleMap = new Map(roles.map((r) => [r.roleName, r.roleId]));
   const created: string[] = [];
 
-  for (const account of TEST_USERS) {
-    const roleId = roleMap.get(account.roleName) ?? null;
+  for (const testUser of TEST_USERS) {
+    const roleId = roleMap.get(testUser.roleName) ?? null;
     const existing = await db
       .select({ id: user.id })
       .from(user)
-      .where(eq(user.email, account.email))
+      .where(eq(user.email, testUser.email))
       .limit(1);
 
     let userId = existing[0]?.id;
@@ -48,23 +48,23 @@ export async function seed() {
     if (!userId) {
       await auth.api.signUpEmail({
         body: {
-          name: account.name,
-          email: account.email,
-          password: account.password,
+          name: testUser.name,
+          email: testUser.email,
+          password: testUser.password,
         },
       });
       const createdUser = await db
         .select({ id: user.id })
         .from(user)
-        .where(eq(user.email, account.email))
+        .where(eq(user.email, testUser.email))
         .limit(1);
       userId = createdUser[0]?.id;
-      if (userId) created.push(account.email);
+      if (userId) created.push(testUser.email);
     }
 
     if (userId) {
       // Always reset demo credentials so live re-seed restores Test1234! login.
-      const hashed = await hashPassword(account.password);
+      const hashed = await hashPassword(testUser.password);
       await db
         .update(account)
         .set({ password: hashed })
@@ -72,7 +72,7 @@ export async function seed() {
 
       await db
         .update(user)
-        .set({ roleId, name: account.name, mustChangePassword: false })
+        .set({ roleId, name: testUser.name, mustChangePassword: false })
         .where(eq(user.id, userId));
     }
   }
