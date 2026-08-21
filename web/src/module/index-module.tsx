@@ -12,8 +12,10 @@ import logo from "../assets/rkz-logo.png";
 import { signIn } from "../lib/auth-client";
 import { apiClient } from "../config/api";
 import { loginSchema } from "../schemas/login";
+import { useAppSettings } from "../lib/app-settings";
 
 export function BrandHeader() {
+  const { appName } = useAppSettings();
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <img
@@ -23,7 +25,7 @@ export function BrandHeader() {
       />
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">
-          MedSupply
+          {appName}
         </h1>
         <p className="mt-1.5 text-sm text-slate-500">
           Voorraadbeheer voor medische supplies

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { routeTree } from "./routeTree.gen";
 import { CartProvider } from "./lib/cart";
+import { AppSettingsProvider } from "./lib/app-settings";
 import "./main.css";
 
 const router = createRouter({ routeTree });
@@ -22,9 +23,11 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <CartProvider>
-          <RouterProvider router={router} />
-        </CartProvider>
+        <AppSettingsProvider>
+          <CartProvider>
+            <RouterProvider router={router} />
+          </CartProvider>
+        </AppSettingsProvider>
       </QueryClientProvider>
     </StrictMode>,
   );

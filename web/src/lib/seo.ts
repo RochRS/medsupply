@@ -85,9 +85,12 @@ export function getPageSeo(pathname: string): PageSeo {
   );
 }
 
-export function formatDocumentTitle(pageTitle: string): string {
-  if (!pageTitle || pageTitle === SITE_NAME) return SITE_NAME;
-  return `${pageTitle} | ${SITE_NAME}`;
+export function formatDocumentTitle(
+  pageTitle: string,
+  siteName: string = SITE_NAME,
+): string {
+  if (!pageTitle || pageTitle === siteName) return siteName;
+  return `${pageTitle} | ${siteName}`;
 }
 
 function upsertMeta(
@@ -117,9 +120,13 @@ function upsertLink(rel: string, href: string): void {
 }
 
 /** Apply document title + meta tags for the current SPA route. */
-export function applyDocumentSeo(pathname: string, origin?: string): void {
+export function applyDocumentSeo(
+  pathname: string,
+  siteName: string = SITE_NAME,
+  origin?: string,
+): void {
   const page = getPageSeo(pathname);
-  const title = formatDocumentTitle(page.title);
+  const title = formatDocumentTitle(page.title, siteName);
   const description = page.description;
   const siteOrigin =
     origin?.replace(/\/$/, "") ??
@@ -143,7 +150,7 @@ export function applyDocumentSeo(pathname: string, origin?: string): void {
   );
 
   upsertMeta("property", "og:type", "website");
-  upsertMeta("property", "og:site_name", SITE_NAME);
+  upsertMeta("property", "og:site_name", siteName);
   upsertMeta("property", "og:title", title);
   upsertMeta("property", "og:description", description);
   upsertMeta("property", "og:image", imageUrl);

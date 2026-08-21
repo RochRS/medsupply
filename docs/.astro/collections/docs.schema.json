@@ -235,6 +235,7 @@
                       "github",
                       "gitlab",
                       "bitbucket",
+                      "forgejo",
                       "codePen",
                       "farcaster",
                       "discord",

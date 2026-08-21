@@ -29,22 +29,14 @@ gebruikershandleiding.
 
 ### 1.3 Gebruikte technologieën
 
-  ---------------- ------------------------------------------------------
-  **Onderdeel**    **Technologie**
-
-  Frontend         HTML, CSS, JavaScript, Bootstrap 5
-
-  Backend          Node.js met Express
-
-  Database         MySQL beheerd via Prisma ORM
-
-  Authenticatie    JSON Web Tokens (JWT) met bcrypt
-
-  Realtime updates Server-Sent Events (SSE)
-
-  Beveiliging      DOMPurify voor invoer- en uitvoerbeveiliging en
-                   rolgebaseerde toegangscontrole
-  ---------------- ------------------------------------------------------
+| Onderdeel | Technologie |
+|-----------|-------------|
+| Frontend | React 19 + TypeScript (Single Page Application), gebouwd met Vite, TanStack Router/Query en Tailwind CSS |
+| Backend | Node.js met Hono |
+| Database | PostgreSQL, beheerd via Drizzle ORM |
+| Authenticatie | Better Auth (sessie-cookies, met ingebouwde wachtwoordversleuteling) |
+| Updates | Periodiek ophalen (polling) van bijvoorbeeld meldingen, geen permanente serververbinding |
+| Beveiliging | Rolgebaseerde toegangscontrole (admin, apotheker, verpleging), afgedwongen in de API |
 
 ### 1.4 Leeswijzer
 

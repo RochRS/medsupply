@@ -12,141 +12,94 @@ veilig?).
 ### 6.1 Authenticatie
 
 Authenticatie is het proces waarbij het systeem controleert of een
-gebruiker is wie die zegt te zijn. De MSMS gebruikt hiervoor JSON Web
-Tokens (JWT) en bcrypt.
+gebruiker is wie die zegt te zijn. De MSMS gebruikt hiervoor
+**Better Auth**, een authenticatiebibliotheek die inloggen, sessies en
+wachtwoordopslag regelt — er wordt dus geen los JWT- of
+bcrypt-mechanisme met eigen code onderhouden.
 
 #### 6.1.1 Inlogproces
 
-Wanneer een gebruiker inlogt, doorloopt het systeem de volgende stappen:
+- De gebruiker vult een e-mailadres en wachtwoord in op het inlogscherm.
+- De frontend stuurt dit rechtstreeks naar Better Auth, via
+  `POST /api/auth/sign-in/email` (geen eigen login-controller).
+- Better Auth vergelijkt het wachtwoord met de opgeslagen hash in de
+  `account`-tabel en maakt bij succes een sessie aan in de
+  `session`-tabel.
+- De sessie wordt bijgehouden via een cookie in de browser (niet via een
+  zelfgemaakt JWT-token). De sessie is 7 dagen geldig
+  (`expiresIn`) en wordt automatisch verlengd als de gebruiker actief
+  blijft (`updateAge`: eenmaal per dag).
+- Om niet bij elk verzoek de database te bevragen, wordt de sessiecheck
+  5 minuten gecached (`cookieCache`).
 
--   De gebruiker vult een e-mailadres, wachtwoord en rol in op het
-    inlogscherm
+Wanneer een admin een account aanmaakt of een wachtwoord reset, krijgt
+de gebruiker een tijdelijk wachtwoord (`mustChangePassword = true`). Bij
+de eerstvolgende login wordt die gebruiker verplicht doorgestuurd naar
+`/change-password` voordat de rest van de applicatie toegankelijk is.
 
-```{=html}
-<!-- -->
-```
--   De server ontvangt deze gegevens via de loginController
+#### 6.1.2 Sessieverificatie per verzoek
 
-```{=html}
-<!-- -->
-```
--   Het wachtwoord wordt vergeleken met het versleutelde wachtwoord in
-    de database via bcrypt.compare()
+Bij elk API-verzoek doorloopt de backend twee middleware-lagen
+(`api/src/middleware/auth.ts`):
 
-```{=html}
-<!-- -->
-```
--   Er wordt gecontroleerd of het account actief is (isActive)
+- **`loadSession`** — controleert bij Better Auth of de meegestuurde
+  cookie bij een geldige sessie hoort, en zet de bijbehorende gebruiker
+  en rol op de request (of `null` als er geen sessie is).
+- **`requireAuth`** — wijst het verzoek af met **401 Unauthorized** als
+  er geen geldige sessie is.
+- **`requireRole(...rollen)`** — wijst het verzoek af met
+  **403 Forbidden** als de rol van de ingelogde gebruiker niet in de
+  toegestane lijst voorkomt.
 
-```{=html}
-<!-- -->
-```
--   Bij succes wordt een JWT-token aangemaakt met daarin: userId,
-    userRoleName, userDepartmentName en een uniek jti (token-ID)
-
-```{=html}
-<!-- -->
-```
--   Het token verloopt na 1 uur en wordt opgeslagen als cookie in de
-    browser
-
-#### 6.1.2 Tokenverificatie
-
-Bij elk beveiligd verzoek controleert de authenticateToken-middleware
-het volgende:
-
--   Is er een token aanwezig in de cookies?
-
-```{=html}
-<!-- -->
-```
--   Is het token geldig en niet verlopen?
-
-```{=html}
-<!-- -->
-```
--   Komt de informatie in het token overeen met de database (rol,
-    afdeling, actief)?
-
-Als een van deze controles faalt, wordt de cookie verwijderd en wordt de
-gebruiker teruggestuurd naar het inlogscherm.
+Wachtwoorden worden gehasht opgeslagen (nooit in platte tekst) en moeten
+tussen de 8 en 128 tekens lang zijn — dit wordt zowel door Better Auth
+als door de Zod-schema's van de applicatie afgedwongen.
 
 ### 6.2 Autorisatie (rolgebaseerde toegangscontrole)
 
-Autorisatie bepaalt wat een ingelogde gebruiker mag doen. De MSMS
-gebruikt drie toegangsniveaus:
+De MSMS kent drie gelijkwaardige rollen (geen numerieke hiërarchie):
+**admin**, **apotheker** en **verpleging**. Wat een rol mag, wordt per
+API-route bepaald met `requireRole(...)`.
 
-  -----------------------------------------------------------------------
-  **Niveau**              **Rol**                 **Waarde**
-  ----------------------- ----------------------- -----------------------
-  1                       Employee                Laagste toegang
+#### 6.2.1 Toegangsrechten per API-route
 
-  2                       Manager                 Middenniveau
+| Route | Toegang |
+|-------|---------|
+| `GET /api/sessions/me` | Elke ingelogde gebruiker |
+| `GET /api/settings` | Iedereen, ook niet-ingelogd (nodig voor het inlogscherm) |
+| `PATCH /api/settings` | Alleen **admin** |
+| `GET /api/items`, `GET /api/items/:id` | Elke ingelogde gebruiker |
+| `POST /PATCH /DELETE /api/items` | **admin** en **apotheker** |
+| `GET /api/requests` | Elke ingelogde gebruiker — **verpleging** ziet in de applicatiecode altijd alleen de eigen aanvragen |
+| `POST /api/requests` (aanvraag indienen) | Alleen **verpleging** |
+| Aanvraag goedkeuren/afhandelen | **admin** en **apotheker** |
+| `GET /api/notifications` | Alleen **verpleging** |
+| `GET/POST/PATCH/DELETE /api/users` | Alleen **admin** |
+| `GET /api/statistics`, `GET /api/history` | Elke ingelogde gebruiker (geen extra rolcontrole — zie hoofdstuk 7) |
 
-  3                       Admin                   Hoogste toegang
-  -----------------------------------------------------------------------
+De frontend verbergt daarnaast menu-items op basis van de rol (bijv.
+Statistieken en Geschiedenis zijn niet zichtbaar voor verpleging), maar
+dat is alleen UI-gemak. De echte afdwinging gebeurt op de API via de
+tabel hierboven.
 
-De getUserAuthorizationLevel-middleware controleert bij elk verzoek of
-het toegangsniveau van de gebruiker hoog genoeg is voor de gevraagde
-pagina of API-route.
+### 6.3 Inputvalidatie en databeveiliging
 
-#### 6.2.1 Toegangsrechten per pagina en API-route
-
-  -----------------------------------------------------------------------
-  **Pagina/Route**                    **Minimaal niveau**
-  ----------------------------------- -----------------------------------
-  /dashboard, /aanvraag,              Employee (1)
-  /totale-voorraad, /profile,         
-  /settings                           
-
-  /statistieken                       Manager (2)
-
-  /geschiedenis                       Admin (3)
-
-  /login, /                           Geen (openbaar)
-  -----------------------------------------------------------------------
-
-Als een gebruiker met een te laag niveau een pagina probeert te openen,
-wordt die teruggestuurd naar het dashboard met een foutmelding.
-
-### 6.3 Databeveiliging (XSS-preventie)
-
-Cross-Site Scripting (XSS) is een aanval waarbij schadelijke code wordt
-ingevoegd via invoervelden. De MSMS beschermt hiertegen op twee plekken,
-beide via de package isomorphic-dompurify (DOMPurify):
-
-1.  Invoerbeveiliging: alle inkomende data (req.body, req.query,
-    req.params) wordt automatisch opgeschoond voordat het de controllers
-    bereikt. Schadelijke HTML- of scripttags worden verwijderd.
-
-2.  Uitvoerbeveiliging: alle uitgaande data wordt opgeschoond voordat
-    het naar de browser wordt gestuurd. Dit geldt voor reguliere
-    JSON-responses en SSE-streams. Beide sanitizers worden globaal
-    toegepast in routingHub.js, waardoor ze automatisch actief zijn op
-    alle routes.
+- Alle inkomende request-bodies worden gecontroleerd met **Zod**-schema's
+  (`api/src/schemas/`) op type, verplichte velden en formaat (bijv.
+  e‑mailformaat, minimale wachtwoordlengte).
+- Er bestaat een aparte sanitize-functie
+  (`api/src/lib/sanitize.ts`) die controletekens en ruwe HTML-tags uit
+  tekstvelden verwijdert, om invoer op te schonen vóór validatie. Deze is
+  gekoppeld aan een `validate`-middleware, maar die wordt op dit moment
+  alleen gebruikt door een niet-actieve demo-route (zie hoofdstuk 7).
+- Drizzle ORM gebruikt geparametriseerde queries, waardoor SQL-injectie
+  via de normale databaselaag niet mogelijk is.
 
 ### 6.4 Overige beveiligingsmaatregelen
 
-  -----------------------------------------------------------------------
-  **Maatregel**           **Status**              **Toelichting**
-  ----------------------- ----------------------- -----------------------
-  CORS                    Ingeschakeld            Staat momenteel alle
-                                                  bronnen toe, zonder
-                                                  specifieke configuratie
-
-  Cookie-instellingen     Gedeeltelijk            httpOnly, sameSite en
-                                                  secure zijn aanwezig in
-                                                  de code maar staan
-                                                  uitgeschakeld
-
-  Rate limiting           Niet geïmplementeerd    Staat als opmerking in
-                                                  de code maar is niet
-                                                  ingebouwd
-
-  Wachtwoord-hashing      Niet in de codebase     bcrypt.compare() wordt
-  (aanmaken)                                      gebruikt voor login,
-                                                  maar bcrypt.hash() voor
-                                                  het aanmaken van nieuwe
-                                                  wachtwoorden is niet
-                                                  aanwezig
-  -----------------------------------------------------------------------
+| Maatregel | Status | Toelichting |
+|-----------|--------|-------------|
+| CORS | Ingeschakeld, beperkt | Alleen de origin uit `FRONTEND_URL` mag cross-origin verzoeken doen (`api/src/index.ts`); niet volledig open. |
+| Cookie-instellingen | Actief | `httpOnly` staat altijd aan. `secure` en `sameSite=none` worden automatisch ingeschakeld zodra frontend en backend op verschillende domeinen draaien (bijv. bij een Railway-deploy); anders `sameSite=lax`. |
+| Rate limiting | Niet geïmplementeerd | Er is geen middleware die het aantal inlog- of API-pogingen per gebruiker/IP beperkt. |
+| Wachtwoordvereisten | Actief | Minimaal 8, maximaal 128 tekens, afgedwongen door zowel Better Auth als de Zod-schema's. |

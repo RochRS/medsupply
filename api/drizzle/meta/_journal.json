@@ -50,6 +50,13 @@
       "when": 1786400108442,
       "tag": "0006_perfect_peter_quill",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787268507073,
+      "tag": "0007_add_app_settings",
+      "breakpoints": true
     }
   ]
 }

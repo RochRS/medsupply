@@ -63,8 +63,18 @@ git clone <repository-url>
 cd medsupply
 
 # API
-cd api && pnpm install && cp .env.example .env
+cd api && pnpm install
+
+# If prompted with ERR_PNPM_IGNORED_BUILDS, approve build scripts:
+pnpm approve-builds
+cp .env.example .env
+
 # Edit .env (DATABASE_URL, BETTER_AUTH_SECRET, URLs)
+# Generate a real BETTER_AUTH_SECRET instead of the placeholder:
+npx @better-auth/cli secret
+
+# Create the database if it doesn't exist yet:
+createdb medsupply
 pnpm db:push && pnpm db:seed && pnpm db:seed:auth-user
 
 # Web SPA
@@ -73,6 +83,9 @@ cd ../web && pnpm install && cp .env.example .env
 
 # Docs (optional)
 cd ../docs && pnpm install
+
+# If prompted with ERR_PNPM_IGNORED_BUILDS, approve build scripts:
+pnpm approve-builds
 ```
 
 See component READMEs for full instructions and environment variables.

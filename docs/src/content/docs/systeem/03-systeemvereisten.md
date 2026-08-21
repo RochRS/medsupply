@@ -14,119 +14,65 @@ verwacht.
 De volgende software moet geïnstalleerd zijn op de server of development
 environment:
 
-  ------------------------------------------------------------------------
-  **Software**      **Minimale Versie**     **Toelichting**
-  ----------------- ----------------------- ------------------------------
-  Node.js           18.0 of hoger           De applicatie draait op
-                                            Node.js. Express 5 en bcrypt 6
-                                            vereisen minimaal versie 18.
-
-  npm               Meegeleverd met node.js Wordt gebruikt om alle
-                                            dependencies te installeren.
-
-  MySQL             MySQL 8.0               De database waarin alle
-                                            gegevens worden opgeslagen. De
-                                            applicatie maakt verbinding
-                                            via de MariaDB-adapter.
-
-  Webbrowser        Moderne versie          Moderne versie Google Chrome,
-                                            Firefox, Edge of Safari. De
-                                            frontend maakt gebruikt van
-                                            JavaScript (ES6+).
-  ------------------------------------------------------------------------
+| Software | Minimale versie | Toelichting |
+|----------|-----------------|-------------|
+| Node.js | 20.0 of hoger | De applicatie (backend en frontend) draait op Node.js met TypeScript. |
+| pnpm | Nieuwste versie | Het project gebruikt pnpm (niet npm) om dependencies te installeren en scripts uit te voeren, zowel in de `api`- als de `web`-map. |
+| PostgreSQL | 14.0 of hoger | De database waarin alle gegevens worden opgeslagen. De applicatie maakt verbinding via de `pg`-driver, aangestuurd door Drizzle ORM. |
+| Webbrowser | Moderne versie | Moderne versie van Google Chrome, Firefox, Edge of Safari. De frontend is een React-SPA en maakt gebruik van moderne JavaScript (ES2020+). |
 
 ### 3.2 Environment variables
 
-De applicatie leest gevoelige instellingen uit een .env-bestand in de
-backend-map. Dit bestand moet handmatig worden aangemaakt en bevat de
-volgende variabelen:
+De backend leest gevoelige instellingen uit een `.env`-bestand in de
+`api`-map. Dit bestand moet handmatig worden aangemaakt (op basis van
+`.env.example`) en bevat de volgende variabelen:
 
-  -----------------------------------------------------------------------
-  **Variables**        **Beschrijving**
-  -------------------- --------------------------------------------------
-  DATABASE_HOST        Het adres van de databaseserver
+| Variabele | Beschrijving |
+|-----------|--------------|
+| `SERVER_PORT` | De poort waarop de Node.js-server lokaal luistert (standaard 5000). |
+| `DATABASE_URL` | De volledige PostgreSQL-connectiestring (host, gebruiker, wachtwoord, databasenaam, poort). |
+| `DATABASE_TYPE` | Geeft aan dat het databasetype `postgresql` is. |
+| `BETTER_AUTH_SECRET` | Een unieke geheime sleutel waarmee Better Auth sessies ondertekent. |
+| `BETTER_AUTH_URL` | De publieke URL van deze API (zonder `/api`-suffix), gebruikt door Better Auth. |
+| `FRONTEND_URL` | De URL van de web-SPA; nodig voor CORS en als vertrouwde origin voor Better Auth. |
 
-  DATABASE_USER        De gebruikersnaam voor de database
-
-  DATABASE_PASSWORD    Het wachtwoord voor de database
-
-  DATABASE_NAME        De naam van de database
-
-  DATABASE_PORT        De poort van de database (standaard: 3306)
-
-  JWT_SECRET           Een unieke geheime sleutel voor het versleutelen
-                       van tokens
-
-  SERVER_PORT          De poort waarop de Node.js server luistert
-  -----------------------------------------------------------------------
-
-*Let op: Het .env-bestand bevat gevoelige gegevens zoals wachtwoorden.
-Deel dit bestand nooit via GitHub of andere openbare kanalen.*
+*Let op: Het `.env`-bestand bevat gevoelige gegevens zoals wachtwoorden en
+geheime sleutels. Deel dit bestand nooit via GitHub of andere openbare
+kanalen.*
 
 ### 3.3 Packages
 
-Alle packages worden automatisch geïnstalleerd via npm install.
+Alle packages worden automatisch geïnstalleerd via `pnpm install`.
 Hieronder een overzicht van de belangrijkste en hun functie:
 
-  ----------------------------------------------------------------------------
-  **Package**                **Versie**              **Functie**
-  -------------------------- ----------------------- -------------------------
-  express                    \^5.2.1                 Webserver en API-routing
-
-  \@prisma/client            \^7.4.2                 Databasecommunicatie via
-                                                     Prisma ORM
-
-  \@prisma/adapter-mariadb   \^7.4.2                 Verbindingsadapter voor
-                                                     MariaDB/MySQL
-
-  bcrypt                     \^6.0.0                 Wachtwoordversleuteling
-
-  jsonwebtoken               \^9.0.3                 Aanmaken en controleren
-                                                     van inlogtokens (JWT)
-
-  isomorphic-dompurify       \^3.0.0                 Beveiliging van invoer en
-                                                     uitvoer tegen Cross-Site
-                                                     Scripting (XSS)
-
-  dotenv                     \^17.3.1                Laadt de environment
-                                                     variables uit het
-                                                     .env-bestand in de
-                                                     applicatie
-
-  cors                       \^2.8.6                 Afhandeling van
-                                                     Cross-Origin Resource
-                                                     Sharing (CORS)
-
-  cookie-parser              \^1.4.7                 Uitlezen van cookies uit
-                                                     inkomende HTTP-requests
-
-  nodemon                    3.1.14                  Herstart de server
-                                                     automatisch bij
-                                                     codewijzigingen (voor
-                                                     gebruik in de development
-                                                     environment)
-  ----------------------------------------------------------------------------
+| Package | Versie | Functie |
+|---------|--------|---------|
+| hono | ^4.12.27 | Webserver en API-routing |
+| @hono/node-server | ^2.0.8 | Laat Hono draaien bovenop de standaard Node.js-server |
+| drizzle-orm | 0.45.2 | Databasecommunicatie via Drizzle ORM |
+| drizzle-kit | 0.31.10 | Genereert en synchroniseert het databaseschema (migraties) met PostgreSQL |
+| pg | ^8.22.0 | PostgreSQL-driver waarmee Drizzle verbinding maakt met de database |
+| better-auth | ^1.6.23 | Authenticatie: inloggen, sessiebeheer via cookies en wachtwoordversleuteling |
+| zod | ^4.4.3 | Validatie van inkomende data (request-bodies) |
+| dotenv | ^17.4.2 | Laadt de environment variables uit het `.env`-bestand in de applicatie |
+| tsx | ^4.23.0 | Draait de TypeScript-server direct en herstart deze automatisch bij codewijzigingen (development) |
 
 ### 3.4 Database
 
-De applicatie verwacht een MySQL-database met de naam management_system.
-Deze database moet aangemaakt worden voordat de applicatie gestart kan
-worden. Het SQL-bestand DB setup.sql in de hoofdmap van het project
-bevat:
+De applicatie verwacht een PostgreSQL-database (bijvoorbeeld `medsupply`,
+in te stellen via `DATABASE_URL`). Het databaseschema (tabellen, kolommen,
+relaties) wordt niet via een los SQL-bestand aangemaakt, maar via Drizzle
+ORM:
 
--   Het aanmaken van de database
+- Het schema staat gedefinieerd in TypeScript in
+  `api/src/database/schemas/`.
+- Met `pnpm db:push` wordt dit schema rechtstreeks naar de database
+  gesynchroniseerd. Met `pnpm db:generate` (en `pnpm db:migrate`) kunnen
+  in plaats daarvan losse, versiebeheerde migratiebestanden aangemaakt en
+  toegepast worden.
+- Demo-data (rollen, voorraad, testgebruikers) wordt apart ingeladen via
+  seed-scripts, bijvoorbeeld `pnpm db:seed` en `pnpm db:seed:auth-user`.
 
-```{=html}
-<!-- -->
-```
--   Een trigger (after_request_insert) die de voorraad automatisch
-    verlaagt wanneer een aanvraag wordt ingediend
-
-```{=html}
-<!-- -->
-```
--   Een trigger (after_shipment_insert) die de voorraad automatisch
-    verhoogt wanneer een levering wordt geregistreerd
-
-De tabellen zelf worden aangemaakt via Prisma aan de hand van het schema
-dat in de applicatie is gedefinieerd.
+Het bijwerken van de voorraad — verlagen bij een aanvraag, verhogen bij
+een levering — gebeurt in de applicatiecode zelf (in de backend-services),
+binnen een databasetransactie, en niet via database-triggers.

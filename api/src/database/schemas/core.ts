@@ -76,3 +76,10 @@ export const requestDescription = pgTable("request_description", {
   requestDescriptionId: integer("request_description_id").primaryKey().generatedAlwaysAsIdentity(),
   requestDescriptionField: text("request_description_field"),
 });
+
+/** Singleton row (id=1) holding site-wide application settings. */
+export const appSettings = pgTable("app_settings", {
+  id: integer("id").primaryKey(),
+  appName: varchar("app_name", { length: 100 }).notNull().default("MedSupply"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});

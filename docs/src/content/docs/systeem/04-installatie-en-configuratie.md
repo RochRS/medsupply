@@ -12,172 +12,155 @@ installatie op een nieuwe development environment.
 
 Clone de broncode van het project via GitHub:
 
-git clone https://github.com/JelOrg/School-Fullstack.git
-
-cd School-Fullstack
+```bash
+git clone https://github.com/RochRS/medsupply.git
+cd medsupply
+```
 
 Het project heeft de volgende hoofdmappen:
 
-  -----------------------------------------------------------------------
-  **Map**                             **Inhoud**
-  ----------------------------------- -----------------------------------
-  backend/                            De Express-server, API-routes,
-                                      Prisma-configuratie
+| Map | Inhoud |
+|-----|--------|
+| `api/` | De Hono-server, API-routes, Drizzle-schema en -migraties |
+| `web/` | De React-SPA (frontend): routes, componenten en styling |
+| `docs/` | Deze documentatiesite (Astro Starlight) |
 
-  frontend/                           HTML-pagina\'s, CSS-stijlen,
-                                      JavaScript-bestanden
-  -----------------------------------------------------------------------
+### 4.2 Dependencies installeren
 
-### 4.2 Packages installeren (npm install)
+Het project gebruikt **pnpm** als package manager (niet npm). Installeer
+dit eenmalig globaal als het nog niet aanwezig is:
 
-Navigeer naar de backend-map en installeer alle packages:
-
-cd backend
-
-npm install
-
-Dit installeert alle packages die in package.json staan, waaronder
-Express, Prisma, bcrypt en de overige packages.
-
-### 4.3 Bootstrap installeren
-
-De frontend maakt gebruik van Bootstrap 5.3.8 voor de styling en layout.
-Deze package is niet opgenomen in de Git-repository en moet handmatig
-worden toegevoegd.
-
-1.  Download Bootstrap 5.3.8 via getbootstrap.com
-
-2.  Plaats de uitgepakte map in: frontend/css/bootstrap-5.3.8-dist/
-
-De HTML-bestanden verwachten Bootstrap op dit exacte pad:
-frontend/css/bootstrap-5.3.8-dist/css/bootstrap.min.css
-
-### 4.4 Environment variables instellen
-
-Maak een nieuw bestand aan met de naam .env in de backend-map:
-backend/.env
-
-Vul het bestand met de volgende variabelen:
-
-DATABASE_HOST=localhost
-
-DATABASE_USER=\<gebruikersnaam\>
-
-DATABASE_PASSWORD=\<wachtwoord\>
-
-DATABASE_NAME=management_system
-
-DATABASE_PORT=3306
-
-JWT_SECRET=\<geheime_sleutel\>
-
-SERVER_PORT=5500
-
-Vervang de waarden tussen \< \> door de daadwerkelijke gegevens van de
-omgeving.
-
-*Let op: Dit bestand staat in .gitignore en wordt niet mee gepusht naar
-de remote repository. Het moet op elke development environment handmatig
-worden aangemaakt.*
-
-### 4.5 Database opzetten
-
-De database wordt in twee stappen opgezet: eerst de database zelf met
-triggers, daarna de tabellen via Prisma.
-
-Stap 1: Database en triggers aanmaken
-
-Open een MySQL-client en voer het bestand DB setup.sql uit dat in de
-hoofdmap van het project staat. Dit script:
-
--   Maakt de database management_system aan
-
-```{=html}
-<!-- -->
+```bash
+npm install -g pnpm
 ```
--   Voegt de trigger after_request_insert toe en dit verlaagt
-    automatisch de voorraad met het aangevraagde aantal wanneer een
-    aanvraag wordt ingediend
 
-```{=html}
-<!-- -->
+Installeer daarna de dependencies voor zowel de backend als de frontend,
+elk in hun eigen map:
+
+```bash
+cd api
+pnpm install
+
+cd ../web
+pnpm install
 ```
--   Voegt de trigger after_shipment_insert toe en dit verhoogt de
-    voorraad met 1 per geregistreerde levering, bedoeld voor het scannen
-    van individuele items
 
-```{=html}
-<!-- -->
+Dit installeert alle packages uit de bijbehorende `package.json`, zoals
+Hono, Drizzle ORM en Better Auth voor de backend, en React, Vite en
+Tailwind CSS voor de frontend. Er hoeft niets handmatig gedownload of
+op een vast pad geplaatst te worden — dat gebeurt allemaal automatisch
+via `pnpm install`.
+
+### 4.3 Environment variables instellen
+
+Zowel `api/` als `web/` heeft een eigen `.env`-bestand, gebaseerd op het
+meegeleverde `.env.example`.
+
+**Backend (`api/.env`):**
+
+```bash
+cd api
+cp .env.example .env
 ```
--   Via de terminal kan dit ook met het volgende commando:
 
-mysql -u \<gebruikersnaam\> -p \< \"DB setup.sql\"
+```bash
+SERVER_PORT=5000
+DATABASE_URL=postgresql://<gebruiker>:<wachtwoord>@localhost:5432/medsupply
+DATABASE_TYPE=postgresql
+BETTER_AUTH_SECRET=<lange_willekeurige_geheime_sleutel>
+BETTER_AUTH_URL=http://localhost:5000
+FRONTEND_URL=http://localhost:5173
+```
 
-Stap 2: Tabellen aanmaken via Prisma
+**Frontend (`web/.env`):**
 
-Voer het volgende commando (Prisma migrate) uit in de terminal vanuit de
-backend-map:
+```bash
+cd ../web
+cp .env.example .env
+```
 
-npx prisma migrate deploy
+```bash
+VITE_API_URL=http://localhost:5000/api
+```
 
-Dit past alle migrations toe op de database en maakt de tabellen aan op
-basis van het schema in backend/prisma/schema.prisma. De tabellen die
-worden aangemaakt zijn: categories, department, items, request,
-shipments, suppliers, users, role en reqDescirptions.
+Vervang de waarden tussen `< >` door de daadwerkelijke gegevens van de
+omgeving. `FRONTEND_URL` (backend) en `VITE_API_URL` (frontend) moeten
+op elkaar aansluiten, anders werken cookies/CORS niet correct.
 
-### 4.6 Prisma Client genereren
+*Let op: Beide `.env`-bestanden staan in `.gitignore` en worden niet mee
+gepusht naar de remote repository. Ze moeten op elke development
+environment handmatig worden aangemaakt.*
 
-Na het uitvoeren van de migrations moet de Prisma Client worden
-gegenereerd. Deze wordt door de applicatie gebruikt om met de database
-te communiceren.
+### 4.4 Database opzetten
 
-Voer het volgende commando uit in de terminal vanuit de backend-map:
+De MSMS gebruikt **PostgreSQL**. Zorg dat er een lokale of gehoste
+Postgres-instantie draait en dat de database uit `DATABASE_URL` bestaat.
 
-npx prisma generate
+Het schema wordt niet via een los SQL-bestand aangemaakt, maar via
+Drizzle ORM, aan de hand van het schema in `api/src/database/schemas/`.
+Voer vanuit de `api/`-map uit:
 
-De gegenereerde bestanden worden opgeslagen in
-backend/generated/prisma/.
+```bash
+pnpm db:push
+```
 
-### 4.7 Applicatie starten
+Dit synchroniseert alle tabellen (o.a. `items`, `request`, `shipments`,
+`categories`, `suppliers`, `user`, `role`, `app_settings`) rechtstreeks
+naar de database. Er is geen aparte "generate client"-stap zoals bij
+Prisma — Drizzle gebruikt het TypeScript-schema direct.
 
-Start de server door het volgende commando uit te voeren in de terminal
-vanuit de backend-map:
+Laad daarna de demodata en testgebruikers in:
 
-node server.js
+```bash
+pnpm db:seed
+pnpm db:seed:auth-user
+```
 
-Als de applicatie correct is geconfigureerd, verschijnen de volgende
-meldingen in de terminal:
+Dit maakt rollen, voorbeeldvoorraad en drie inlogbare demo-accounts aan
+(admin, apotheker, verpleging — zie hoofdstuk 5 voor de inloggegevens).
 
-Server running on [http://localhost:5500](http://localhost:3000)
+Het bijwerken van de voorraad bij een aanvraag of levering gebeurt in de
+backend-code zelf (in een databasetransactie), niet via
+database-triggers.
 
-API available at [http://localhost:5500/api](http://localhost:3000/api)
+### 4.5 Applicatie starten
 
-MySQL: Connection established successfully.
+Start backend en frontend in twee aparte terminals, elk vanuit hun
+eigen map.
+
+**Backend:**
+
+```bash
+cd api
+pnpm dev
+```
+
+Bij een correcte configuratie verschijnt in de terminal:
+
+```
+Server is running on http://localhost:5000
+Auth endpoints: http://localhost:5000/api/auth/*
+Frontend origin (CORS): http://localhost:5173
+```
+
+**Frontend:**
+
+```bash
+cd web
+pnpm dev
+```
 
 De applicatie is nu bereikbaar via de browser op
-[http://localhost:5500](http://localhost:3000).
+**http://localhost:5173**.
 
-### 4.8 Overzicht van de installatiestappen
+### 4.6 Overzicht van de installatiestappen
 
-  -----------------------------------------------------------------------
-  **Stap**                **Commando / Actie**    **Locatie**
-  ----------------------- ----------------------- -----------------------
-  1                       git clone               Hoofdmap
-
-  2                       npm install             backend/
-
-  3                       Bootstrap 5.3.8         frontend/css/
-                          downloaden en plaatsen  
-
-  4                       env-bestand aanmaken en backend/
-                          invullen                
-
-  5                       DB setup.sql uitvoeren  MySQL-client
-
-  6                       npx prisma migrate      backend/
-                          deploy                  
-
-  7                       npx prisma generate     backend/
-
-  8                       node server.js          backend/
-  -----------------------------------------------------------------------
+| Stap | Commando / Actie | Locatie |
+|------|-------------------|---------|
+| 1 | `git clone ...` | Hoofdmap |
+| 2 | `pnpm install` | `api/` en `web/` |
+| 3 | `.env` aanmaken en invullen | `api/` en `web/` |
+| 4 | `pnpm db:push` | `api/` |
+| 5 | `pnpm db:seed` + `pnpm db:seed:auth-user` | `api/` |
+| 6 | `pnpm dev` | `api/` |
+| 7 | `pnpm dev` | `web/` |

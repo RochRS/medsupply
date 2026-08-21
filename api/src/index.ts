@@ -86,6 +86,10 @@ api.use("*", loadSession);
 // Public session helpers (/sessions/me, /sessions/health)
 api.route("/sessions", session);
 
+// Public: app name is readable by anyone (e.g. the login screen);
+// the route itself gates writes to admins via requireRole.
+api.route("/settings", settings);
+
 // Protected API routes (require a logged-in session)
 const mountProtected = (path: string, route: Hono<AppEnv>) => {
   const secured = new Hono<AppEnv>();
@@ -98,7 +102,6 @@ mountProtected("/requests", requests);
 mountProtected("/items", items);
 mountProtected("/statistics", statistics);
 mountProtected("/history", history);
-mountProtected("/settings", settings);
 mountProtected("/users", users);
 mountProtected("/notifications", notifications);
 

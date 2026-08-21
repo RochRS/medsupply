@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useCart } from "@/lib/cart";
 import { roleLabel, useAppUser, type AppRole } from "@/lib/roles";
+import { useAppSettings } from "@/lib/app-settings";
 import { NotificationBell } from "@/components/global/notification-bell";
 import logo from "@/assets/rkz-logo.png";
 
@@ -104,8 +105,17 @@ const accountLinks: NavItem[] = [
     to: "/settings",
     label: "Instellingen",
     icon: Settings01Icon,
+    roles: ["admin"],
   },
 ];
+
+function filterByRole(links: NavItem[], role: string | null) {
+  return links.filter((link) => {
+    if (!link.roles) return true;
+    if (!role) return true; // show until role loads; API still enforces
+    return link.roles.includes(role as AppRole);
+  });
+}
 
 function NavLink({
   to,
@@ -150,14 +160,16 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { productCount } = useCart();
   const { data: session } = useSession();
   const { user, role } = useAppUser();
+  const { appName } = useAppSettings();
 
-  const visibleMain = useMemo(() => {
-    return mainLinks.filter((link) => {
-      if (!link.roles) return true;
-      if (!role) return true; // show until role loads; API still enforces
-      return link.roles.includes(role as AppRole);
-    });
-  }, [role]);
+  const visibleMain = useMemo(
+    () => filterByRole(mainLinks, role),
+    [role],
+  );
+  const visibleAccount = useMemo(
+    () => filterByRole(accountLinks, role),
+    [role],
+  );
 
   const homeTo = role === "verpleging" ? "/inventory" : "/dashboard";
 
@@ -182,7 +194,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           />
           <div className="min-w-0">
             <p className="truncate text-base font-bold tracking-tight text-sky-950">
-              MedSupply
+              {appName}
             </p>
             <p className="truncate text-xs text-slate-500">
               {role === "verpleging" ? "Supplies aanvragen" : "Apotheek voorraad"}
@@ -210,7 +222,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         <p className="mt-5 mb-1 px-3 text-[11px] font-semibold tracking-wide text-slate-400 uppercase">
           Account
         </p>
-        {accountLinks.map((link) => (
+        {visibleAccount.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
@@ -259,6 +271,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { productCount } = useCart();
   const { role } = useAppUser();
+  const { appName } = useAppSettings();
   const canRequest = role === "verpleging";
   const homeTo = role === "verpleging" ? "/inventory" : "/dashboard";
 
@@ -300,7 +313,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Button>
           <Link to={homeTo} className="flex items-center gap-2">
             <img src={logo} alt="" className="h-8 w-auto object-contain" />
-            <span className="font-bold tracking-tight text-sky-950">MedSupply</span>
+            <span className="font-bold tracking-tight text-sky-950">{appName}</span>
           </Link>
           {canRequest ? (
             <div className="ml-auto flex items-center gap-1">

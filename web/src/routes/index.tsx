@@ -13,6 +13,7 @@ import {
   SubmitLoginRequestButton,
 } from "../module/index-module.tsx";
 import { cn } from "@/lib/utils";
+import { useAppSettings } from "@/lib/app-settings";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -44,6 +45,7 @@ const DEMO_ACCOUNTS = [
 type DemoId = (typeof DEMO_ACCOUNTS)[number]["id"];
 
 function Index() {
+  const { appName } = useAppSettings();
   const defaultDemo = DEMO_ACCOUNTS[0]; // Admin
   const [activeDemo, setActiveDemo] = useState<DemoId>(defaultDemo.id);
   const [email, setEmail] = useState<string>(defaultDemo.email);
@@ -137,7 +139,7 @@ function Index() {
         </Card>
 
         <p className="pt-2 text-center text-sm text-slate-400">
-          © {new Date().getFullYear()} MedSupply
+          © {new Date().getFullYear()} {appName}
         </p>
       </div>
     </div>

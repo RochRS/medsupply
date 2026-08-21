@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { applyDocumentSeo } from "./seo";
+import { applyDocumentSeo, SITE_NAME } from "./seo";
 
 /** Keeps document title and meta tags in sync with the current route. */
-export function useDocumentSeo(pathname: string) {
+export function useDocumentSeo(pathname: string, siteName: string = SITE_NAME) {
   useEffect(() => {
-    applyDocumentSeo(pathname);
-  }, [pathname]);
+    applyDocumentSeo(pathname, siteName);
+  }, [pathname, siteName]);
 }
