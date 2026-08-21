@@ -14,6 +14,7 @@ import {
 } from "../module/index-module.tsx";
 import { cn } from "@/lib/utils";
 import { useAppSettings } from "@/lib/app-settings";
+import { ThemeToggle } from "@/components/global/theme-toggle";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -67,28 +68,29 @@ function Index() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-linear-to-b from-sky-50 via-sky-100 to-sky-200/80 px-4 py-10">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-linear-to-b from-sky-50 via-sky-100 to-sky-200/80 px-4 py-10 dark:from-slate-950 dark:via-slate-900 dark:to-sky-950">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.75)_0%,rgba(125,211,252,0.25)_55%,rgba(56,189,248,0.2)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.75)_0%,rgba(125,211,252,0.25)_55%,rgba(56,189,248,0.2)_100%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(14,116,144,0.25)_0%,rgba(15,23,42,0.1)_55%,rgba(2,6,23,0.15)_100%)]"
       />
+      <ThemeToggle className="absolute top-4 right-4 z-20 dark:bg-slate-900/60" />
 
       <div className="relative z-10 flex w-full max-w-md flex-col items-center gap-8">
         <BrandHeader />
 
-        <Card className="w-full rounded-3xl border-0 bg-white py-8 shadow-[0_10px_40px_-12px_rgba(14,116,144,0.18)] ring-0 [--card-spacing:--spacing(6)]">
+        <Card className="w-full rounded-3xl border-0 bg-white py-8 shadow-[0_10px_40px_-12px_rgba(14,116,144,0.18)] ring-0 [--card-spacing:--spacing(6)] dark:bg-slate-800 dark:shadow-black/30">
           <CardHeader className="px-8 text-left">
-            <CardTitle className="text-xl font-bold tracking-tight text-sky-950">
+            <CardTitle className="text-xl font-bold tracking-tight text-sky-950 dark:text-sky-50">
               Welkom terug
             </CardTitle>
-            <CardDescription className="text-sm text-slate-500">
+            <CardDescription className="text-sm text-slate-500 dark:text-slate-300">
               Log in met je ziekenhuisaccount
             </CardDescription>
           </CardHeader>
 
           <CardContent className="flex flex-col gap-6 px-8">
             <div className="flex flex-col gap-2">
-              <p className="text-xs font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-300">
                 Demo-accounts (auto ingevuld)
               </p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -98,10 +100,10 @@ function Index() {
                     type="button"
                     onClick={() => fillDemo(account.id)}
                     className={cn(
-                      "rounded-xl border px-3 py-2.5 text-left transition-colors",
+                      "rounded-xl border px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 dark:focus-visible:ring-sky-400/50",
                       activeDemo === account.id
-                        ? "border-sky-300 bg-sky-50 text-sky-950"
-                        : "border-slate-200 bg-slate-50/80 text-slate-600 hover:border-sky-200 hover:bg-sky-50/60",
+                        ? "border-sky-300 bg-sky-50 text-sky-950 dark:border-sky-700 dark:bg-sky-950/60 dark:text-sky-50"
+                        : "border-slate-200 bg-slate-50/80 text-slate-600 hover:border-sky-200 hover:bg-sky-50/60 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-sky-700 dark:hover:bg-slate-800",
                     )}
                   >
                     <span className="block text-sm font-semibold">

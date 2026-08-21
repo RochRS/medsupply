@@ -24,10 +24,10 @@ export function BrandHeader() {
         className="h-16 w-auto object-contain sm:h-20"
       />
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-sky-950 sm:text-4xl">
+        <h1 className="text-3xl font-bold tracking-tight text-sky-950 dark:text-sky-50 sm:text-4xl">
           {appName}
         </h1>
-        <p className="mt-1.5 text-sm text-slate-500">
+        <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-300">
           Voorraadbeheer voor medische supplies
         </p>
       </div>
@@ -62,7 +62,7 @@ export function UserInputFields({
         error={errors?.email}
         autoComplete="email"
         required
-        className="h-11 rounded-xl border-sky-200 bg-white shadow-none"
+        className="h-11 rounded-xl border-sky-200 bg-white shadow-none dark:border-slate-600 dark:bg-slate-800"
         icon={
           <HugeiconsIcon
             icon={Mail01Icon}
@@ -81,7 +81,7 @@ export function UserInputFields({
         error={errors?.password}
         autoComplete="current-password"
         required
-        className="h-11 rounded-xl border-sky-200 bg-white shadow-none"
+        className="h-11 rounded-xl border-sky-200 bg-white shadow-none dark:border-slate-600 dark:bg-slate-800"
         icon={
           <HugeiconsIcon
             icon={SquareLock01Icon}

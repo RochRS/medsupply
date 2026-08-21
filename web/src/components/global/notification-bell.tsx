@@ -146,8 +146,8 @@ export function NotificationBell({
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "relative inline-flex h-9 w-9 items-center justify-center rounded-xl text-sky-900 transition-colors",
-          "hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40",
-          open && "bg-sky-50",
+          "hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 dark:text-sky-100 dark:hover:bg-slate-800 dark:focus-visible:ring-sky-400/50",
+          open && "bg-sky-50 dark:bg-slate-800",
         )}
       >
         <HugeiconsIcon

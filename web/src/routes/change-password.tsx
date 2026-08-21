@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { apiClient } from "@/config/api";
 import { BrandHeader } from "@/module/index-module";
+import { ThemeToggle } from "@/components/global/theme-toggle";
 
 export const Route = createFileRoute("/change-password")({
   component: ChangePasswordPage,
@@ -72,16 +73,17 @@ function ChangePasswordPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-linear-to-b from-sky-50 via-sky-100 to-sky-200/80 px-4 py-10">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-linear-to-b from-sky-50 via-sky-100 to-sky-200/80 px-4 py-10 dark:from-slate-950 dark:via-slate-900 dark:to-sky-950">
+      <ThemeToggle className="absolute top-4 right-4 z-20 dark:bg-slate-900/60" />
       <div className="relative z-10 flex w-full max-w-md flex-col items-center gap-8">
         <BrandHeader />
 
-        <Card className="w-full rounded-3xl border-0 bg-white py-8 shadow-[0_10px_40px_-12px_rgba(14,116,144,0.18)] ring-0 [--card-spacing:--spacing(6)]">
+        <Card className="w-full rounded-3xl border-0 bg-white py-8 shadow-[0_10px_40px_-12px_rgba(14,116,144,0.18)] ring-0 [--card-spacing:--spacing(6)] dark:bg-slate-800 dark:shadow-black/30">
           <CardHeader className="px-8 text-left">
-            <CardTitle className="text-xl font-bold tracking-tight text-sky-950">
+            <CardTitle className="text-xl font-bold tracking-tight text-sky-950 dark:text-sky-50">
               Wachtwoord wijzigen
             </CardTitle>
-            <CardDescription className="text-sm text-slate-500">
+            <CardDescription className="text-sm text-slate-500 dark:text-slate-300">
               Je logt voor het eerst in met een tijdelijk wachtwoord. Kies nu een
               eigen wachtwoord om door te gaan.
             </CardDescription>

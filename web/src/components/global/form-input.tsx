@@ -39,7 +39,7 @@ export function FormInput({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={name} className="text-sm font-medium text-sky-950">
+      <Label htmlFor={name} className="text-sm font-medium text-sky-950 dark:text-sky-50">
         {label}
         {required ? (
           <span className="ml-0.5 text-rkz-red" aria-hidden="true">
@@ -49,7 +49,7 @@ export function FormInput({
       </Label>
       <div className="relative">
         {icon ? (
-          <span className="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-sky-600/80 [&_svg]:size-4">
+          <span className="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-sky-600/80 dark:text-sky-300 [&_svg]:size-4">
             {icon}
           </span>
         ) : null}
@@ -65,7 +65,7 @@ export function FormInput({
           aria-invalid={Boolean(error)}
           onChange={(e) => onChange(e.target.value)}
           className={cn(
-            "h-10 border-sky-200 bg-white text-sm shadow-none md:text-sm",
+            "h-10 border-sky-200 bg-white text-sm shadow-none md:text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400",
             icon && "pl-10",
             isPassword && "pr-10",
             error &&
@@ -79,7 +79,7 @@ export function FormInput({
             tabIndex={-1}
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
-            className="absolute top-1/2 right-2.5 z-10 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-lg text-sky-700/70 transition-colors hover:bg-sky-50 hover:text-sky-900"
+            className="absolute top-1/2 right-2.5 z-10 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-lg text-sky-700/70 transition-colors hover:bg-sky-50 hover:text-sky-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 dark:text-sky-300 dark:hover:bg-slate-700 dark:hover:text-sky-100 dark:focus-visible:ring-sky-400/50"
           >
             <HugeiconsIcon
               icon={showPassword ? ViewOffSlashIcon : ViewIcon}

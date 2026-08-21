@@ -32,6 +32,19 @@
     <meta name="twitter:image" content="/images/rkz-logo.png" />
 
     <title>MedSupply — Apotheek voorraad</title>
+    <script>
+      try {
+        if (localStorage.getItem("theme") === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch {
+        // Keep the default light theme when storage is unavailable.
+      }
+    </script>
+    <style>
+      html { background: #f3f6f9; }
+      html.dark { background: #020617; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
