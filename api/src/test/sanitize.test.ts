@@ -1,5 +1,9 @@
 import { sanitizeDeep, sanitizeString } from "../lib/sanitize.js";
-import { loginSchema, registerSchema } from "../schemas/user-login.js";
+import {
+  loginSchema,
+  registerSchema,
+  updateOwnProfileSchema,
+} from "../schemas/user-login.js";
 
 // Tests for sanitization helpers and Zod schemas
 
@@ -97,5 +101,35 @@ describe("registerSchema", () => {
     });
 
     expect(result.success).toBe(true);
+  });
+});
+
+describe("updateOwnProfileSchema", () => {
+  it("trims the name and normalizes the email address", () => {
+    const result = updateOwnProfileSchema.safeParse({
+      name: "  Jan de Vries ",
+      email: " JAN@RKZ.SR ",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual({
+        name: "Jan de Vries",
+        email: "jan@rkz.sr",
+      });
+    }
+  });
+
+  it("rejects administrative fields", () => {
+    expect(
+      updateOwnProfileSchema.safeParse({
+        name: "Jan de Vries",
+        roleId: 1,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("requires at least one editable field", () => {
+    expect(updateOwnProfileSchema.safeParse({}).success).toBe(false);
   });
 });

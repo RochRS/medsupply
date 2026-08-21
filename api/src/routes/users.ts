@@ -7,6 +7,7 @@ import {
   adminCreateUserSchema,
   adminUpdateUserSchema,
   changePasswordSchema,
+  updateOwnProfileSchema,
 } from "../schemas/user-login.js";
 import {
   assignUserRole,
@@ -17,6 +18,7 @@ import {
   listRoles,
   listUsersWithRoles,
   updateUserAdmin,
+  updateOwnProfile,
   UserAdminError,
 } from "../services/users.service.js";
 
@@ -77,6 +79,49 @@ users.post("/me/password", async (c) => {
     console.error("users POST /me/password error:", error);
     return c.json(
       { message: "Could not change password", error: "PASSWORD_CHANGE_FAILED" },
+      ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
+    );
+  }
+});
+
+// Authenticated user: edit their own non-administrative profile fields.
+users.patch("/me/profile", async (c) => {
+  const currentUser = c.get("user");
+  if (!currentUser) {
+    return c.json({ message: "Not authenticated" }, ERROR_CODE_MAP.UNAUTHORIZED);
+  }
+
+  const parsed = updateOwnProfileSchema.safeParse(await c.req.json());
+  if (!parsed.success) {
+    return c.json(
+      {
+        message: parsed.error.issues[0]?.message ?? "Invalid input",
+        error: "VALIDATION_ERROR",
+      },
+      ERROR_CODE_MAP.BAD_REQUEST,
+    );
+  }
+
+  try {
+    // The target id comes exclusively from the authenticated Better Auth session.
+    const updated = await updateOwnProfile(currentUser.id, parsed.data);
+    if (!updated) {
+      return c.json(
+        { message: "User not found", error: "NOT_FOUND" },
+        ERROR_CODE_MAP.NOT_FOUND,
+      );
+    }
+    return c.json({ user: updated });
+  } catch (error) {
+    if (error instanceof UserAdminError && error.code === "EMAIL_EXISTS") {
+      return c.json(
+        { message: "E-mailadres is al in gebruik", error: error.code },
+        ERROR_CODE_MAP.CONFLICT,
+      );
+    }
+    console.error("users PATCH /me/profile error:", error);
+    return c.json(
+      { message: "Could not update profile", error: "PROFILE_UPDATE_FAILED" },
       ERROR_CODE_MAP.INTERNAL_SERVER_ERROR,
     );
   }

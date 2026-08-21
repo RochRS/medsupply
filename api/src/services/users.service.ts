@@ -5,6 +5,7 @@ import { auth } from "../auth/auth.js";
 import { db } from "../database/database.js";
 import { account, user, role, request } from "../database/schemas/schema.js";
 import type { RoleName } from "../database/seed/seed-roles.js";
+import type { UpdateOwnProfileInput } from "../schemas/user-login.js";
 
 export type UserRole = {
   roleId: number;
@@ -118,6 +119,52 @@ export class UserAdminError extends Error {
     super(message);
     this.name = "UserAdminError";
   }
+}
+
+/**
+ * Update the authenticated user's editable profile fields only.
+ * Administrative fields must never be added to this input type.
+ */
+export async function updateOwnProfile(
+  userId: string,
+  input: UpdateOwnProfileInput,
+): Promise<UserWithRole | null> {
+  await db.transaction(async (tx) => {
+    const [existing] = await tx
+      .select({ id: user.id, email: user.email })
+      .from(user)
+      .where(eq(user.id, userId))
+      .limit(1);
+
+    if (!existing) return;
+
+    const userUpdates: { name?: string; email?: string } = {};
+    if (input.name !== undefined) userUpdates.name = input.name;
+
+    if (input.email !== undefined && input.email !== existing.email) {
+      const [duplicate] = await tx
+        .select({ id: user.id })
+        .from(user)
+        .where(and(eq(user.email, input.email), ne(user.id, userId)))
+        .limit(1);
+
+      if (duplicate) {
+        throw new UserAdminError("EMAIL_EXISTS", "Email is already in use");
+      }
+
+      userUpdates.email = input.email;
+      await tx
+        .update(account)
+        .set({ accountId: input.email })
+        .where(eq(account.userId, userId));
+    }
+
+    if (Object.keys(userUpdates).length > 0) {
+      await tx.update(user).set(userUpdates).where(eq(user.id, userId));
+    }
+  });
+
+  return getUserWithRoleById(userId);
 }
 
 export async function createUserAdmin(input: {

@@ -7,7 +7,10 @@ import type { RoleName } from "../database/seed/seed-roles.js";
 
 // Read the session cookie and put user/session + role on the request context
 export const loadSession = createMiddleware<AppEnv>(async (c, next) => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  const session = await auth.api.getSession({
+    headers: c.req.raw.headers,
+    query: { disableCookieCache: true },
+  });
 
   c.set("user", session?.user ?? null);
   c.set("session", session?.session ?? null);

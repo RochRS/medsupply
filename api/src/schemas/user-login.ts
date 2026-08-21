@@ -42,6 +42,21 @@ const nameField = z
   .min(2, "Name must be at least 2 characters")
   .max(100, "Name is too long");
 
+/** Fields an authenticated user may change on their own profile. */
+const ownProfileNameField = z
+  .string()
+  .trim()
+  .min(2, "Naam moet minimaal 2 tekens bevatten")
+  .max(100, "Naam is te lang");
+
+const ownProfileEmailField = z
+  .string()
+  .trim()
+  .min(1, "E-mailadres is verplicht")
+  .email("Ongeldig e-mailadres")
+  .max(255, "E-mailadres is te lang")
+  .transform((value) => value.toLowerCase());
+
 const roleIdField = z
   .number()
   .int("roleId must be an integer")
@@ -90,6 +105,17 @@ export const changePasswordSchema = z
     path: ["newPassword"],
   });
 
+export const updateOwnProfileSchema = z
+  .object({
+    name: ownProfileNameField.optional(),
+    email: ownProfileEmailField.optional(),
+  })
+  .strict()
+  .refine((data) => data.name !== undefined || data.email !== undefined, {
+    message: "Vul minimaal één veld in",
+  });
+
 export type AdminCreateUserInput = z.infer<typeof adminCreateUserSchema>;
 export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type UpdateOwnProfileInput = z.infer<typeof updateOwnProfileSchema>;

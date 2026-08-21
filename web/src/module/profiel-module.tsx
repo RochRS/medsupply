@@ -4,10 +4,13 @@ import {
   Calendar03Icon,
   Mail01Icon,
   Shield01Icon,
+  Tick02Icon,
   UserIcon,
 } from "@hugeicons/core-free-icons";
 import { apiClient } from "../config/api";
+import { FormInput } from "../components/global/form-input";
 import { LoadingSpinner } from "../components/global/loading-spinner";
+import { Button } from "../components/ui/button";
 import { roleLabel } from "../lib/roles";
 import { cn } from "../lib/utils";
 
@@ -80,15 +83,63 @@ export function ProfielPage() {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string }>({});
+  const [formError, setFormError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     apiClient("/sessions/me")
       .then((result) => {
-        setUser((result as SessionPayload).user);
+        const sessionUser = (result as SessionPayload).user;
+        setUser(sessionUser);
+        setName(sessionUser.name);
+        setEmail(sessionUser.email);
       })
       .catch(() => setError("Profielgegevens konden niet worden geladen."))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFormError("");
+    setSuccess(false);
+
+    const nextErrors: typeof fieldErrors = {};
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    if (trimmedName.length < 2) nextErrors.name = "Naam moet minimaal 2 tekens bevatten";
+    if (!trimmedEmail) {
+      nextErrors.email = "E-mailadres is verplicht";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      nextErrors.email = "Ongeldig e-mailadres";
+    }
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setSaving(true);
+    try {
+      const result = (await apiClient("/users/me/profile", {
+        method: "PATCH",
+        body: JSON.stringify({ name: trimmedName, email: trimmedEmail }),
+      })) as { user: Pick<SessionUser, "name" | "email"> };
+      setUser((current) => (current ? { ...current, ...result.user } : current));
+      setName(result.user.name);
+      setEmail(result.user.email);
+      setSuccess(true);
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : "Profiel wijzigen mislukt.";
+      if (message.toLowerCase().includes("in gebruik")) {
+        setFieldErrors({ email: "Dit e-mailadres is al in gebruik" });
+      } else {
+        setFormError(message);
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return <LoadingSpinner label="Profiel laden..." />;
@@ -184,6 +235,27 @@ export function ProfielPage() {
             last
           />
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+        <div className="mb-4 flex items-center gap-2 px-1 sm:px-2">
+          <HugeiconsIcon icon={UserIcon} size={18} strokeWidth={2} className="text-sky-700" />
+          <div>
+            <h3 className="text-sm font-bold text-rkz-navy dark:text-white">Profiel bewerken</h3>
+            <p className="text-xs text-slate-500">Je kunt alleen je naam en e-mailadres wijzigen.</p>
+          </div>
+        </div>
+
+        <form className="space-y-4 px-1 sm:px-2" onSubmit={(event) => void handleSubmit(event)}>
+          <FormInput label="Naam" name="profile-name" value={name} onChange={setName} required error={fieldErrors.name} autoComplete="name" />
+          <FormInput label="E-mailadres" name="profile-email" type="email" value={email} onChange={setEmail} required error={fieldErrors.email} autoComplete="email" />
+          {formError ? <p className="text-sm text-rose-600" role="alert">{formError}</p> : null}
+          {success ? <p className="text-sm text-emerald-600" role="status">Profiel is opgeslagen.</p> : null}
+          <Button type="submit" disabled={saving} className="h-10 gap-2 rounded-xl bg-sky-800 px-4 text-sm font-semibold text-white hover:bg-sky-900">
+            {saving ? "Opslaan..." : "Profiel opslaan"}
+            {!saving ? <HugeiconsIcon icon={Tick02Icon} strokeWidth={2} className="size-4" /> : null}
+          </Button>
+        </form>
       </section>
     </div>
   );
